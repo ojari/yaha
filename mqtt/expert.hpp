@@ -4,7 +4,9 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include <jansson.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 /**
  * @brief Represents different types of statements.
@@ -65,8 +67,8 @@ struct Condition {
     float lowerBound;
     float upperBound;
 
-    void load(json_t* obj);
-    void save(json_t* obj) const;
+    void load(const json& obj);
+    void save(json& obj) const;
 };
 
 /**
@@ -86,8 +88,9 @@ public:
         action(action) 
     {}
 
-    void addCondition(Statement statement, float lowerBound, float upperBound) {
+    Rule* addCondition(Statement statement, float lowerBound, float upperBound) {
         conditions.push_back({statement, lowerBound, upperBound});
+        return this;
     }
 
     /**
@@ -95,8 +98,8 @@ public:
      */
     bool isConditionTrue(Facts& facts) const;
 
-    void load(json_t* obj);
-    void save(json_t* obj) const;
+    void load(const json& obj);
+    void save(json& obj) const;
 };
 
 class ExpertSystem {
@@ -105,12 +108,14 @@ private:
     Facts facts;
 
 public:
-    void addRule(std::unique_ptr<Rule> rule) {
+    ExpertSystem& addRule(std::unique_ptr<Rule> rule) {
         rules.push_back(std::move(rule));
+        return *this;
     }
 
-    void addFact(Statement statement, float value) {
+    ExpertSystem& addFact(Statement statement, float value) {
         facts.addFact(statement, value);
+        return *this;
     }
 
     std::pair<std::string, std::string> infer();

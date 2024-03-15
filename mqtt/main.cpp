@@ -18,7 +18,7 @@ void interact(ExpertSystem& system)
     system.addFact(static_cast<Statement>(fact), value);
 
     auto result = system.infer();
-    std::cout << result.first << "::" << result.second << "\n";
+    // std::cout << result.first << "::" << result.second << "\n";
 }   
 
 /**
@@ -26,17 +26,22 @@ void interact(ExpertSystem& system)
  */
 void fill_rules(ExpertSystem& system) {
     std::unique_ptr<Rule> rule = std::make_unique<Rule>("HEATER", "ON");
-    rule->addCondition(Statement::Temperature, -30 , 0);
-    rule->addCondition(Statement::DayLight, 0 , 1);
+    rule->addCondition(Statement::Temperature, -30 , 0)
+        ->addCondition(Statement::DayLight, 0 , 1);
     system.addRule(std::move(rule));
 
     std::unique_ptr<Rule> rule2 = std::make_unique<Rule>("HEADER", "OFF");
-    rule2->addCondition(Statement::Temperature, 20 , 90);
-    rule2->addCondition(Statement::Weekday, 1 , 1);
+    rule2->addCondition(Statement::Temperature, 20 , 90)
+         ->addCondition(Statement::Weekday, 1 , 1);
     system.addRule(std::move(rule2));
 
-    system.saveRules("rules.json");
- }
+    std::unique_ptr<Rule> rule3 = std::make_unique<Rule>("ALARM", "ON");
+    rule3->addCondition(Statement::Time, 1000 , 1030)
+         ->addCondition(Statement::Weekday, 1 , 5);
+    system.addRule(std::move(rule3));
+
+    system.saveRules("rules_gen.json");
+}
 
 /**
  * @brief The main function of the program.
@@ -45,13 +50,13 @@ int main()
 {
     ExpertSystem system;
 
-    system.addFact(Statement::Temperature, 20);
-    system.addFact(Statement::Weekday, 1);
-    system.addFact(Statement::Time, 1020);
-    system.addFact(Statement::DayLight, 1);
-    system.addFact(Statement::ElectricityPrice, 0.1);
-    system.addFact(Statement::Temperature3h, 20);
-    system.addFact(Statement::Temperature6h, 20);
+    system.addFact(Statement::Temperature, 20)
+          .addFact(Statement::Weekday, 1)
+          .addFact(Statement::Time, 1020)
+          .addFact(Statement::DayLight, 1)
+          .addFact(Statement::ElectricityPrice, 0.1)
+          .addFact(Statement::Temperature3h, 20)
+          .addFact(Statement::Temperature6h, 20);
 
     // fill_rules(system);
     system.loadRules("rules.json");
