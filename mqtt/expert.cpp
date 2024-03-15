@@ -6,7 +6,6 @@
 #include <chrono>
 #include <thread>
 #include <unordered_map>
-#include <jansson.h>
 #include "expert.hpp"
 
 
@@ -62,16 +61,17 @@ float Facts::getValue(Statement statement) {
 }
 
 //-----------------------------------------------------------------------------
-void Condition::load(json_t* obj) {
-    const char* statement_str = json_string_value(json_object_get(obj, "statement"));
+void Condition::load(const json& obj) {
+    std::string statement_str = obj[0].get<std::string>();
     statement = str2statement(statement_str);
-    lowerBound = json_number_value(json_object_get(obj, "lower"));
-    upperBound = json_number_value(json_object_get(obj, "upper"));
+    lowerBound = obj[1].get<float>();
+    upperBound = obj[2].get<float>();
 }
-void Condition::save(json_t* obj) const {
-    json_object_set_new(obj, "statement", json_string(statement2str(statement).c_str()));
-    json_object_set_new(obj, "lower", json_real(lowerBound));
-    json_object_set_new(obj, "upper", json_real(upperBound));
+
+void Condition::save(json& obj) const {
+    obj.push_back(statement2str(statement).c_str());
+    obj.push_back(lowerBound);
+    obj.push_back(upperBound);
 }
 
 
@@ -86,29 +86,28 @@ bool Rule::isConditionTrue(Facts& facts) const {
     return true;
 }
 
-void Rule::load(json_t* obj) {
-    json_t* conditionsArray = json_object_get(obj, "conditions");
-    size_t index;
-    json_t* conditionObj;
-    json_array_foreach(conditionsArray, index, conditionObj) {
+void Rule::load(const json& obj) {
+    json conditionsArray = obj["if"];
+    for (const auto& conditionObj : conditionsArray) {
         Condition condition;
         condition.load(conditionObj);
         conditions.push_back(condition);
     }
-    target = json_string_value(json_object_get(obj, "target"));
-    action = json_string_value(json_object_get(obj, "action"));
+    json thenArray = obj["then"];
+    target = thenArray[0].get<std::string>();
+    action = thenArray[1].get<std::string>();
 }
 
-void Rule::save(json_t* obj) const {
-    json_t* conditionsArray = json_array();
+void Rule::save(json& obj) const {
+    json conditionsArray = json::array();
     for (const auto& condition : conditions) {
-        json_t* conditionObj = json_object();
+        json conditionObj = json::array();
         condition.save(conditionObj);
-        json_array_append_new(conditionsArray, conditionObj);
+        conditionsArray.push_back(conditionObj);
     }
-    json_object_set_new(obj, "conditions", conditionsArray);
-    json_object_set_new(obj, "target", json_string(target.c_str()));
-    json_object_set_new(obj, "action", json_string(action.c_str()));
+    obj["conditions"] = conditionsArray;
+    obj["target"] = target;
+    obj["action"] = action;
 }
 
 
@@ -116,38 +115,43 @@ void Rule::save(json_t* obj) const {
 std::pair<std::string, std::string> ExpertSystem::infer() {
     for (auto& rule : rules) {
         if (rule->isConditionTrue(facts)) {
-            return std::make_pair(rule->target, rule->action);
+            // return std::make_pair(rule->target, rule->action);
+            std::cout << rule->target << "::" << rule->action << "\n";
         }
     }
     return std::make_pair("NONE", "unknown");
 }
 
 void ExpertSystem::loadRules(const std::string& filename) {
-    json_error_t error;
-    json_t* root = json_load_file(filename.c_str(), 0, &error);
-    if (!root) {
-        std::cerr << "Error on line " << error.line << ": " << error.text << std::endl;
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error opening file: " << filename << std::endl;
         return;
     }
 
-    size_t index;
-    json_t* ruleObj;
-    json_array_foreach(root, index, ruleObj) {
+    json root;
+    file >> root;
+
+    for (const auto& ruleObj : root) {
         std::unique_ptr<Rule> rule = std::make_unique<Rule>();
         rule->load(ruleObj);
         addRule(std::move(rule));
     }
-    json_decref(root);
 }
 
 void ExpertSystem::saveRules(const std::string& filename) const {
-    json_t* root = json_array();
+    json root = json::array();
     for (const auto& rule : rules) {
-        json_t* ruleObj = json_object();
+        json ruleObj = json::object();
         rule->save(ruleObj);
-        json_array_append_new(root, ruleObj);
+        root.push_back(ruleObj);
     }
 
-    json_dump_file(root, filename.c_str(), JSON_INDENT(2));
-    json_decref(root);
+    std::ofstream file(filename);
+    if (!file) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
+
+    file << root.dump(2);
 }

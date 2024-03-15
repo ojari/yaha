@@ -24,11 +24,9 @@ set(CMAKE_CXX_STANDARD 14)
 # add the executable
 add_executable(ExpertSystem expert.cpp main.cpp)
 
-# find the Jansson library
-find_package(jansson REQUIRED)
+# find_package(mosquitto REQUIRED)
 
-# add the Jansson library to the executable
-target_link_libraries(ExpertSystem PRIVATE jansson)
+# target_link_libraries(ExpertSystem PRIVATE mosquitto)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${VCPKG_ROOT}/include
