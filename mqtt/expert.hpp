@@ -22,18 +22,32 @@ enum class Statement {
     Unknown             ///< Unknown statement
 };
 
+enum class Weekday {
+    Mon,  // Monday
+    Tue,  // Tuesday
+    Wed,  // Wednesday
+    Thu,  // Thursday
+    Fri,  // Friday
+    Sat,  // Saturday
+    Sun   // Sunday
+};
+
 /**
  * Prints the statements.
  * This function is responsible for printing the statements.
  */
 extern void print_statements();
 
+struct ExecutorBase {
+    virtual void execute(std::string target, std::string action) = 0;
+};
+
 /**
  * @brief The Facts class represents a collection of facts and their corresponding values.
  */
 class Facts {
 private:
-    std::map<Statement, float> facts;
+    std::map<Statement, long> facts;
 
 public:
     /**
@@ -42,7 +56,7 @@ public:
      * @param statement The statement representing the fact.
      * @param value The value associated with the fact.
      */
-    void addFact(Statement statement, float value);
+    void addFact(Statement statement, long value);
 
     /**
      * @brief Checks if the specified fact exists in the collection.
@@ -58,7 +72,7 @@ public:
      * @param statement The statement representing the fact.
      * @return The value associated with the fact.
      */
-    float getValue(Statement statement);
+    long getValue(Statement statement);
 };
 
 struct Condition {
@@ -91,15 +105,35 @@ private:
     float upperBound;
 };
 
+struct TimeCondition : public Condition {
+    TimeCondition() = default;
+
+    TimeCondition(Weekday weekday, int startTime, int endTime) :
+        weekday(weekday),
+        startTime(startTime),
+        endTime(endTime)
+    {}
+    bool isTrue(Facts& facts) const {
+        if (facts.getValue(Statement::Weekday) != static_cast<long>(weekday)) {
+            return false;
+        }
+        int time = facts.getValue(Statement::Time);
+        return time >= startTime && time <= endTime;
+    }
+    void load(const json& obj);
+    void save(json& obj) const;
+
+private:
+    Weekday weekday;
+    int startTime;
+    int endTime;
+};
+
 /**
  * @brief Represents a rule in the expert system.
  */
 class Rule {
 public:
-    std::vector<Condition*> conditions; /**< The conditions of the rule. */
-    std::string target; /**< The target of the rule. */
-    std::string action; /**< The action of the rule. */
-
     Rule() = default;
 
 
@@ -108,18 +142,37 @@ public:
         action(action) 
     {}
 
-    Rule* addRange(Statement statement, float lowerBound, float upperBound) {
+    Rule* addRange(Statement statement, long lowerBound, long upperBound) {
         conditions.push_back(new RangeCondition(statement, lowerBound, upperBound));
+        return this;
+    }
+
+    Rule* addTime(Weekday weekday, long startTime, long endTime) {
+        conditions.push_back(new TimeCondition(weekday, startTime, endTime));
         return this;
     }
 
     /**
      * @brief Checks if the conditions of the rule are true based on the given facts.
+     * 
+     * @return action name of empty string if no action is to be taken.
      */
-    bool isConditionTrue(Facts& facts) const;
+    std::string isConditionTrue(Facts& facts) const;
+    void execute(ExecutorBase* executor) const;
 
     void load(const json& obj);
     void save(json& obj) const;
+
+    std::string getTarget() const {
+        return target;
+    }
+
+private:
+    std::vector<Condition*> conditions; /**< The conditions of the rule. */
+    std::string target; /**< The target of the rule. */
+    std::string action; /**< The action of the rule. */
+    std::string action_off;
+    bool timeMode = false;
 };
 
 class ExpertSystem {
@@ -128,17 +181,17 @@ private:
     Facts facts;
 
 public:
-    ExpertSystem& addRule(std::unique_ptr<Rule> rule) {
+    ExpertSystem& addRule(std::unique_ptr<Rule> rule, ExecutorBase* executor = nullptr) {
         rules.push_back(std::move(rule));
         return *this;
     }
 
-    ExpertSystem& addFact(Statement statement, float value) {
+    ExpertSystem& addFact(Statement statement, long value) {
         facts.addFact(statement, value);
         return *this;
     }
 
-    std::pair<std::string, std::string> infer();
+    void infer(ExecutorBase& executor);
     void loadRules(const std::string& filename);
     void saveRules(const std::string& filename) const;
 };

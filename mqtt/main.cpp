@@ -1,5 +1,32 @@
 #include "expert.hpp"
 #include <iostream>
+#include <map>
+#include <chrono>
+#include <thread>
+#include <iomanip>
+
+class MyExecutor : public ExecutorBase {
+public:
+    void setTime(int time) {
+        this->time = time;
+    }
+    void execute(std::string target, std::string action) override {
+        if (cache.find(target) != cache.end() && cache[target] == action) {
+            return;
+        }
+        cache[target] = action;
+
+        int hour = time / 100;
+        int minute = time % 100;
+
+        std::cout << std::setw(2) << std::setfill('0') << hour << ":"
+                  << std::setw(2) << std::setfill('0') << minute << " "
+                  << target << "::" << action << std::endl;
+    }
+private:
+    int time = 0;
+    std::map<std::string, std::string> cache;
+};
 
 /**
  * @brief Interacts with the expert system by adding facts and getting the inferred action.
@@ -17,8 +44,7 @@ void interact(ExpertSystem& system)
     std::cin.ignore();  // ignore the newline character
     system.addFact(static_cast<Statement>(fact), value);
 
-    auto result = system.infer();
-    // std::cout << result.first << "::" << result.second << "\n";
+    //system.infer();
 }   
 
 /**
@@ -48,6 +74,7 @@ void fill_rules(ExpertSystem& system) {
  */
 int main()
 {
+    MyExecutor executor;
     ExpertSystem system;
 
     system.addFact(Statement::Temperature, 20)
@@ -60,10 +87,20 @@ int main()
 
     // fill_rules(system);
     system.loadRules("rules.json");
-    while (true) {
-        interact(system);
+    //while (true) {
+        for(int hour = 0; hour<24; hour++){
+            for (int minute = 0; minute < 60; minute++) {
+                long time = hour*100 + minute;
+
+                executor.setTime(time);
+                system.addFact(Statement::Time, time);
+                system.infer(executor);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
+        }
         //std::this_thread::sleep_for(std::chrono::minutes(1));
-    }
+    //}
 
     return 0;
 }

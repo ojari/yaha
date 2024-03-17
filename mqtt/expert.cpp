@@ -9,7 +9,7 @@
 #include "expert.hpp"
 
 
-std::unordered_map<std::string, Statement> str2statementMap = {
+std::unordered_map<std::string, Statement> str2statement = {
     {"Temperature", Statement::Temperature},
     {"Weekday", Statement::Weekday},
     {"Time", Statement::Time},
@@ -19,32 +19,44 @@ std::unordered_map<std::string, Statement> str2statementMap = {
     {"Temperature6h", Statement::Temperature6h}
 };
 
-Statement str2statement(const std::string& str) {
-    if (str2statementMap.find(str) != str2statementMap.end())
-        return str2statementMap[str];
+std::unordered_map<std::string, Weekday> str2weekday = {
+    {"Mon", Weekday::Mon},
+    {"Tue", Weekday::Tue},
+    {"Wed", Weekday::Wed},
+    {"Thu", Weekday::Thu},
+    {"Fri", Weekday::Fri},
+    {"Sat", Weekday::Sat},
+    {"Sun", Weekday::Sun}
+};
+
+template <typename Enum>
+Enum str2enum(const std::string& str, const std::unordered_map<std::string, Enum>& map) {
+    auto it = map.find(str);
+    if (it != map.end())
+        return it->second;
     else
-        throw std::invalid_argument("Unknown statement: " + str);
+        throw std::invalid_argument("Unknown enum value: " + str);
 }
 
-std::string statement2str(Statement statement) {
-    for (const auto& pair : str2statementMap) {
-        if (pair.second == statement) {
+template <typename Enum>
+std::string enum2str(Enum value, const std::unordered_map<std::string, Enum>& map) {
+    for (const auto& pair : map) {
+        if (pair.second == value) {
             return pair.first;
         }
     }
-    throw std::invalid_argument("Unknown statement: " + std::to_string(static_cast<int>(statement)));
+    throw std::invalid_argument("Unknown enum value: " + std::to_string(static_cast<int>(value)));
 }
 
 void print_statements()
 {
-    for (const auto& pair : str2statementMap) {
+    for (const auto& pair : str2statement) {
         std::cout << "    " << int(pair.second) << " - " << pair.first << std::endl;
     }
-
 }
 
 //-----------------------------------------------------------------------------
-void Facts::addFact(Statement statement, float value) {
+void Facts::addFact(Statement statement, long value) {
     facts[statement] = value;
 }
 
@@ -52,7 +64,7 @@ bool Facts::isFact(Statement statement) const {
     return facts.find(statement) != facts.end();
 }
 
-float Facts::getValue(Statement statement) {
+long Facts::getValue(Statement statement) {
     if (isFact(statement)) {
         return facts[statement];
     }
@@ -63,38 +75,78 @@ float Facts::getValue(Statement statement) {
 //-----------------------------------------------------------------------------
 void RangeCondition::load(const json& obj) {
     std::string statement_str = obj[0].get<std::string>();
-    statement = str2statement(statement_str);
+    statement = str2enum(statement_str, str2statement);
     lowerBound = obj[1].get<float>();
     upperBound = obj[2].get<float>();
 }
 
 void RangeCondition::save(json& obj) const {
-    obj.push_back(statement2str(statement).c_str());
+    obj.push_back(enum2str(statement, str2statement).c_str());
     obj.push_back(lowerBound);
     obj.push_back(upperBound);
 }
 
+void TimeCondition::load(const json& obj) {
+    std::string weekday_str = obj[0].get<std::string>();
+    weekday = str2enum(weekday_str, str2weekday);
+    startTime = obj[1].get<int>();
+    endTime = obj[2].get<int>();
+}
+
+void TimeCondition::save(json& obj) const {
+    obj.push_back(enum2str(weekday, str2weekday).c_str());
+    obj.push_back(startTime);
+    obj.push_back(endTime);
+}
 
 //-----------------------------------------------------------------------------
-bool Rule::isConditionTrue(Facts& facts) const {
+std::string Rule::isConditionTrue(Facts& facts) const {
     for (const auto condition : conditions) {
-        if (!condition->isTrue(facts)) {
-            return false;
+        // All conditions must pass
+        //
+        if (!timeMode && !condition->isTrue(facts)) {
+            return "";
+        }
+        // At least one condition must pass
+        //
+        if (timeMode && condition->isTrue(facts)) {
+            return action;
         }
     }
-    return true;
+    if (timeMode) {
+        return action_off;
+    }
+    return action;
+}
+
+void Rule::execute(ExecutorBase* executor) const {
+    executor->execute(target, action);
 }
 
 void Rule::load(const json& obj) {
-    json conditionsArray = obj["if"];
-    for (const auto& conditionObj : conditionsArray) {
-        auto condition = new RangeCondition();
-        condition->load(conditionObj);
-        conditions.push_back(condition);
+    if (obj.contains("if")) {
+        json conditionsArray = obj["if"];
+        for (const auto& conditionObj : conditionsArray) {
+            auto condition = new RangeCondition();
+            condition->load(conditionObj);
+            conditions.push_back(condition);
+        }
+    }
+    if (obj.contains("if_time")) {
+        timeMode = true;
+        json conditionsArray = obj["if_time"];
+        for (const auto& conditionObj : conditionsArray) {
+            auto condition = new TimeCondition();
+            condition->load(conditionObj);
+            conditions.push_back(condition);
+        }
     }
     json thenArray = obj["then"];
     target = thenArray[0].get<std::string>();
     action = thenArray[1].get<std::string>();
+    if (thenArray.size() > 2) {
+        action_off = thenArray[2].get<std::string>();
+    }
 }
 
 void Rule::save(json& obj) const {
@@ -111,14 +163,13 @@ void Rule::save(json& obj) const {
 
 
 //-----------------------------------------------------------------------------
-std::pair<std::string, std::string> ExpertSystem::infer() {
+void ExpertSystem::infer(ExecutorBase& executor) {
     for (auto& rule : rules) {
-        if (rule->isConditionTrue(facts)) {
-            // return std::make_pair(rule->target, rule->action);
-            std::cout << rule->target << "::" << rule->action << "\n";
+        std::string action = rule->isConditionTrue(facts);
+        if (!action.empty()) {
+            executor.execute(rule->getTarget(), action);
         }
     }
-    return std::make_pair("NONE", "unknown");
 }
 
 void ExpertSystem::loadRules(const std::string& filename) {
