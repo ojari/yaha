@@ -61,14 +61,14 @@ float Facts::getValue(Statement statement) {
 }
 
 //-----------------------------------------------------------------------------
-void Condition::load(const json& obj) {
+void RangeCondition::load(const json& obj) {
     std::string statement_str = obj[0].get<std::string>();
     statement = str2statement(statement_str);
     lowerBound = obj[1].get<float>();
     upperBound = obj[2].get<float>();
 }
 
-void Condition::save(json& obj) const {
+void RangeCondition::save(json& obj) const {
     obj.push_back(statement2str(statement).c_str());
     obj.push_back(lowerBound);
     obj.push_back(upperBound);
@@ -77,9 +77,8 @@ void Condition::save(json& obj) const {
 
 //-----------------------------------------------------------------------------
 bool Rule::isConditionTrue(Facts& facts) const {
-    for (const auto& condition : conditions) {
-        float value = facts.getValue(condition.statement);
-        if (value < condition.lowerBound || value > condition.upperBound) {
+    for (const auto condition : conditions) {
+        if (!condition->isTrue(facts)) {
             return false;
         }
     }
@@ -89,8 +88,8 @@ bool Rule::isConditionTrue(Facts& facts) const {
 void Rule::load(const json& obj) {
     json conditionsArray = obj["if"];
     for (const auto& conditionObj : conditionsArray) {
-        Condition condition;
-        condition.load(conditionObj);
+        auto condition = new RangeCondition();
+        condition->load(conditionObj);
         conditions.push_back(condition);
     }
     json thenArray = obj["then"];
@@ -100,9 +99,9 @@ void Rule::load(const json& obj) {
 
 void Rule::save(json& obj) const {
     json conditionsArray = json::array();
-    for (const auto& condition : conditions) {
+    for (const auto condition : conditions) {
         json conditionObj = json::array();
-        condition.save(conditionObj);
+        condition->save(conditionObj);
         conditionsArray.push_back(conditionObj);
     }
     obj["conditions"] = conditionsArray;

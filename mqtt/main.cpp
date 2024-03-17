@@ -26,18 +26,18 @@ void interact(ExpertSystem& system)
  */
 void fill_rules(ExpertSystem& system) {
     std::unique_ptr<Rule> rule = std::make_unique<Rule>("HEATER", "ON");
-    rule->addCondition(Statement::Temperature, -30 , 0)
-        ->addCondition(Statement::DayLight, 0 , 1);
+    rule->addRange(Statement::Temperature, -30 , 0)
+        ->addRange(Statement::DayLight, 0 , 1);
     system.addRule(std::move(rule));
 
     std::unique_ptr<Rule> rule2 = std::make_unique<Rule>("HEADER", "OFF");
-    rule2->addCondition(Statement::Temperature, 20 , 90)
-         ->addCondition(Statement::Weekday, 1 , 1);
+    rule2->addRange(Statement::Temperature, 20 , 90)
+         ->addRange(Statement::Weekday, 1 , 1);
     system.addRule(std::move(rule2));
 
     std::unique_ptr<Rule> rule3 = std::make_unique<Rule>("ALARM", "ON");
-    rule3->addCondition(Statement::Time, 1000 , 1030)
-         ->addCondition(Statement::Weekday, 1 , 5);
+    rule3->addRange(Statement::Time, 1000 , 1030)
+         ->addRange(Statement::Weekday, 1 , 5);
     system.addRule(std::move(rule3));
 
     system.saveRules("rules_gen.json");

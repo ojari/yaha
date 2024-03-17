@@ -61,14 +61,34 @@ public:
     float getValue(Statement statement);
 };
 
-
 struct Condition {
+    virtual bool isTrue(Facts& facts) const = 0;
+    virtual void load(const json& obj) = 0;
+    virtual void save(json& obj) const = 0;
+};
+
+struct RangeCondition : public Condition {
+    RangeCondition() = default;
+
+    RangeCondition(Statement statement, float lowerBound, float upperBound) :
+        statement(statement),
+        lowerBound(lowerBound),
+        upperBound(upperBound)
+    {}
+    bool isTrue(Facts& facts) const {
+        if (!facts.isFact(statement)) {
+            return false;
+        }
+        float value = facts.getValue(statement);
+        return value >= lowerBound && value <= upperBound;
+    }
+    void load(const json& obj);
+    void save(json& obj) const;
+
+private:
     Statement statement;
     float lowerBound;
     float upperBound;
-
-    void load(const json& obj);
-    void save(json& obj) const;
 };
 
 /**
@@ -76,7 +96,7 @@ struct Condition {
  */
 class Rule {
 public:
-    std::vector<Condition> conditions; /**< The conditions of the rule. */
+    std::vector<Condition*> conditions; /**< The conditions of the rule. */
     std::string target; /**< The target of the rule. */
     std::string action; /**< The action of the rule. */
 
@@ -88,8 +108,8 @@ public:
         action(action) 
     {}
 
-    Rule* addCondition(Statement statement, float lowerBound, float upperBound) {
-        conditions.push_back({statement, lowerBound, upperBound});
+    Rule* addRange(Statement statement, float lowerBound, float upperBound) {
+        conditions.push_back(new RangeCondition(statement, lowerBound, upperBound));
         return this;
     }
 
