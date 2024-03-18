@@ -27,14 +27,8 @@ public:
         action(action) 
     {}
 
-    Rule* addRange(Statement statement, long lowerBound, long upperBound) {
-        conditions.push_back(new RangeCondition(statement, lowerBound, upperBound));
-        return this;
-    }
-
-    Rule* addTime(Weekday weekday, long startTime, long endTime) {
-        conditions.push_back(new TimeCondition(weekday, startTime, endTime));
-        return this;
+    void addCondition(std::unique_ptr<Condition> condition) {
+        conditions.push_back(std::move(condition));
     }
 
     /**
@@ -53,11 +47,38 @@ public:
     }
 
 private:
-    std::vector<Condition*> conditions; /**< The conditions of the rule. */
+    std::vector<std::unique_ptr<Condition>> conditions; /**< The conditions of the rule. */
     std::string target; /**< The target of the rule. */
     std::string action; /**< The action of the rule. */
     std::string action_off;
     bool timeMode = false;
+};
+
+// @pattern builder
+//
+class RuleBuilder {
+public:
+    RuleBuilder(std::string target, std::string action)
+    {
+        root = std::make_unique<Rule>(target, action);
+    }
+
+    RuleBuilder& addRange(Statement statement, long lowerBound, long upperBound) {
+        root->addCondition(std::make_unique<RangeCondition>(statement, lowerBound, upperBound));
+        return *this;
+    }
+
+    RuleBuilder& addTime(Weekday weekday, long startTime, long endTime) {
+        root->addCondition(std::make_unique<TimeCondition>(weekday, startTime, endTime));
+        return *this;
+    }
+
+    std::unique_ptr<Rule> getRule() {
+        return std::move(root);
+    }
+
+private:
+    std::unique_ptr<Rule> root;
 };
 
 class ExpertSystem {
@@ -66,7 +87,7 @@ private:
     Facts facts;
 
 public:
-    ExpertSystem& addRule(std::unique_ptr<Rule> rule, ExecutorBase* executor = nullptr) {
+    ExpertSystem& addRule(std::unique_ptr<Rule> rule) {
         rules.push_back(std::move(rule));
         return *this;
     }

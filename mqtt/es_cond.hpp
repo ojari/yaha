@@ -1,5 +1,7 @@
 #pragma once
 #include "es_base.hpp"
+#include <memory>
+#include <functional>
 
 
 struct Condition {
@@ -56,4 +58,20 @@ private:
     Weekday weekday;
     int startTime;
     int endTime;
+};
+
+// @pattern functional factory
+//
+class ConditionFactory {
+    std::map<std::string, std::function<std::unique_ptr<Condition>()>> creators;
+public:
+    ConditionFactory() {
+        creators["range"] = []() { return std::make_unique<RangeCondition>(); };
+        creators["time"] = []() { return std::make_unique<TimeCondition>(); };
+    }
+
+    std::unique_ptr<Condition> make_cond(std::string type) {
+        auto result = creators[type]();
+        return result;
+    }
 };

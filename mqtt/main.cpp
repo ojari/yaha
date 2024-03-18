@@ -51,20 +51,20 @@ void interact(ExpertSystem& system)
  * Fills the rules of the expert system.
  */
 void fill_rules(ExpertSystem& system) {
-    std::unique_ptr<Rule> rule = std::make_unique<Rule>("HEATER", "ON");
-    rule->addRange(Statement::Temperature, -30 , 0)
-        ->addRange(Statement::DayLight, 0 , 1);
-    system.addRule(std::move(rule));
+    RuleBuilder rule1("HEATER", "ON");
+    rule1.addRange(Statement::Temperature, -30 , 0)
+         .addRange(Statement::DayLight, 0 , 1);
+    system.addRule(std::move(rule1.getRule()));
 
-    std::unique_ptr<Rule> rule2 = std::make_unique<Rule>("HEADER", "OFF");
-    rule2->addRange(Statement::Temperature, 20 , 90)
-         ->addRange(Statement::Weekday, 1 , 1);
-    system.addRule(std::move(rule2));
+    RuleBuilder rule2("HEATER", "OFF");
+    rule2.addRange(Statement::Temperature, 20 , 90)
+         .addRange(Statement::DayLight, 0 , 1);
+    system.addRule(std::move(rule2.getRule()));
 
-    std::unique_ptr<Rule> rule3 = std::make_unique<Rule>("ALARM", "ON");
-    rule3->addRange(Statement::Time, 1000 , 1030)
-         ->addRange(Statement::Weekday, 1 , 5);
-    system.addRule(std::move(rule3));
+    RuleBuilder rule3("ALARM", "ON");
+    rule3.addRange(Statement::Time, 1000 , 1030)
+         .addRange(Statement::Weekday, 1 , 5);
+    system.addRule(std::move(rule3.getRule()));
 
     system.saveRules("rules_gen.json");
 }

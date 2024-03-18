@@ -101,7 +101,7 @@ void TimeCondition::save(json& obj) const {
 
 //-----------------------------------------------------------------------------
 std::string Rule::isConditionTrue(Facts& facts) const {
-    for (const auto condition : conditions) {
+    for (const auto& condition : conditions) {
         // All conditions must pass
         //
         if (!timeMode && !condition->isTrue(facts)) {
@@ -124,41 +124,41 @@ void Rule::execute(ExecutorBase* executor) const {
 }
 
 void Rule::load(const json& obj) {
-    if (obj.contains("if")) {
-        json conditionsArray = obj["if"];
-        for (const auto& conditionObj : conditionsArray) {
-            auto condition = new RangeCondition();
-            condition->load(conditionObj);
-            conditions.push_back(condition);
+    auto conditionFactory = ConditionFactory();
+    for (auto& element : obj.items()) {
+        // std::string key = element.key();
+        if (element.key() == "then") {
+            json thenArray = element.value();
+            target = thenArray[0].get<std::string>();
+            action = thenArray[1].get<std::string>();
+            if (thenArray.size() > 2) {
+                action_off = thenArray[2].get<std::string>();
+            } 
         }
-    }
-    if (obj.contains("if_time")) {
-        timeMode = true;
-        json conditionsArray = obj["if_time"];
-        for (const auto& conditionObj : conditionsArray) {
-            auto condition = new TimeCondition();
-            condition->load(conditionObj);
-            conditions.push_back(condition);
+        else {
+            json conditionsArray = element.value();
+            for (const auto& conditionObj : conditionsArray) {
+                auto condition = conditionFactory.make_cond(element.key());
+                condition->load(conditionObj);
+                conditions.push_back(std::move(condition));
+            }            
         }
-    }
-    json thenArray = obj["then"];
-    target = thenArray[0].get<std::string>();
-    action = thenArray[1].get<std::string>();
-    if (thenArray.size() > 2) {
-        action_off = thenArray[2].get<std::string>();
     }
 }
 
 void Rule::save(json& obj) const {
-    json conditionsArray = json::array();
-    for (const auto condition : conditions) {
+    json ifArr = json::array();
+    for (const auto& condition : conditions) {
         json conditionObj = json::array();
         condition->save(conditionObj);
-        conditionsArray.push_back(conditionObj);
+        ifArr.push_back(conditionObj);
     }
-    obj["conditions"] = conditionsArray;
-    obj["target"] = target;
-    obj["action"] = action;
+    obj["if"] = ifArr;
+
+    json thenArr = json::array();
+    thenArr.push_back(target);
+    thenArr.push_back(action);
+    obj["then"] = thenArr;
 }
 
 
