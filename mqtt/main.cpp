@@ -87,20 +87,27 @@ int main()
 
     // fill_rules(system);
     system.loadRules("rules.json");
-    //while (true) {
-        for(int hour = 0; hour<24; hour++){
-            for (int minute = 0; minute < 60; minute++) {
-                long time = hour*100 + minute;
+    //system.saveRules("rules_tmp.json");
 
-                executor.setTime(time);
-                system.addFact(Statement::Time, time);
-                system.infer(executor);
+    /*
+    system.addFact(Statement::Time, 400);
+    system.infer(executor);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            }
+    system.addFact(Statement::Time, 700);
+    system.infer(executor);
+    */
+
+    for(int hour = 0; hour<24; hour++){
+        for (int minute = 0; minute < 60; minute++) {
+            long time = hour*100 + minute;
+
+            executor.setTime(time);
+            system.addFact(Statement::Time, time);
+            system.infer(executor);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
-        //std::this_thread::sleep_for(std::chrono::minutes(1));
-    //}
+    }
 
     return 0;
 }

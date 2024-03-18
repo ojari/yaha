@@ -138,6 +138,9 @@ void Rule::load(const json& obj) {
         else {
             json conditionsArray = element.value();
             for (const auto& conditionObj : conditionsArray) {
+                if (element.key() == "time") {
+                    timeMode = true;
+                }
                 auto condition = conditionFactory.make_cond(element.key());
                 condition->load(conditionObj);
                 conditions.push_back(std::move(condition));
@@ -158,6 +161,8 @@ void Rule::save(json& obj) const {
     json thenArr = json::array();
     thenArr.push_back(target);
     thenArr.push_back(action);
+    if (action_off.length() > 0)
+        thenArr.push_back(action_off);
     obj["then"] = thenArr;
 }
 
