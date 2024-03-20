@@ -2,6 +2,7 @@
 #include "es_base.hpp"
 #include <memory>
 #include <functional>
+#include <iostream>
 
 
 struct Condition {
@@ -10,7 +11,26 @@ struct Condition {
     virtual void save(json& obj) const = 0;
 };
 
+struct BoolCondition : public Condition {
+    BoolCondition() = default;
 
+    BoolCondition(Statement statement) :
+        statement(statement)
+    {}
+    bool isTrue(Facts& facts) const {
+        if (!facts.isFact(statement)) {
+            return false;
+        }
+        return facts.getValue(statement);
+    }
+    void load(const json& obj);
+    void save(json& obj) const;
+
+private:
+    Statement statement;
+};
+
+/*
 struct RangeCondition : public Condition {
     RangeCondition() = default;
 
@@ -59,19 +79,25 @@ private:
     int startTime;
     int endTime;
 };
-
+*/
 // @pattern functional factory
 //
 class ConditionFactory {
     std::map<std::string, std::function<std::unique_ptr<Condition>()>> creators;
 public:
     ConditionFactory() {
-        creators["range"] = []() { return std::make_unique<RangeCondition>(); };
-        creators["time"] = []() { return std::make_unique<TimeCondition>(); };
+        // creators["range"] = []() { return std::make_unique<RangeCondition>(); };
+        // creators["time"] = []() { return std::make_unique<TimeCondition>(); };
+	creators["if"] = []() { return std::make_unique<BoolCondition>(); };
     }
 
     std::unique_ptr<Condition> make_cond(std::string type) {
+        if (creators.find(type) == creators.end()) {
+            std::cerr << "Invalid condition in rules file " << type << std::endl;
+            return nullptr;
+        }
         auto result = creators[type]();
         return result;
     }
 };
+

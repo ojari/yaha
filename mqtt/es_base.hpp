@@ -11,10 +11,19 @@ enum class Statement {
     Temperature,        ///< Temperature statement
     Weekday,            ///< Weekday statement
     Time,               ///< Time statement
-    DayLight,           ///< Daylight statement
-    ElectricityPrice,   ///< Electricity price statement
-    Temperature3h,      ///< Temperature for 3 hours statement
-    Temperature6h,      ///< Temperature for 6 hours statement
+    Winter,
+    Summer,
+    Day,
+    Night,
+    ElPriceHigh,
+    ElPriceLow,
+    TempHigh,
+    TempLow,
+    TempLowLow,
+    Temp8hLow,
+    Temp8hLowLow,
+    Temp24hLow,
+    Temp24hLowLow,
     Unknown             ///< Unknown statement
 };
 
@@ -37,7 +46,7 @@ struct ExecutorBase {
  */
 class Facts {
 private:
-    std::map<Statement, long> facts;
+    std::map<Statement, bool> facts;
 
 public:
     /**
@@ -46,7 +55,7 @@ public:
      * @param statement The statement representing the fact.
      * @param value The value associated with the fact.
      */
-    void addFact(Statement statement, long value);
+    void addFact(Statement statement, bool value);
 
     /**
      * @brief Checks if the specified fact exists in the collection.
@@ -62,5 +71,5 @@ public:
      * @param statement The statement representing the fact.
      * @return The value associated with the fact.
      */
-    long getValue(Statement statement);
+    bool getValue(Statement statement);
 };

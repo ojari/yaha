@@ -54,6 +54,7 @@ private:
     bool timeMode = false;
 };
 
+
 // @pattern builder
 //
 class RuleBuilder {
@@ -63,6 +64,12 @@ public:
         root = std::make_unique<Rule>(target, action);
     }
 
+    RuleBuilder& addIf(Statement statement) {
+        root->addCondition(std::make_unique<BoolCondition>(statement));
+        return *this;
+    }
+
+    /*
     RuleBuilder& addRange(Statement statement, long lowerBound, long upperBound) {
         root->addCondition(std::make_unique<RangeCondition>(statement, lowerBound, upperBound));
         return *this;
@@ -72,6 +79,7 @@ public:
         root->addCondition(std::make_unique<TimeCondition>(weekday, startTime, endTime));
         return *this;
     }
+    */
 
     std::unique_ptr<Rule> getRule() {
         return std::move(root);
@@ -80,6 +88,7 @@ public:
 private:
     std::unique_ptr<Rule> root;
 };
+
 
 class ExpertSystem {
 private:

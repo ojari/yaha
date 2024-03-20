@@ -51,21 +51,37 @@ void interact(ExpertSystem& system)
  * Fills the rules of the expert system.
  */
 void fill_rules(ExpertSystem& system) {
+    
     RuleBuilder rule1("HEATER", "ON");
+    rule1.addIf(Statement::TempLow)
+         .addIf(Statement::Winter);
+    system.addRule(std::move(rule1.getRule()));
+
+    RuleBuilder rule2("HEATER", "OFF");
+    rule2.addIf(Statement::TempHigh)
+         .addIf(Statement::Day);
+    system.addRule(std::move(rule2.getRule()));
+
+    RuleBuilder rule3("ALARM", "ON");
+    rule3.addIf(Statement::Day)
+         .addIf(Statement::ElPriceHigh);
+    system.addRule(std::move(rule3.getRule()));
+
+    /*RuleBuilder rule1("HEATER", "ON");
     rule1.addRange(Statement::Temperature, -30 , 0)
-         .addRange(Statement::DayLight, 0 , 1);
+         .addRange(Statement::Winter, 1 , 1);
     system.addRule(std::move(rule1.getRule()));
 
     RuleBuilder rule2("HEATER", "OFF");
     rule2.addRange(Statement::Temperature, 20 , 90)
-         .addRange(Statement::DayLight, 0 , 1);
+         .addRange(Statement::Day, 0 , 1);
     system.addRule(std::move(rule2.getRule()));
 
     RuleBuilder rule3("ALARM", "ON");
     rule3.addRange(Statement::Time, 1000 , 1030)
          .addRange(Statement::Weekday, 1 , 5);
     system.addRule(std::move(rule3.getRule()));
-
+    */
     system.saveRules("rules_gen.json");
 }
 
@@ -80,10 +96,11 @@ int main()
     system.addFact(Statement::Temperature, 20)
           .addFact(Statement::Weekday, 1)
           .addFact(Statement::Time, 1020)
-          .addFact(Statement::DayLight, 1)
-          .addFact(Statement::ElectricityPrice, 0.1)
-          .addFact(Statement::Temperature3h, 20)
-          .addFact(Statement::Temperature6h, 20);
+          .addFact(Statement::Day, 1)
+          .addFact(Statement::ElPriceHigh, 1)
+          .addFact(Statement::Winter, 1)
+          .addFact(Statement::TempLowLow, 1)
+          .addFact(Statement::TempLow, 1);
 
     // fill_rules(system);
     system.loadRules("rules.json");

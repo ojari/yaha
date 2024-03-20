@@ -13,10 +13,20 @@ std::unordered_map<std::string, Statement> str2statement = {
     {"Temperature", Statement::Temperature},
     {"Weekday", Statement::Weekday},
     {"Time", Statement::Time},
-    {"DayLight", Statement::DayLight},
-    {"ElectricityPrice", Statement::ElectricityPrice},
-    {"Temperature3h", Statement::Temperature3h},
-    {"Temperature6h", Statement::Temperature6h}
+    {"Winter", Statement::Winter},
+    {"Summer", Statement::Summer},
+    {"Day", Statement::Day},
+    {"Night", Statement::Night},
+    {"ElPriceHigh", Statement::ElPriceHigh},
+    {"ElPriceLow", Statement::ElPriceLow},
+    {"TempHigh", Statement::TempHigh},
+    {"TempLow", Statement::TempLow},
+    {"TempLowLow", Statement::TempLowLow},
+    {"Temp8hLow", Statement::Temp8hLow},
+    {"Temp8hLowLow", Statement::Temp8hLowLow},
+    {"Temp24hLow", Statement::Temp24hLow},
+    {"Temp24hLowLow", Statement::Temp24hLowLow},
+    {"Unknown", Statement::Unknown}
 };
 
 std::unordered_map<std::string, Weekday> str2weekday = {
@@ -56,7 +66,7 @@ void print_statements()
 }
 
 //-----------------------------------------------------------------------------
-void Facts::addFact(Statement statement, long value) {
+void Facts::addFact(Statement statement, bool value) {
     facts[statement] = value;
 }
 
@@ -64,7 +74,7 @@ bool Facts::isFact(Statement statement) const {
     return facts.find(statement) != facts.end();
 }
 
-long Facts::getValue(Statement statement) {
+bool Facts::getValue(Statement statement) {
     if (isFact(statement)) {
         return facts[statement];
     }
@@ -73,7 +83,16 @@ long Facts::getValue(Statement statement) {
 }
 
 //-----------------------------------------------------------------------------
-void RangeCondition::load(const json& obj) {
+void BoolCondition::load(const json& obj) {
+    std::string statement_str = obj[0].get<std::string>();
+    statement = str2enum(statement_str, str2statement);
+}
+
+void BoolCondition::save(json& obj) const {
+    obj.push_back(enum2str(statement, str2statement).c_str());
+}
+
+/*void RangeCondition::load(const json& obj) {
     std::string statement_str = obj[0].get<std::string>();
     statement = str2enum(statement_str, str2statement);
     lowerBound = obj[1].get<float>();
@@ -98,6 +117,7 @@ void TimeCondition::save(json& obj) const {
     obj.push_back(startTime);
     obj.push_back(endTime);
 }
+*/
 
 //-----------------------------------------------------------------------------
 std::string Rule::isConditionTrue(Facts& facts) const {
@@ -142,8 +162,10 @@ void Rule::load(const json& obj) {
                     timeMode = true;
                 }
                 auto condition = conditionFactory.make_cond(element.key());
-                condition->load(conditionObj);
-                conditions.push_back(std::move(condition));
+                if (condition != nullptr) {
+                    condition->load(conditionObj);
+                    conditions.push_back(std::move(condition));
+                }
             }            
         }
     }
