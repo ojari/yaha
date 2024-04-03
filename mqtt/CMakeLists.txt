@@ -30,6 +30,7 @@ add_executable(${PROJECT_NAME}
   main.cpp
   mqtt.cpp
   scheduler.cpp
+  common.cpp
 )
 
 

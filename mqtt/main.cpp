@@ -34,7 +34,7 @@ private:
 void interact(ExpertSystem& system)
 {
     int fact;
-    float value;
+    int value;
     std::cout << "Enter a fact:" << std::endl;
     print_statements();
 
@@ -46,44 +46,6 @@ void interact(ExpertSystem& system)
 
     //system.infer();
 }   
-
-/**
- * Fills the rules of the expert system.
- */
-void fill_rules(ExpertSystem& system) {
-    
-    RuleBuilder rule1("HEATER", "ON");
-    rule1.addIf(Statement::TempLow)
-         .addIf(Statement::Winter);
-    system.addRule(std::move(rule1.getRule()));
-
-    RuleBuilder rule2("HEATER", "OFF");
-    rule2.addIf(Statement::TempHigh)
-         .addIf(Statement::Day);
-    system.addRule(std::move(rule2.getRule()));
-
-    RuleBuilder rule3("ALARM", "ON");
-    rule3.addIf(Statement::Day)
-         .addIf(Statement::ElPriceHigh);
-    system.addRule(std::move(rule3.getRule()));
-
-    /*RuleBuilder rule1("HEATER", "ON");
-    rule1.addRange(Statement::Temperature, -30 , 0)
-         .addRange(Statement::Winter, 1 , 1);
-    system.addRule(std::move(rule1.getRule()));
-
-    RuleBuilder rule2("HEATER", "OFF");
-    rule2.addRange(Statement::Temperature, 20 , 90)
-         .addRange(Statement::Day, 0 , 1);
-    system.addRule(std::move(rule2.getRule()));
-
-    RuleBuilder rule3("ALARM", "ON");
-    rule3.addRange(Statement::Time, 1000 , 1030)
-         .addRange(Statement::Weekday, 1 , 5);
-    system.addRule(std::move(rule3.getRule()));
-    */
-    system.saveRules("rules_gen.json");
-}
 
 /**
  * @brief The main function of the program.
@@ -102,17 +64,8 @@ int main()
           .addFact(Statement::TempLowLow, 1)
           .addFact(Statement::TempLow, 1);
 
-    // fill_rules(system);
     system.loadRules("rules.json");
     //system.saveRules("rules_tmp.json");
-
-    /*
-    system.addFact(Statement::Time, 400);
-    system.infer(executor);
-
-    system.addFact(Statement::Time, 700);
-    system.infer(executor);
-    */
 
     for(int hour = 0; hour<24; hour++){
         for (int minute = 0; minute < 60; minute++) {
@@ -125,6 +78,5 @@ int main()
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
-
     return 0;
 }
