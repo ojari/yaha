@@ -1,8 +1,11 @@
 #include <mosquitto.h>
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "mqtt.hpp"
 #include "common.hpp"
+using json = nlohmann::json;
 
 
 void MessageRouter::route(std::string& deviceName, std::string& payload) {
@@ -15,10 +18,11 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 
 void on_connect(struct mosquitto *mosq, void *obj, int result) {
     if (!result) {
+        std::cout << "Connected" << std::endl;
         //mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+/state", 0);
         mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
     } else {
-        std::cerr << "Connect failed\n";
+        std::cerr << "Connect failed: " << result << std::endl;
     }
 }
 
@@ -28,6 +32,8 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
     char **topics;
     int topic_count;
     int rc;
+
+    // std::cout << "Topic: " << message->topic << " Message: " << (char*)message->payload << std::endl;
 
     rc = mosquitto_sub_topic_tokenise(message->topic, &topics, &topic_count);
     if ((rc == MOSQ_ERR_SUCCESS) && (topic_count > 1)) {
@@ -47,8 +53,7 @@ Mqtt::Mqtt() :
     int rc = 0;
     char* hostname = getenv("RPI_HOST");
 
-    deviceRegistry.registerDevice("light", &lightDevice);
-    deviceRegistry.registerDevice("thermostat", &thermostatDevice);
+    readDevices();
 
     if (hostname == NULL) {
         showError("Missing RPI_HOST environmental variable");
@@ -72,15 +77,36 @@ Mqtt::Mqtt() :
     }
 }
 
+void Mqtt::readDevices() {
+    std::ifstream file("devices.json");
+    if (!file) {
+        showError("Error opening devices.json");
+        return;
+    }
+
+    json root;
+    file >> root;
+
+    for (const auto& deviceData : root) {
+        std::string name = deviceData["name"].get<std::string>();
+        std::string type = deviceData["type"].get<std::string>();
+
+        if (type == "Lamp") {
+            deviceRegistry.registerDevice(name, &lightDevice);
+        } else if (type == "Thermostat") {
+            deviceRegistry.registerDevice(name, &thermostatDevice);
+        }
+        // std::cout << "Device: " << name << " Type: " << type << std::endl;
+    }
+}
+
 void Mqtt::loop() {
     int rc = 0;
 
-    while (true) {
-        rc = mosquitto_loop(mosq, -1, 1);
-        if (rc) {
-            showError(mosquitto_strerror(rc));
-            // sleep(10);
-            mosquitto_reconnect(mosq);
-        }
+    rc = mosquitto_loop(mosq, -1, 1);
+    if (rc) {
+        showError(mosquitto_strerror(rc));
+        // sleep(10);
+        mosquitto_reconnect(mosq);
     }
 }

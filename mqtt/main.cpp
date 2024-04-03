@@ -1,4 +1,5 @@
 #include "expert.hpp"
+#include "mqtt.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
@@ -54,6 +55,7 @@ int main()
 {
     MyExecutor executor;
     ExpertSystem system;
+    Mqtt mqtt;
 
     system.addFact(Statement::Temperature, 20)
           .addFact(Statement::Weekday, 1)
@@ -69,6 +71,7 @@ int main()
 
     for(int hour = 0; hour<24; hour++){
         for (int minute = 0; minute < 60; minute++) {
+            mqtt.loop();
             long time = hour*100 + minute;
 
             executor.setTime(time);
