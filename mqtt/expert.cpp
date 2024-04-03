@@ -58,8 +58,7 @@ std::string enum2str(Enum value, const std::unordered_map<std::string, Enum>& ma
     throw std::invalid_argument("Unknown enum value: " + std::to_string(static_cast<int>(value)));
 }
 
-void print_statements()
-{
+void print_statements() {
     for (const auto& pair : str2statement) {
         std::cout << "    " << int(pair.second) << " - " << pair.first << std::endl;
     }

@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include "common.hpp"
 
 
 class Device {
 public:
     virtual void on_message(const struct mosquitto_message *message) = 0;
 };
-
 
 
 class LightDevice : public Device {
@@ -18,9 +18,9 @@ public:
         std::string payload = (char*) message->payload;
 
         std::cout << "LightDevice received message on topic: " << topic << " with payload: " << payload << "\n";
-
     }
 };
+
 
 class ThermostatDevice : public Device {
 public:
@@ -29,9 +29,9 @@ public:
         std::string payload = (char*) message->payload;
 
         std::cout << "ThermostatDevice received message on topic: " << topic << " with payload: " << payload << "\n";
-
     }
 };
+
 
 class DeviceRegistry {
 public:
@@ -50,6 +50,7 @@ public:
 private:
     std::unordered_map<std::string, Device*> devices_;
 };
+
 
 class MessageRouter {
 public:
@@ -85,7 +86,7 @@ private:
 
 void on_connect(struct mosquitto *mosq, void *obj, int result)
 {
-    if(!result){
+    if (!result) {
         //mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+/state", 0);
         mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
     } else {
@@ -105,27 +106,19 @@ int task_mqtt()
     struct mosquitto *mosq;
     int rc = 0;
 
-    mosquitto_lib_init();
-
-    // Create instances of devices
     LightDevice lightDevice;
     ThermostatDevice thermostatDevice;
 
-    // Create an instance of the device registry
     DeviceRegistry deviceRegistry;
-
-    // Register devices with the registry
     deviceRegistry.registerDevice("light", &lightDevice);
     deviceRegistry.registerDevice("thermostat", &thermostatDevice);
 
-    // Create an instance of the message router
     MessageRouter messageRouter(&deviceRegistry);
 
-    // Rest of the code remains the same
-
+    mosquitto_lib_init();
     mosq = mosquitto_new(NULL, true, static_cast<void*>(&messageRouter));
-    if(!mosq){
-        std::cerr << "Error: Out of memory.\n";
+    if (!mosq) {
+        showError("Out of memory");
         return 1;
     }
 
@@ -133,19 +126,18 @@ int task_mqtt()
     mosquitto_message_callback_set(mosq, on_message);
 
     rc = mosquitto_connect(mosq, "localhost", 1883, 60);
-    if(rc){
-        std::cerr << "Unable to connect.\n";
+    if (rc) {
+        showError(mosquitto_strerror(rc));
         return 1;
     }
 
-    while(true) {
+    while (true) {
         rc = mosquitto_loop(mosq, -1, 1);
-        if(rc){
-	    std::cout << "connection error!" << std::endl;
+        if (rc) {
+            showError(mosquitto_strerror(rc));
             // sleep(10);
             mosquitto_reconnect(mosq);
         }
     }
-
     return rc;
 }

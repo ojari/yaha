@@ -88,7 +88,7 @@ public:
     ConditionFactory() {
         // creators["range"] = []() { return std::make_unique<RangeCondition>(); };
         // creators["time"] = []() { return std::make_unique<TimeCondition>(); };
-	creators["if"] = []() { return std::make_unique<BoolCondition>(); };
+        creators["if"] = []() { return std::make_unique<BoolCondition>(); };
     }
 
     std::unique_ptr<Condition> make_cond(std::string type) {
