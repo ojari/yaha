@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}
   expert.cpp
   main.cpp
   mqtt.cpp
+  mqtt_device.cpp
   scheduler.cpp
   common.cpp
 )

@@ -25,11 +25,7 @@ public:
     void loop();
 
 private:
-    void readDevices();
-
     struct mosquitto *mosq;
-    LightDevice lightDevice;
-    ThermostatDevice thermostatDevice;
     DeviceRegistry deviceRegistry;
     MessageRouter messageRouter;
 

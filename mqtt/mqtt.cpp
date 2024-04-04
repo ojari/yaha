@@ -11,7 +11,10 @@ using json = nlohmann::json;
 void MessageRouter::route(std::string& deviceName, std::string& payload) {
     Device* device = deviceRegistry->getDevice(deviceName);
     if (device) {
-        device->on_message(deviceName, payload);
+        json jsonPayload = json::parse(payload);
+        device->on_message(deviceName, jsonPayload);
+    } else {
+        std::cout << "ERROR Topic: " << deviceName << " Payload: " << payload << std::endl; 
     }
 }
 
@@ -53,7 +56,7 @@ Mqtt::Mqtt() :
     int rc = 0;
     char* hostname = getenv("RPI_HOST");
 
-    readDevices();
+    deviceRegistry.load("devices.json");
 
     if (hostname == NULL) {
         showError("Missing RPI_HOST environmental variable");
@@ -74,29 +77,6 @@ Mqtt::Mqtt() :
     if (rc) {
         showError(mosquitto_strerror(rc));
         return;
-    }
-}
-
-void Mqtt::readDevices() {
-    std::ifstream file("devices.json");
-    if (!file) {
-        showError("Error opening devices.json");
-        return;
-    }
-
-    json root;
-    file >> root;
-
-    for (const auto& deviceData : root) {
-        std::string name = deviceData["name"].get<std::string>();
-        std::string type = deviceData["type"].get<std::string>();
-
-        if (type == "Lamp") {
-            deviceRegistry.registerDevice(name, &lightDevice);
-        } else if (type == "Thermostat") {
-            deviceRegistry.registerDevice(name, &thermostatDevice);
-        }
-        // std::cout << "Device: " << name << " Type: " << type << std::endl;
     }
 }
 
