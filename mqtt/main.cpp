@@ -69,16 +69,18 @@ int main()
     system.loadRules("rules.json");
     //system.saveRules("rules_tmp.json");
 
-    for(int hour = 0; hour<24; hour++){
-        for (int minute = 0; minute < 60; minute++) {
-            mqtt.loop();
-            long time = hour*100 + minute;
+    while (true) {
+        for(int hour = 0; hour<24; hour++){
+            for (int minute = 0; minute < 60; minute++) {
+                mqtt.loop();
+                long time = hour*100 + minute;
 
-            executor.setTime(time);
-            system.addFact(Statement::Time, time);
-            system.infer(executor);
+                executor.setTime(time);
+                system.addFact(Statement::Time, time);
+                system.infer(executor);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
         }
     }
     return 0;

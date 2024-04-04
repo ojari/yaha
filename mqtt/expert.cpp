@@ -83,7 +83,7 @@ bool Facts::getValue(Statement statement) {
 
 //-----------------------------------------------------------------------------
 void BoolCondition::load(const json& obj) {
-    std::string statement_str = obj[0].get<std::string>();
+    std::string statement_str = obj.get<std::string>();
     statement = str2enum(statement_str, str2statement);
 }
 

@@ -14,7 +14,7 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
         json jsonPayload = json::parse(payload);
         device->on_message(deviceName, jsonPayload);
     } else {
-        std::cout << "ERROR Topic: " << deviceName << " Payload: " << payload << std::endl; 
+        std::cout << "ERROR Missing topic: " << deviceName << " Payload: " << payload << std::endl; 
     }
 }
 

@@ -32,7 +32,9 @@ public:
 class TempSensorDevice : public Device {
 public:
     void on_message(std::string& deviceName, nlohmann::json& payload) override {
-        std::cout << "Temperature " << deviceName << " :: " << payload << std::endl;
+        float temperature = payload["temperature"];
+        float humidity = payload["humidity"];
+        std::cout << "Temperature " << deviceName << " :: " << temperature << "C :: " << humidity << "%" << std::endl;
     }
 };
 
