@@ -1,0 +1,25 @@
+@startuml
+!include ./C4_Container.puml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+'LAYOUT_WITH_LEGEND()
+
+System_Boundary(yaha, "YaHa") {
+    Container(app, "Application")
+    Container(expert, "expert system")
+    Container(scheduler, "scheduler")
+    Container(mqtt, "Mqtt")
+    Container(data, "Data")
+}
+
+System_Boundary(external, "External") {
+    System_Ext(mosquitto, "Mosquitto")
+    ContainerDb(database, "Database", "sqlite")
+}
+
+Rel_U(app, expert, "uses")
+Rel_U(app, scheduler, "uses")
+Rel_D(app, mqtt, "Uses")
+Rel_D(app, data, "Uses")
+Rel_D(mqtt, mosquitto, "")
+Rel_D(data, database, "")
+@enduml

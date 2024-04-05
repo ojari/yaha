@@ -1,0 +1,22 @@
+@startuml C4 context
+!include ./C4_Context.puml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+'LAYOUT_WITH_LEGEND()
+
+System_Ext(mqtt, "Mosquitto", "MQTT broker")
+System_Ext(z2m, "zigbee2mqtt", "zigbee2mqtt")
+System_Ext(nodered, "NodeRed", "App")
+Person_Ext(user, "Configuration", "User")
+System(yaha, "Yaha", "C++ app")
+SystemDb(db, "Mosquitto DB", "DB", "data")
+
+Rel_L(nodered, mqtt, "messages")
+Rel_R(z2m, mqtt, "messages")
+Rel_D(mqtt, yaha, "messages")
+Rel_D(yaha, db, "database")
+
+Rel_D(user, z2m, "Web UI")
+Rel_D(user, nodered, "Web UI")
+
+@enduml

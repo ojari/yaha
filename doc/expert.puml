@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+class Facts
+
+class Condition
+class BoolCondition
+class RangeCondition
+class ConditionFactory
+class Rule
+class RuleBuilder
+class ExpertSystem
+
+Condition <-- BoolCondition
+Condition <-- RangeCondition
+
+BoolCondition -- ConditionFactory
+RangeCondition -- ConditionFactory
+
+ExpertSystem  o-- Rule
+ExpertSystem  o-- Facts
+
+Rule *-- Condition
+Rule - RuleBuilder
+
+@enduml
