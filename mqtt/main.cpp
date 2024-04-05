@@ -1,31 +1,83 @@
 #include "expert.hpp"
 #include "mqtt.hpp"
+#include "common.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
 #include <thread>
 #include <iomanip>
 
+class IntTime {
+public:
+    IntTime(int hour_, int minute_) :
+        hour(hour_),
+        minute(minute_)
+    {}
+    int getHour() const {
+        return hour;
+    }
+    int getMinute() const {
+        return minute;
+    }
+    int getTime() const {
+        return hm2time(hour, minute);
+    }
+
+    void operator+(int minutes) {
+        minute += minutes;
+        if (minute >= 60) {
+            hour += minute / 60;
+            minute %= 60;
+            if (hour >= 24) {
+                hour %= 24;
+            }
+        }
+    }
+private:
+    int hour;
+    int minute;
+};
+
+
 class MyExecutor : public ExecutorBase {
 public:
-    void setTime(int time) {
-        this->time = time;
+    MyExecutor() : 
+        system()
+    {
+        system.addFact(Statement::Temperature, 20)
+            .addFact(Statement::Weekday, 1)
+            .addFact(Statement::Time, 1020)
+            .addFact(Statement::Day, 1)
+            .addFact(Statement::ElPriceHigh, 1)
+            .addFact(Statement::Winter, 1)
+            .addFact(Statement::TempLowLow, 1)
+            .addFact(Statement::TempLow, 1);
+
+        system.loadRules("rules.json");
+        //system.saveRules("rules_tmp.json");
     }
+
+    void loop() {
+        time + 1;
+
+        system.addFact(Statement::Time, time.getTime());
+
+        system.infer(*this);
+    }
+
     void execute(std::string target, std::string action) override {
         if (cache.find(target) != cache.end() && cache[target] == action) {
             return;
         }
         cache[target] = action;
 
-        int hour = time / 100;
-        int minute = time % 100;
-
-        std::cout << std::setw(2) << std::setfill('0') << hour << ":"
-                  << std::setw(2) << std::setfill('0') << minute << " "
+        std::cout << std::setw(2) << std::setfill('0') << time.getHour() << ":"
+                  << std::setw(2) << std::setfill('0') << time.getMinute() << " "
                   << target << "::" << action << std::endl;
     }
 private:
-    int time = 0;
+    ExpertSystem system;
+    IntTime time {0, 0};
     std::map<std::string, std::string> cache;
 };
 
@@ -54,34 +106,13 @@ void interact(ExpertSystem& system)
 int main()
 {
     MyExecutor executor;
-    ExpertSystem system;
     Mqtt mqtt;
 
-    system.addFact(Statement::Temperature, 20)
-          .addFact(Statement::Weekday, 1)
-          .addFact(Statement::Time, 1020)
-          .addFact(Statement::Day, 1)
-          .addFact(Statement::ElPriceHigh, 1)
-          .addFact(Statement::Winter, 1)
-          .addFact(Statement::TempLowLow, 1)
-          .addFact(Statement::TempLow, 1);
-
-    system.loadRules("rules.json");
-    //system.saveRules("rules_tmp.json");
-
     while (true) {
-        for(int hour = 0; hour<24; hour++){
-            for (int minute = 0; minute < 60; minute++) {
-                mqtt.loop();
-                long time = hour*100 + minute;
+        mqtt.loop();
+        executor.loop();
 
-                executor.setTime(time);
-                system.addFact(Statement::Time, time);
-                system.infer(executor);
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            }
-        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
     return 0;
 }
