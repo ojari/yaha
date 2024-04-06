@@ -6,4 +6,4 @@ Yet Again Home Automation
 
 ![container](doc/container.png)
 
-![expert](doc/export.png)
+![expert](doc/expert.png)
