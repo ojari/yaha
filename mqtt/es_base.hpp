@@ -4,12 +4,10 @@
 using json = nlohmann::json;
 
 /**
- * @brief Represents different types of statements.
+ * @brief Represents different types of boolean statements.
  */
 enum class Statement {
-    Temperature,        ///< Temperature statement
     Weekday,            ///< Weekday statement
-    Time,               ///< Time statement
     Winter,
     Summer,
     Day,
@@ -23,6 +21,13 @@ enum class Statement {
     Temp8hLowLow,
     Temp24hLow,
     Temp24hLowLow,
+    Unknown             ///< Unknown statement
+};
+
+enum class ScalarStatement {
+    Temperature,        ///< Temperature statement
+    Time,               ///< Time statement
+    ElPrice,            ///< Electricity price statement
     Unknown             ///< Unknown statement
 };
 
@@ -46,6 +51,7 @@ struct ExecutorBase {
 class Facts {
 private:
     std::map<Statement, bool> facts;
+    std::map<ScalarStatement, int> scalarFacts;
 
 public:
     /**
@@ -55,14 +61,10 @@ public:
      * @param value The value associated with the fact.
      */
     void addFact(Statement statement, bool value);
+    void addFact(ScalarStatement statement, int value);
 
-    /**
-     * @brief Checks if the specified fact exists in the collection.
-     * 
-     * @param statement The statement representing the fact.
-     * @return true if the fact exists, false otherwise.
-     */
-    bool isFact(Statement statement) const;
+
+    bool isFact(ScalarStatement statement) const;
 
     /**
      * @brief Retrieves the value associated with the specified fact.
@@ -71,4 +73,5 @@ public:
      * @return The value associated with the fact.
      */
     bool getValue(Statement statement);
+    int getValue(ScalarStatement statement);
 };

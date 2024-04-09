@@ -1,0 +1,10 @@
+[
+    {"name": "LampOlkkari", "type": "Lamp"},
+    {"name": "LampKirjasto", "type": "Lamp"},
+    {"name": "0xa4c138ae82323b54", "type": "TempSensor"},
+    {"name": "ButtonPcPower", "type": "Switch"},
+    {"name": "0x842e14fffe28bb18", "type": "Switch"},
+    {"name": "0x0c4314fffe10c010", "type": "Switch"},
+    {"name": "0x842e14fffe28bba7", "type": "Switch"},
+    {"name": "0x842e14fffe28b7fa", "type": "Switch"}
+]

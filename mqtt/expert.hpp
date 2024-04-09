@@ -101,7 +101,12 @@ public:
         return *this;
     }
 
-    ExpertSystem& addFact(Statement statement, long value) {
+    ExpertSystem& addFact(Statement statement) {
+        facts.addFact(statement, true);
+        return *this;
+    }
+
+    ExpertSystem& addFact(ScalarStatement statement, long value) {
         facts.addFact(statement, value);
         return *this;
     }

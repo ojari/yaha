@@ -18,9 +18,6 @@ struct BoolCondition : public Condition {
         statement(statement)
     {}
     bool isTrue(Facts& facts) const {
-        if (!facts.isFact(statement)) {
-            return false;
-        }
         return facts.getValue(statement);
     }
     void load(const json& obj);
@@ -30,11 +27,11 @@ private:
     Statement statement;
 };
 
-/*
+
 struct RangeCondition : public Condition {
     RangeCondition() = default;
 
-    RangeCondition(Statement statement, float lowerBound, float upperBound) :
+    RangeCondition(ScalarStatement, int lowerBound, int upperBound) :
         statement(statement),
         lowerBound(lowerBound),
         upperBound(upperBound)
@@ -50,12 +47,12 @@ struct RangeCondition : public Condition {
     void save(json& obj) const;
 
 private:
-    Statement statement;
-    float lowerBound;
-    float upperBound;
+    ScalarStatement statement;
+    int lowerBound;
+    int upperBound;
 };
 
-
+/*
 struct TimeCondition : public Condition {
     TimeCondition() = default;
 
@@ -86,9 +83,9 @@ class ConditionFactory {
     std::map<std::string, std::function<std::unique_ptr<Condition>()>> creators;
 public:
     ConditionFactory() {
-        // creators["range"] = []() { return std::make_unique<RangeCondition>(); };
-        // creators["time"] = []() { return std::make_unique<TimeCondition>(); };
         creators["if"] = []() { return std::make_unique<BoolCondition>(); };
+        creators["range"] = []() { return std::make_unique<RangeCondition>(); };
+        // creators["time"] = []() { return std::make_unique<TimeCondition>(); };
     }
 
     std::unique_ptr<Condition> make_cond(std::string type) {

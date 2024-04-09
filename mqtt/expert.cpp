@@ -10,9 +10,7 @@
 
 
 std::unordered_map<std::string, Statement> str2statement = {
-    {"Temperature", Statement::Temperature},
     {"Weekday", Statement::Weekday},
-    {"Time", Statement::Time},
     {"Winter", Statement::Winter},
     {"Summer", Statement::Summer},
     {"Day", Statement::Day},
@@ -27,6 +25,13 @@ std::unordered_map<std::string, Statement> str2statement = {
     {"Temp24hLow", Statement::Temp24hLow},
     {"Temp24hLowLow", Statement::Temp24hLowLow},
     {"Unknown", Statement::Unknown}
+};
+
+
+std::unordered_map<std::string, ScalarStatement> str2scalarstatement = {
+    {"Temperature", ScalarStatement::Temperature},
+    {"Time", ScalarStatement::Time},
+    {"Unknown", ScalarStatement::Unknown}
 };
 
 std::unordered_map<std::string, Weekday> str2weekday = {
@@ -69,13 +74,24 @@ void Facts::addFact(Statement statement, bool value) {
     facts[statement] = value;
 }
 
-bool Facts::isFact(Statement statement) const {
-    return facts.find(statement) != facts.end();
+void Facts::addFact(ScalarStatement statement, int value) {
+    scalarFacts[statement] = value;
+}
+
+bool Facts::isFact(ScalarStatement statement) const {
+    return scalarFacts.find(statement) != scalarFacts.end();
 }
 
 bool Facts::getValue(Statement statement) {
-    if (isFact(statement)) {
+    if (facts.find(statement) != facts.end()) {
         return facts[statement];
+    }
+    return false;
+}
+
+int Facts::getValue(ScalarStatement statement) {
+    if (isFact(statement)) {
+        return scalarFacts[statement];
     }
     std::cerr << "Fact not found " << int(statement) << std::endl;
     throw std::runtime_error("Fact not found");
@@ -91,19 +107,20 @@ void BoolCondition::save(json& obj) const {
     obj.push_back(enum2str(statement, str2statement).c_str());
 }
 
-/*void RangeCondition::load(const json& obj) {
+void RangeCondition::load(const json& obj) {
     std::string statement_str = obj[0].get<std::string>();
-    statement = str2enum(statement_str, str2statement);
+    statement = str2enum(statement_str, str2scalarstatement);
     lowerBound = obj[1].get<float>();
     upperBound = obj[2].get<float>();
 }
 
 void RangeCondition::save(json& obj) const {
-    obj.push_back(enum2str(statement, str2statement).c_str());
+    obj.push_back(enum2str(statement, str2scalarstatement).c_str());
     obj.push_back(lowerBound);
     obj.push_back(upperBound);
 }
 
+/*
 void TimeCondition::load(const json& obj) {
     std::string weekday_str = obj[0].get<std::string>();
     weekday = str2enum(weekday_str, str2weekday);

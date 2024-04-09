@@ -44,14 +44,14 @@ public:
     MyExecutor() : 
         system()
     {
-        system.addFact(Statement::Temperature, 20)
-            .addFact(Statement::Weekday, 1)
-            .addFact(Statement::Time, 1020)
-            .addFact(Statement::Day, 1)
-            .addFact(Statement::ElPriceHigh, 1)
-            .addFact(Statement::Winter, 1)
-            .addFact(Statement::TempLowLow, 1)
-            .addFact(Statement::TempLow, 1);
+        system.addFact(ScalarStatement::Temperature, 20)
+            .addFact(Statement::Weekday)
+            .addFact(ScalarStatement::Time, 1020)
+            .addFact(Statement::Day)
+            .addFact(Statement::ElPriceHigh)
+            .addFact(Statement::Winter)
+            .addFact(Statement::TempLowLow)
+            .addFact(Statement::TempLow);
 
         system.loadRules("rules.json");
         //system.saveRules("rules_tmp.json");
@@ -60,7 +60,7 @@ public:
     void loop() {
         time + 1;
 
-        system.addFact(Statement::Time, time.getTime());
+        system.addFact(ScalarStatement::Time, static_cast<long>(time.getTime()));
 
         system.infer(*this);
     }
@@ -95,7 +95,7 @@ void interact(ExpertSystem& system)
     std::cout << "Enter a value: ";
     std::cin >> value;
     std::cin.ignore();  // ignore the newline character
-    system.addFact(static_cast<Statement>(fact), value);
+    //system.addFact(static_cast<Statement>(fact), value);
 
     //system.infer();
 }   
