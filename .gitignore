@@ -31,3 +31,5 @@
 *.out
 *.app
 mqtt/build
+test/build
+coro/build

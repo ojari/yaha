@@ -7,7 +7,7 @@
 class DataTemperatureORM {
 public:
     DataTemperatureORM(sqlite3* db) : db(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS DataTemperature ("
+        const char* sql = "CREATE TABLE IF NOT EXISTS Temperature ("
                           "epoch INTEGER PRIMARY KEY,"
                           "temperature REAL,"
                           "humidity REAL);";
@@ -15,7 +15,7 @@ public:
     }
 
     void insert(const DataTemperature& data) {
-        const char* sql = "INSERT INTO DataTemperature (epoch, temperature, humidity) VALUES (?, ?, ?);";
+        const char* sql = "INSERT INTO Temperature (epoch, temperature, humidity) VALUES (?, ?, ?);";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
         sqlite3_bind_int64(stmt, 1, data.epoch);
@@ -26,7 +26,7 @@ public:
     }
 
     std::vector<DataTemperature> getAll() {
-        const char* sql = "SELECT epoch, temperature, humidity FROM DataTemperature;";
+        const char* sql = "SELECT epoch, temperature, humidity FROM Temperature;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -49,7 +49,7 @@ private:
 class DataWeatherORM {
 public:
     DataWeatherORM(sqlite3* db) : db(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS DataWeather ("
+        const char* sql = "CREATE TABLE IF NOT EXISTS Weather ("
                 "epoch INTEGER PRIMARY KEY,"
                "temperature REAL,"
                "humidity REAL,"
@@ -64,7 +64,7 @@ public:
     }
 
     void insert(const DataWeather& data) {
-        const char* sql = "INSERT INTO DataWeather (epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        const char* sql = "INSERT INTO Weather (epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
         sqlite3_bind_int64(stmt, 1, data.epoch);
@@ -81,7 +81,7 @@ public:
     }
 
     std::vector<DataWeather> getAll() {
-        const char* sql = "SELECT epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation FROM DataWeather;";
+        const char* sql = "SELECT epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation FROM Weather;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -110,14 +110,14 @@ private:
 class DataElPriceORM {
 public:
     DataElPriceORM(sqlite3* db) : db(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS DataElPrice ("
+        const char* sql = "CREATE TABLE IF NOT EXISTS ElPrice ("
                           "epoch INTEGER PRIMARY KEY,"
                           "price REAL);";
         sqlite3_exec(db, sql, 0, 0, 0);
     }
 
     void insert(const DataElPrice& data) {
-        const char* sql = "INSERT INTO DataElPrice (epoch, price) VALUES (?, ?);";
+        const char* sql = "INSERT INTO ElPrice (epoch, price) VALUES (?, ?);";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
         sqlite3_bind_int64(stmt, 1, data.epoch);
@@ -127,7 +127,7 @@ public:
     }
 
     std::vector<DataElPrice> getAll() {
-        const char* sql = "SELECT epoch, price FROM DataElPrice;";
+        const char* sql = "SELECT epoch, price FROM ElPrice;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -150,7 +150,7 @@ private:
 class DataHistoryORM {
 public:
     DataHistoryORM(sqlite3* db) : db(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS DataHistory ("
+        const char* sql = "CREATE TABLE IF NOT EXISTS History ("
                           "epoch INTEGER PRIMARY KEY,"
                           "device TEXT,"
                           "state INTEGER);";
@@ -158,7 +158,7 @@ public:
     }
 
     void insert(const DataHistory& data) {
-        const char* sql = "INSERT INTO DataHistory (epoch, device, state) VALUES (?, ?, ?);";
+        const char* sql = "INSERT INTO History (epoch, device, state) VALUES (?, ?, ?);";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
         sqlite3_bind_int64(stmt, 1, data.epoch);
@@ -169,7 +169,7 @@ public:
     }
 
     std::vector<DataHistory> getAll() {
-        const char* sql = "SELECT epoch, device, state FROM DataHistory;";
+        const char* sql = "SELECT epoch, device, state FROM History;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -212,6 +212,7 @@ public:
 private:
     sqlite3* db;
 };
+
 
 std::unique_ptr<Database> createDatabase(const std::string& filename) {
     sqlite3* db;
