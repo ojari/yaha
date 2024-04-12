@@ -110,8 +110,8 @@ void BoolCondition::save(json& obj) const {
 void RangeCondition::load(const json& obj) {
     std::string statement_str = obj[0].get<std::string>();
     statement = str2enum(statement_str, str2scalarstatement);
-    lowerBound = obj[1].get<float>();
-    upperBound = obj[2].get<float>();
+    lowerBound = obj[1].get<int>();
+    upperBound = obj[2].get<int>();
 }
 
 void RangeCondition::save(json& obj) const {
