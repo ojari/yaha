@@ -28,5 +28,4 @@ private:
     struct mosquitto *mosq;
     DeviceRegistry deviceRegistry;
     MessageRouter messageRouter;
-
 };

@@ -42,5 +42,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
 )
 target_link_libraries(${PROJECT_NAME}
-    mosquitto
+    mosquitto_static
+    ${EXTRA_LIBRARIES}
 )
