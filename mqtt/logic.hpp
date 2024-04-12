@@ -1,27 +1,27 @@
 #pragma once
 #include "events.hpp"
 
+struct Lights : public Event {
+    void onEvent(EventType type, int arg) override;
+private:
+    int onTime;
+    int offTime;
+};
 
-struct CarHeater : public EventTime, public EventTemperture {
-    void onTime(int time) override;
-    void onTemperture(int temp) override;
+struct CarHeater : public Event {
+    void onEvent(EventType type, int arg) override;
 private:
     int leaveTime;
 };
 
-class StorageHeater : public EventTime, public EventElPrice {
-    void onTime(int time) override;
-    void onElPrice(int price) override;
+class StorageHeater : public Event {
+    void onEvent(EventType type, int arg) override;
 };
 
-class WaterHeater : public EventTime, public EventTemperture, public EventElPrice {
-    void onTime(int time) override;
-    void onTemperture(int temp) override;
-    void onElPrice(int price) override;
+class WaterHeater : public Event {
+    void onEvent(EventType type, int arg) override;
 };
 
-class RoomHeater : public EventTime, public EventTemperture, public EventElPrice {
-    void onTime(int time) override;
-    void onTemperture(int temp) override;
-    void onElPrice(int price) override;
+class RoomHeater : public Event {
+    void onEvent(EventType type, int arg) override;
 };

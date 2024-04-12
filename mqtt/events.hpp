@@ -1,14 +1,11 @@
 #pragma once
 
-
-struct EventTime {
-    virtual void onTime(int time) = 0;
+enum EventType {
+    TIME,
+    TEMPERATURE,
+    EL_PRICE
 };
 
-struct EventElPrice {
-    virtual void onElPrice(int price) = 0;
-};
-
-struct EventTemperture {
-    virtual void onTemperture(int temp) = 0;
+struct Event {
+    virtual void onEvent(EventType type, int arg) = 0;
 };
