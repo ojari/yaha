@@ -17,16 +17,28 @@ struct Values{
     }
 
     // Setters
-    void setTime(int newTime) {
+    bool setTime(int newTime) {
+      if (time != newTime) {
         time = newTime;
+        return true;
+      }
+      return false;
     }
 
-    void setTemperature(float newTemperature) {
+    bool setTemperature(float newTemperature) {
+      if (temperature != newTemperature) {
         temperature = newTemperature;
+        return true;
+      }
+      return false;
     }
 
-    void setElPrice(int newElPrice) {
+    bool setElPrice(int newElPrice) {
+      if (elPrice != newElPrice) {
         elPrice = newElPrice;
+        return true;
+      }
+      return false;
     }
 
 private:
