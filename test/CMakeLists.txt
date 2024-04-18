@@ -18,16 +18,16 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(test)
 
-find_package(mosquitto REQUIRED)
+# find_package(mosquitto REQUIRED)
 
 # specify the C++ standard
-# set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 # target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # add the executable
 add_executable(${PROJECT_NAME}
+  main.cpp
   test_orm.cpp
-  catch_amalgamated.cpp
 )
 
 
@@ -36,10 +36,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ../mqtt
 )
 target_link_directories(${PROJECT_NAME} PRIVATE
-    ${VCPKG_ROOT}/lib
+    ${VCPKG_ROOT}/debug/lib
+    ${VCPKG_ROOT}/debug/lib/manual-link
 )
 target_link_libraries(${PROJECT_NAME}
-    mosquitto
+    Catch2d
+    mosquitto_static
     sqlite3
     pthread
     dl
