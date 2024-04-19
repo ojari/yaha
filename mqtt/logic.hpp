@@ -6,6 +6,10 @@ struct DebugOutput : public Observer {
 };
 
 struct Lights : public Observer {    
+    Lights(int onTime, int offTime) :
+        onTime(onTime),
+        offTime(offTime)
+    {}
     void onChange(const Values& state) override;
 private:
     int onTime;
@@ -13,14 +17,20 @@ private:
 };
 
 struct CarHeater : public Observer {
+    CarHeater(int leaveTime) :
+        leaveTime(leaveTime)
+    {}
     void onChange(const Values& state) override;
 private:
-    int calculateStartTime(const Values& state);
+    int calculateDuration(const Values& state);
     int leaveTime;
 };
 
 class StorageHeater : public Observer {
     void onChange(const Values& state) override;
+private:
+    int calculateStartTime(const Values& state);
+    int calculateEndTime(const Values& state);
 };
 
 class WaterHeater : public Observer {
