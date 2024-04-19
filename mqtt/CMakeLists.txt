@@ -16,7 +16,7 @@ set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake)
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(ExpertSystem)
+project(yaha)
 
 find_package(mosquitto REQUIRED)
 
@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   mqtt_device.cpp
   common.cpp
+  logic.cpp
+  collect.cpp
 )
 
 

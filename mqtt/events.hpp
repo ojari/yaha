@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include <ostream>
 
 struct Values{
     // Getters
@@ -39,6 +40,13 @@ struct Values{
         return true;
       }
       return false;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Values& values) {
+      os << "Time: " << values.getTime() << std::endl;
+      os << "Temperature: " << values.getTemperature() << std::endl;
+      os << "Electricity Price: " << values.getElPrice() << std::endl;
+      return os;
     }
 
 private:

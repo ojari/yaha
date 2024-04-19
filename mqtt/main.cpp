@@ -1,6 +1,7 @@
 #include "mqtt.hpp"
 #include "common.hpp"
 #include "collect.hpp"
+#include "logic.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
@@ -43,10 +44,17 @@ private:
  * @brief The main function of the program.
  */
 int main() {
-    Collect collect;
+    std::shared_ptr<Collect> collect{new Collect()};
+
     std::vector<Task*> tasks {
-        new Mqtt()
+        new Mqtt(),
+        new SourceTime(collect),
+        new SourceTemperature(collect)
     };
+
+    DebugOutput debugOutput;
+    collect->subscribe(debugOutput);
+
 
     while (true) {
         for (auto task : tasks)

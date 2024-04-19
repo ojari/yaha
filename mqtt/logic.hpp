@@ -1,6 +1,10 @@
 #pragma once
 #include "events.hpp"
 
+struct DebugOutput : public Observer {
+    void onChange(const Values& state) override;
+};
+
 struct Lights : public Observer {    
     void onChange(const Values& state) override;
 private:
