@@ -1,4 +1,5 @@
 #pragma once
+#include "common.hpp"
 #include "mqtt_device.hpp"
 
 class MessageRouter {
@@ -19,10 +20,10 @@ private:
 };
 
 
-class Mqtt {
+class Mqtt : public Task {
 public:
     Mqtt();
-    void loop();
+    void execute();
 
 private:
     struct mosquitto *mosq;

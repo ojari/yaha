@@ -80,7 +80,7 @@ Mqtt::Mqtt() :
     }
 }
 
-void Mqtt::loop() {
+void Mqtt::execute() {
     int rc = 0;
 
     rc = mosquitto_loop(mosq, -1, 1);
