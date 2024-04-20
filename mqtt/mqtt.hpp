@@ -1,15 +1,20 @@
 #pragma once
 #include "common.hpp"
 #include "mqtt_device.hpp"
+#include "database.hpp"
 
 class MessageRouter {
 public:
-    MessageRouter(DeviceRegistry* deviceReg) : deviceRegistry(deviceReg) {}
+    MessageRouter(DeviceRegistry* deviceReg, DataInsertHistory &history) : 
+        deviceRegistry(deviceReg),
+        history(history)
+    {}
 
     void route(std::string& deviceName, std::string& payload);
 
 private:
     DeviceRegistry* deviceRegistry;
+    DataInsertHistory &history;
 
     /*std::string extractDeviceName(const std::string& topic) {
         // Extract the device name from the topic
@@ -22,7 +27,7 @@ private:
 
 class Mqtt : public Task {
 public:
-    Mqtt();
+    Mqtt(DataInsertHistory &history);
     void execute();
 
 private:

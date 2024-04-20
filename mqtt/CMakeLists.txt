@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
   common.cpp
   logic.cpp
   collect.cpp
+  database.cpp
 )
 
 
@@ -44,4 +45,5 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME}
     mosquitto_static
     ${EXTRA_LIBRARIES}
+    sqlite3
 )

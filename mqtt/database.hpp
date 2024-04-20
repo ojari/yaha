@@ -1,17 +1,34 @@
 #pragma once
-#include <data.hpp>
+#include "data.hpp"
 #include <sqlite3.h>
 #include <vector>
 #include <memory>
 
-class DataTemperatureORM {
+class BaseORM {
 public:
-    DataTemperatureORM(sqlite3* db) : db(db) {
+    BaseORM(sqlite3* db) : db(db) {
+    }
+
+    virtual ~BaseORM() {
+    }
+
+protected:
+    void createTable(const char* sql) {
+        sqlite3_exec(db, sql, 0, 0, 0);
+    }
+
+    sqlite3* db;
+};
+
+class DataTemperatureORM : public BaseORM {
+public:
+    DataTemperatureORM(sqlite3* db) :
+        BaseORM(db) {
         const char* sql = "CREATE TABLE IF NOT EXISTS Temperature ("
                           "epoch INTEGER PRIMARY KEY,"
                           "temperature REAL,"
                           "humidity REAL);";
-        sqlite3_exec(db, sql, 0, 0, 0);
+        createTable(sql);
     }
 
     void insert(const DataTemperature& data) {
@@ -41,14 +58,11 @@ public:
         sqlite3_finalize(stmt);
         return data;
     }
-
-private:
-    sqlite3* db;
 };
 
-class DataWeatherORM {
+class DataWeatherORM : public BaseORM {
 public:
-    DataWeatherORM(sqlite3* db) : db(db) {
+    DataWeatherORM(sqlite3* db) : BaseORM(db) {
         const char* sql = "CREATE TABLE IF NOT EXISTS Weather ("
                 "epoch INTEGER PRIMARY KEY,"
                "temperature REAL,"
@@ -60,7 +74,7 @@ public:
                "uv REAL,"
                "solarRadiation REAL);";
 
-        sqlite3_exec(db, sql, 0, 0, 0);
+        createTable(sql);
     }
 
     void insert(const DataWeather& data) {
@@ -102,18 +116,15 @@ public:
         sqlite3_finalize(stmt);
         return data;
     }
-
-private:
-    sqlite3* db;
 };
 
-class DataElPriceORM {
+class DataElPriceORM : public BaseORM {
 public:
-    DataElPriceORM(sqlite3* db) : db(db) {
+    DataElPriceORM(sqlite3* db) : BaseORM(db) {
         const char* sql = "CREATE TABLE IF NOT EXISTS ElPrice ("
                           "epoch INTEGER PRIMARY KEY,"
                           "price REAL);";
-        sqlite3_exec(db, sql, 0, 0, 0);
+        createTable(sql);
     }
 
     void insert(const DataElPrice& data) {
@@ -141,35 +152,39 @@ public:
         sqlite3_finalize(stmt);
         return data;
     }
-
-private:
-    sqlite3* db;
 };
 
 
-class DataHistoryORM {
+
+class DataHistoryORM : public BaseORM, public DataInsertHistory {
 public:
-    DataHistoryORM(sqlite3* db) : db(db) {
+    DataHistoryORM(sqlite3* db) : BaseORM(db) {
         const char* sql = "CREATE TABLE IF NOT EXISTS History ("
                           "epoch INTEGER PRIMARY KEY,"
                           "device TEXT,"
-                          "state INTEGER);";
-        sqlite3_exec(db, sql, 0, 0, 0);
+                          "type INTEGER,"
+                          "val1 INTEGER,"
+                          "val2 INTEGER,"
+                          "val3 INTEGER);";
+        createTable(sql);
     }
 
-    void insert(const DataHistory& data) {
-        const char* sql = "INSERT INTO History (epoch, device, state) VALUES (?, ?, ?);";
+    void insert(const DataHistory& data) override {
+        const char* sql = "INSERT INTO History (epoch, device, type, val1, val2, val3) VALUES (?, ?, ?, ?, ?, ?);";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
         sqlite3_bind_int64(stmt, 1, data.epoch);
         sqlite3_bind_text(stmt, 2, data.device.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_int(stmt, 3, data.state);
+        sqlite3_bind_int(stmt, 3, data.type);
+        sqlite3_bind_int(stmt, 4, data.val1);
+        sqlite3_bind_int(stmt, 5, data.val2);
+        sqlite3_bind_int(stmt, 6, data.val3);
         sqlite3_step(stmt);
         sqlite3_finalize(stmt);
     }
 
     std::vector<DataHistory> getAll() {
-        const char* sql = "SELECT epoch, device, state FROM History;";
+        const char* sql = "SELECT epoch, device, type, val1, val2, val3 FROM History;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -177,16 +192,16 @@ public:
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             long epoch = sqlite3_column_int64(stmt, 0);
             std::string device = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            int state = sqlite3_column_int(stmt, 2);
-            data.push_back(DataHistory(epoch, device, state));
+            DataType type = static_cast<DataType>(sqlite3_column_int(stmt, 2));
+            int val1 = sqlite3_column_int(stmt, 3);
+            int val2 = sqlite3_column_int(stmt, 4);
+            int val3 = sqlite3_column_int(stmt, 5);
+            data.push_back(DataHistory(epoch, device, type, val1, val2, val3));
         }
 
         sqlite3_finalize(stmt);
         return data;
     }
-
-private:
-    sqlite3* db;
 };
 
 
@@ -214,9 +229,4 @@ private:
 };
 
 
-std::unique_ptr<Database> createDatabase(const std::string& filename) {
-    sqlite3* db;
-
-    sqlite3_open(filename.c_str(), &db);
-    return std::unique_ptr<Database>(new Database(db));
-}
+std::unique_ptr<Database> createDatabase(const std::string& filename);

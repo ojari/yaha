@@ -53,14 +53,37 @@ struct DataElPrice : public BaseData {
     {}
 };
 
+enum DataType {
+    LIGHT = 0,
+    SWITCH = 1,
+    TEMPERATURE = 2
+};
 
 struct DataHistory : public BaseData {
     std::string device;
-    int state;
+    DataType type;
+    int val1;
+    int val2;
+    int val3;
 
-    DataHistory(long time, const std::string& dev, int st) :
-        BaseData(time),
-        device(dev),
-        state(st)
+    DataHistory() :
+        BaseData{0},
+        device{"unknown"},
+        type{DataType::LIGHT},
+        val1{0},
+        val2{0},
+        val3{0}
     {}
+    DataHistory(long time, const std::string& dev, DataType type, int v1, int v2, int v3) :
+        BaseData{time},
+        device{dev},
+        type{type},
+        val1{v1},
+        val2{v2},
+        val3{v3}
+    {}
+};
+
+struct DataInsertHistory {
+    virtual void insert(const DataHistory& data) = 0;
 };

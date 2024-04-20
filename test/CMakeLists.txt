@@ -34,6 +34,7 @@ add_executable(${PROJECT_NAME}
   ../mqtt/common.cpp
   ../mqtt/collect.cpp
   ../mqtt/logic.cpp
+  ../mqtt/database.cpp
 )
 
 

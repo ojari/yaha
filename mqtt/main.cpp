@@ -44,10 +44,11 @@ private:
  * @brief The main function of the program.
  */
 int main() {
+    std::unique_ptr<Database> db{createDatabase("data.db")};
     std::shared_ptr<Collect> collect{new Collect()};
 
     std::vector<Task*> tasks {
-        new Mqtt(),
+        new Mqtt(db->history),
         new SourceTime(collect),
         new SourceTemperature(collect)
     };

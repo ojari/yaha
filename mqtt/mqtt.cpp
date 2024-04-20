@@ -13,6 +13,11 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
     if (device) {
         json jsonPayload = json::parse(payload);
         device->on_message(deviceName, jsonPayload);
+
+        DataHistory entry;
+        device->getHistory(entry);
+        history.insert(entry);
+
     } else {
         std::cout << "ERROR Missing topic: " << deviceName << " Payload: " << payload << std::endl; 
     }
@@ -50,8 +55,8 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
 
 
 //------------------------------------------------------------------
-Mqtt::Mqtt() : 
-    messageRouter(&deviceRegistry)
+Mqtt::Mqtt(DataInsertHistory &da) : 
+    messageRouter(&deviceRegistry, da)
 {
     int rc = 0;
     char* hostname = getenv("RPI_HOST");

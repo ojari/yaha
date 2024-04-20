@@ -91,9 +91,9 @@ TEST_CASE("Test Database.history", "[database]") {
     SECTION("Insert and retrieve history") {
         const int TIME = 123;
         const std::string DEVICE = "dummy";
-        const int STATE = 2;
+        const DataType STATE = DataType::SWITCH;
 
-        DataHistory data { TIME, DEVICE, STATE };
+        DataHistory data { TIME, DEVICE, STATE, 0, 0, 0 };
 
         db->history.insert(data);
 
@@ -102,6 +102,6 @@ TEST_CASE("Test Database.history", "[database]") {
         REQUIRE(history.size() == 1);
         REQUIRE(history[0].epoch == TIME);
         // REQUIRE(history[0].device == DEVICE);
-        REQUIRE(history[0].state == STATE);
+        REQUIRE(history[0].type == STATE);
     }
 }
