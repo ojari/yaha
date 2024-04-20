@@ -1,26 +1,35 @@
 #include "logic.hpp"
+#include "common.hpp"
 #include <iostream>
 
-void DebugOutput::onChange(const Values& state) {
-    std::cout << "Temperature: " << state.getTemperature() << " ElPrice: " << state.getElPrice() << " Time: " << state.getTime() << std::endl;
+void DebugOutput::onChange(const Values& vars) {
+    std::cout << "Temperature: " << vars.getTemperature() << " ElPrice: " << vars.getElPrice() << " Time: " << vars.getTime() << std::endl;
 }
 
-void Lights::onChange(const Values& state) {
-    int time = state.getTime();
-    if (time >= onTime && time < offTime) {
-        std::cout << "Lights are on" << std::endl;
-    } else {
-        std::cout << "Lights are off" << std::endl;
+void BooleanOutput::set(bool value) {
+    if (value != state) {
+        std::cout << name << " changed to " << value << std::endl;
+        state = value;
     }
 }
 
-void CarHeater::onChange(const Values& state) {
-    int time = state.getTime();
-    //@todo: implement time addition
-    if ((time >= leaveTime - calculateDuration(state)) && time < leaveTime) {
-        std::cout << "Car heater is on" << std::endl;
+
+void Lights::onChange(const Values& vars) {
+    int time = vars.getTime();
+    if (time >= onTime && time < offTime) {
+        set(true);
     } else {
-        std::cout << "Car heater is off" << std::endl;
+        set(false);
+    }
+}
+
+void CarHeater::onChange(const Values& vars) {
+    int time = vars.getTime();
+    int startTime = timeMinus(leaveTime, calculateDuration(vars));
+    if ((time >= startTime) && time < leaveTime) {
+        set(true);
+    } else {
+        set(false);
     }
 }
 

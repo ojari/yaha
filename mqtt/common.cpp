@@ -11,3 +11,17 @@ void showError(const char* message, const char* arg) {
 int hm2time(int hour, int minute) {
     return hour * 100 + minute;
 }
+
+int timeMinus(int time, int minutes) {
+    int hour = time / 100;
+    int minute = time % 100;
+    minute -= minutes;
+    if (minute < 0) {
+        hour += minute / 60;
+        minute %= 60;
+        if (hour < 0) {
+            hour += 24;
+        }
+    }
+    return hm2time(hour, minute);
+}
