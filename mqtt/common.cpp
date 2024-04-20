@@ -12,13 +12,16 @@ int hm2time(int hour, int minute) {
     return hour * 100 + minute;
 }
 
-int timeMinus(int time, int minutes) {
+int timeAdd(int time, int minutes) {
     int hour = time / 100;
     int minute = time % 100;
-    minute -= minutes;
-    if (minute < 0) {
+    minute += minutes;
+    if ((minute >= 60) || (minute < 0)){
         hour += minute / 60;
         minute %= 60;
+        if (hour >= 24) {
+            hour %= 24;
+        }
         if (hour < 0) {
             hour += 24;
         }

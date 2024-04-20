@@ -25,7 +25,7 @@ void Lights::onChange(const Values& vars) {
 
 void CarHeater::onChange(const Values& vars) {
     int time = vars.getTime();
-    int startTime = timeMinus(leaveTime, calculateDuration(vars));
+    int startTime = timeAdd(leaveTime, -calculateDuration(vars));
     if ((time >= startTime) && time < leaveTime) {
         set(true);
     } else {
