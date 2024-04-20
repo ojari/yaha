@@ -20,16 +20,29 @@ TEST_CASE("Lights class test") {
 
 
 TEST_CASE("CarHeaer class test") {
-    CarHeater heater(hm2time(10, 0));
+    int leaveTime = hm2time(10, 0);
+    CarHeater heater(leaveTime);
     Values state;
-    SECTION("Temperature -21") {
-        state.setTemperature(-21);
-        state.setTime(hm2time(7, 59));
+    auto data = GENERATE(
+        std::make_pair(-21, 120),
+        std::make_pair(-11,  90),
+        std::make_pair( -6,  60),
+        std::make_pair(  0,  30),
+        std::make_pair(  4,  30)
+    );
+    SECTION("Temperature test") {
+        int temperature = data.first;
+        int offset = data.second;
+
+        state.setTemperature(temperature);
+        state.setTime(timeAdd(leaveTime, -(offset+2)));
         heater.onChange(state);
+        INFO("Temperature: " << temperature << ", Offset: " << offset << ", Time: " << state.getTime() << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == false);
 
-        state.setTime(hm2time(8, 1));
+        state.setTime(timeAdd(leaveTime, -(offset - 2)));
         heater.onChange(state);
+        INFO("Temperature: " << temperature << ", Offset: " << offset << ", Time: " << state.getTime() << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == true);
     }
 }

@@ -16,15 +16,22 @@ int timeAdd(int time, int minutes) {
     int hour = time / 100;
     int minute = time % 100;
     minute += minutes;
-    if ((minute >= 60) || (minute < 0)){
+    if (minute >= 60) {
         hour += minute / 60;
         minute %= 60;
-        if (hour >= 24) {
-            hour %= 24;
+    }
+    if (minute < 0) {
+        hour += (minute - 59) / 60;
+        minute = (minute % 60);
+        if (minute != 0) {
+            minute += 60;
         }
-        if (hour < 0) {
-            hour += 24;
-        }
+    }
+    if (hour >= 24) {
+        hour %= 24;
+    }
+    if (hour < 0) {
+        hour += 24;
     }
     return hm2time(hour, minute);
 }

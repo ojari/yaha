@@ -15,10 +15,7 @@ set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake)
 
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name
 project(test)
-
-# find_package(mosquitto REQUIRED)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -30,6 +27,7 @@ add_executable(${PROJECT_NAME}
   test_orm.cpp
   test_logic.cpp
   test_collect.cpp
+  test_time.cpp
 
   ../mqtt/common.cpp
   ../mqtt/collect.cpp
