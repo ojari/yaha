@@ -2,6 +2,7 @@ if (YOCTO)
   set(VCPKG_ROOT /usr)
   set(CURL_LIB curl)
   set(EXTRA_LIBRARIES ssl crypto pthread dl z)
+  set(MOSQUITTO_LIB mosquitto)
 else()
   if (WIN32)
     set(VCPKG_DIR c:/usr/vcpkg)
@@ -14,6 +15,7 @@ else()
     set(CURL_LIB curl)
     set(EXTRA_LIBRARIES ssl crypto pthread dl z)
   endif()
+  set(MOSQUITTO_LIB mosquitto_static)
   set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake)
 endif()
 
@@ -44,7 +46,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
 )
 target_link_libraries(${PROJECT_NAME}
-    mosquitto_static
+    ${MOSQUITTO_LIB}
     ${EXTRA_LIBRARIES}
     sqlite3
 )
