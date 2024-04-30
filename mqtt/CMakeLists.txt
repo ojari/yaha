@@ -15,10 +15,7 @@ set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake)
 
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name
 project(yaha)
-
-find_package(mosquitto REQUIRED)
 
 # specify the C++ standard
 # set(CMAKE_CXX_STANDARD 17)
