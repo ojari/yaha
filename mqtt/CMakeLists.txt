@@ -50,3 +50,5 @@ target_link_libraries(${PROJECT_NAME}
     ${EXTRA_LIBRARIES}
     sqlite3
 )
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
