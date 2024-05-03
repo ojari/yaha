@@ -70,13 +70,10 @@ private:
 
 class DeviceRegistry {
 public:
-    void registerDevice(const std::string& name, Device* device) {
-        devices_[name] = device;
-    }
 
     void load(const std::string& filename);
 
-    Device* getDevice(const std::string& name) {
+    std::shared_ptr<Device> getDevice(const std::string& name) {
         auto it = devices_.find(name);
         if (it != devices_.end()) {
             return it->second;
@@ -85,8 +82,10 @@ public:
     }
 
 private:
-    std::unordered_map<std::string, Device*> devices_;
-    LightDevice lightDevice;
-    SwitchDevice switchDevice;
-    TempSensorDevice tempSensorDevice;
+   /* void registerDevice(const std::string& name, std::shared_ptr<Device> device) {
+        devices_[name] = device;
+    }*/
+    std::shared_ptr<Device> createDevice(const std::string& type) const;
+
+    std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
