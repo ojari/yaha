@@ -52,8 +52,8 @@ private:
 
 class StorageHeater : public BooleanOutput, public Observer {
 public:
-    StorageHeater() :
-        BooleanOutput("StorageHeater")
+    StorageHeater(std::shared_ptr<IActuator> actuator) :
+        BooleanOutput(actuator, "StorageHeater")
     {}
     void onChange(const Values& state) override;
 private:
@@ -63,16 +63,16 @@ private:
 
 class WaterHeater : public BooleanOutput, public Observer {
 public:
-    WaterHeater() :
-        BooleanOutput("WaterHeater")
+    WaterHeater(std::shared_ptr<IActuator> actuator) :
+        BooleanOutput(actuator, "WaterHeater")
     {}
     void onChange(const Values& state) override;
 };
 
 class RoomHeater : public BooleanOutput, public Observer {
 public:
-    RoomHeater() :
-        BooleanOutput("RoomHeater")
+    RoomHeater(std::shared_ptr<IActuator> actuator) :
+        BooleanOutput(actuator, "RoomHeater")
     {}
     void onChange(const Values& state) override;
 };
