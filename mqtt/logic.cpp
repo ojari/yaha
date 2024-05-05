@@ -8,7 +8,8 @@ void DebugOutput::onChange(const Values& vars) {
 
 void BooleanOutput::set(bool value) {
     if (value != state) {
-        std::cout << name << " changed to " << value << std::endl;
+        actuator.set(name, value);
+        // std::cout << name << " changed to " << value << std::endl;
         state = value;
     }
 }

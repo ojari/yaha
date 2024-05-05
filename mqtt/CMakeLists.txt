@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   mqtt_device.cpp
   common.cpp
+  actuator.cpp
   logic.cpp
   collect.cpp
   database.cpp
@@ -49,6 +50,7 @@ target_link_libraries(${PROJECT_NAME}
     ${MOSQUITTO_LIB}
     ${EXTRA_LIBRARIES}
     sqlite3
+    redis++
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)

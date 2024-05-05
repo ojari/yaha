@@ -1,13 +1,16 @@
 #pragma once
 #include "events.hpp"
+#include "actuator.hpp"
 #include <string>
+#include <memory>
 
 struct DebugOutput : public Observer {
     void onChange(const Values& state) override;
 };
 
 struct BooleanOutput {
-    BooleanOutput(const std::string& name) :
+    BooleanOutput(std::shared_ptr<IActuator> actuator, const std::string& name) :
+        actuator(actuator),
         state(false),
         name(name)
     {}
@@ -16,6 +19,7 @@ struct BooleanOutput {
         return state;
     }
 protected:
+    std::shared_ptr<IActuator> actuator;
     void set(bool value);
 private:
     bool state;
@@ -23,10 +27,10 @@ private:
 };
 
 struct Lights : public BooleanOutput, public Observer {    
-    Lights(int onTime, int offTime) :
+    Lights(std::shared_ptr<IActuator> actuator, int onTime, int offTime) :
         onTime(onTime),
         offTime(offTime),
-        BooleanOutput("Lights")
+        BooleanOutput(actuator, "Lights")
     {}
     void onChange(const Values& vars) override;
 private:
@@ -35,9 +39,9 @@ private:
 };
 
 struct CarHeater : public BooleanOutput, public Observer {
-    CarHeater(int leaveTime) :
+    CarHeater(std::shared_ptr<IActuator> actuator, int leaveTime) :
         leaveTime(leaveTime),
-        BooleanOutput("CarHeater")
+        BooleanOutput(actuator, "CarHeater")
     {}
     void onChange(const Values& state) override;
 private:
