@@ -1,9 +1,21 @@
 #include "catch2/catch_all.hpp"
 #include "../mqtt/logic.hpp"
 #include "../mqtt/common.hpp"
+#include <memory>
+
+class TestActuator : public IActuator {
+public:
+    void set(std::string &device, bool value) override {
+        //this->device = device;
+        //this->value = value;
+    }
+};
+
+std::shared_ptr<IActuator> actuator{new TestActuator()};
+
 
 TEST_CASE("Lights class test") {
-    Lights lights(hm2time(10, 0), hm2time(20, 0));
+    Lights lights(actuator, hm2time(10, 0), hm2time(20, 0));
     Values state;
     SECTION("Turn on lights") {
         state.setTime(hm2time(12, 0));
@@ -21,7 +33,7 @@ TEST_CASE("Lights class test") {
 
 TEST_CASE("CarHeaer class test") {
     int leaveTime = hm2time(10, 0);
-    CarHeater heater(leaveTime);
+    CarHeater heater(actuator, leaveTime);
     Values state;
     auto data = GENERATE(
         std::make_pair(-21, 120),

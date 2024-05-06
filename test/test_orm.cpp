@@ -6,7 +6,7 @@ auto db = createDatabase("test.db");
 TEST_CASE("Test database", "[database]") {
     DataTemperature temp { 123, 10.1, 90.0 };
 
-    db->temperature.insert(temp);
+    db->insert(temp);
 
     auto temps = db->temperature.getAll();
 
@@ -37,7 +37,7 @@ TEST_CASE("Test Database.weather", "[database]") {
         const float SOLARRAD = 0.4;
         DataWeather data { TIME, TEMP, HUM, PRESS, WINDSPD, WINDDIR, RAIN, UV, SOLARRAD};
 
-        db->weather.insert(data);
+        db->insert(data);
 
         auto weather = db->weather.getAll();
 
@@ -68,7 +68,7 @@ TEST_CASE("Test Database.elPrice", "[database]") {
         const float PRICE = 0.15;
         DataElPrice data { TIME, PRICE };
 
-        db->elPrice.insert(data);
+        db->insert(data);
 
         auto elPrice = db->elPrice.getAll();
 
@@ -95,7 +95,7 @@ TEST_CASE("Test Database.history", "[database]") {
 
         DataHistory data { TIME, DEVICE, STATE, 0, 0, 0 };
 
-        db->history.insert(data);
+        db->insert(data);
 
         auto history = db->history.getAll();
 

@@ -235,6 +235,19 @@ public:
     ~Database() {
         sqlite3_close(db);
     }
+    
+    void insert(const DataTemperature& data) {
+        temperature.insert(data);
+    }
+    void insert(const DataWeather& data) {
+        weather.insert(data);
+    }
+    void insert(const DataElPrice& data) {
+        elPrice.insert(data);
+    }
+    void insert(const DataHistory& data) {
+        history.insert(data);
+    }
 
     DataTemperatureORM temperature;
     DataWeatherORM weather;
