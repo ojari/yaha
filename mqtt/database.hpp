@@ -20,6 +20,41 @@ protected:
     sqlite3* db;
 };
 
+class SqlInsert {
+public:
+    SqlInsert(sqlite3* db, const char* sql) {
+        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    }
+
+    ~SqlInsert() {
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+    }
+
+    void add(long value) {
+        sqlite3_bind_int64(stmt, index, value);
+        index++;
+    }
+
+    void add(int value) {
+        sqlite3_bind_int(stmt, index, value);
+        index++;
+    }
+
+    void add(float value) {
+        sqlite3_bind_double(stmt, index, value);
+        index++;
+    }
+
+    void add(const std::string& value) {
+        sqlite3_bind_text(stmt, index, value.c_str(), -1, SQLITE_TRANSIENT);
+        index++;
+    }
+private:
+    sqlite3_stmt* stmt;
+    int index = 1;
+};
+
 class DataTemperatureORM : public BaseORM {
 public:
     DataTemperatureORM(sqlite3* db) :
@@ -32,14 +67,10 @@ public:
     }
 
     void insert(const DataTemperature& data) {
-        const char* sql = "INSERT INTO Temperature (epoch, temperature, humidity) VALUES (?, ?, ?);";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        sqlite3_bind_int64(stmt, 1, data.epoch);
-        sqlite3_bind_double(stmt, 2, data.temperature);
-        sqlite3_bind_double(stmt, 3, data.humidity);
-        sqlite3_step(stmt);
-        sqlite3_finalize(stmt);
+        auto sql = SqlInsert(db, "INSERT INTO Temperature (epoch, temperature, humidity) VALUES (?, ?, ?);");
+        sql.add(data.epoch);
+        sql.add(data.temperature);
+        sql.add(data.humidity);
     }
 
     std::vector<DataTemperature> getAll() {
@@ -78,20 +109,16 @@ public:
     }
 
     void insert(const DataWeather& data) {
-        const char* sql = "INSERT INTO Weather (epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        sqlite3_bind_int64(stmt, 1, data.epoch);
-        sqlite3_bind_double(stmt, 2, data.temperature);
-        sqlite3_bind_double(stmt, 3, data.humidity);
-        sqlite3_bind_double(stmt, 4, data.pressure);
-        sqlite3_bind_double(stmt, 5, data.windSpeed);
-        sqlite3_bind_double(stmt, 6, data.windDirection);
-        sqlite3_bind_double(stmt, 7, data.rain);
-        sqlite3_bind_double(stmt, 8, data.uv);
-        sqlite3_bind_double(stmt, 9, data.solarRadiation);
-        sqlite3_step(stmt);
-        sqlite3_finalize(stmt);
+        auto sql = SqlInsert(db, "INSERT INTO Weather (epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        sql.add(data.epoch);
+        sql.add(data.temperature);
+        sql.add(data.humidity);
+        sql.add(data.pressure);
+        sql.add(data.windSpeed);
+        sql.add(data.windDirection);
+        sql.add(data.rain);
+        sql.add(data.uv);
+        sql.add(data.solarRadiation);
     }
 
     std::vector<DataWeather> getAll() {
@@ -128,13 +155,9 @@ public:
     }
 
     void insert(const DataElPrice& data) {
-        const char* sql = "INSERT INTO ElPrice (epoch, price) VALUES (?, ?);";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        sqlite3_bind_int64(stmt, 1, data.epoch);
-        sqlite3_bind_double(stmt, 2, data.price);
-        sqlite3_step(stmt);
-        sqlite3_finalize(stmt);
+        auto sql = SqlInsert(db, "INSERT INTO ElPrice (epoch, price) VALUES (?, ?);");
+        sql.add(data.epoch);
+        sql.add(data.price);
     }
 
     std::vector<DataElPrice> getAll() {
@@ -154,8 +177,6 @@ public:
     }
 };
 
-
-
 class DataHistoryORM : public BaseORM, public DataInsertHistory {
 public:
     DataHistoryORM(sqlite3* db) : BaseORM(db) {
@@ -170,17 +191,13 @@ public:
     }
 
     void insert(const DataHistory& data) override {
-        const char* sql = "INSERT INTO History (epoch, device, type, val1, val2, val3) VALUES (?, ?, ?, ?, ?, ?);";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        sqlite3_bind_int64(stmt, 1, data.epoch);
-        sqlite3_bind_text(stmt, 2, data.device.c_str(), -1, SQLITE_TRANSIENT);
-        sqlite3_bind_int(stmt, 3, data.type);
-        sqlite3_bind_int(stmt, 4, data.val1);
-        sqlite3_bind_int(stmt, 5, data.val2);
-        sqlite3_bind_int(stmt, 6, data.val3);
-        sqlite3_step(stmt);
-        sqlite3_finalize(stmt);
+        auto sql = SqlInsert(db, "INSERT INTO History (epoch, device, type, val1, val2, val3) VALUES (?, ?, ?, ?, ?, ?);");
+        sql.add(data.epoch);
+        sql.add(data.device);
+        sql.add(data.type);
+        sql.add(data.val1);
+        sql.add(data.val2);
+        sql.add(data.val3);
     }
 
     std::vector<DataHistory> getAll() {
