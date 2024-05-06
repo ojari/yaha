@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 #include <vector>
 #include <memory>
+#include <functional>
 
 class BaseORM {
 public:
@@ -55,6 +56,44 @@ private:
     int index = 1;
 };
 
+template <typename T>
+class SqlIterator {
+public:
+    SqlIterator(sqlite3_stmt* stmt, std::function<T(sqlite3_stmt*)> rowToData) :
+        stmt(stmt), 
+        rowToData(rowToData), 
+        done(false)
+    {
+        step();
+    }
+
+    SqlIterator& operator++() {
+        step();
+        return *this;
+    }
+
+    T operator*() {
+        return rowToData(stmt);
+    }
+
+    bool operator!=(const SqlIterator& other) const {
+        return done != other.done;
+    }
+
+private:
+    sqlite3_stmt* stmt;
+    std::function<T(sqlite3_stmt*)> rowToData;
+    bool done;
+
+    void step() {
+        if (sqlite3_step(stmt) != SQLITE_ROW) {
+            done = true;
+            sqlite3_finalize(stmt);
+        }
+    }
+};
+
+
 class DataTemperatureORM : public BaseORM {
 public:
     DataTemperatureORM(sqlite3* db) :
@@ -71,6 +110,22 @@ public:
         sql.add(data.epoch);
         sql.add(data.temperature);
         sql.add(data.humidity);
+    }
+
+    SqlIterator<DataTemperature> begin() {
+        const char* sql = "SELECT epoch, temperature, humidity FROM Temperature;";
+        sqlite3_stmt* stmt;
+        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+        return SqlIterator<DataTemperature>(stmt, [](sqlite3_stmt* stmt) {
+            long epoch = sqlite3_column_int64(stmt, 0);
+            float temperature = sqlite3_column_double(stmt, 1);
+            float humidity = sqlite3_column_double(stmt, 2);
+            return DataTemperature(epoch, temperature, humidity);
+        });
+    }
+
+    SqlIterator<DataTemperature> end() {
+        return SqlIterator<DataTemperature>(nullptr, {});
     }
 
     std::vector<DataTemperature> getAll() {

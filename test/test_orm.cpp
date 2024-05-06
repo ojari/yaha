@@ -8,12 +8,17 @@ TEST_CASE("Test database", "[database]") {
 
     db->insert(temp);
 
-    auto temps = db->temperature.getAll();
+    auto temps = db->temperature.begin();
 
-    REQUIRE(temps.size() == 1);
-    REQUIRE(temps[0].temperature == 10.1f);
-    REQUIRE(temps[0].humidity == 90.0f);
-    REQUIRE(temps[0].epoch == 123);
+    REQUIRE((*temps).temperature == 10.1f);
+    REQUIRE((*temps).humidity == 90.0f);
+    REQUIRE((*temps).epoch == 123);
+
+    int counter {0};
+    for (auto t : db->temperature) {
+        counter++;
+    }
+    REQUIRE(counter == 1);
 }
 
 TEST_CASE("Test Database.weather", "[database]") {
