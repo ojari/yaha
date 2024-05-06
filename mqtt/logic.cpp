@@ -6,7 +6,7 @@ void DebugOutput::onChange(const Values& vars) {
     std::cout << "Temperature: " << vars.getTemperature() << " ElPrice: " << vars.getElPrice() << " Time: " << vars.getTime() << std::endl;
 }
 
-void BooleanOutput::set(bool value) {
+void BooleanController::set(bool value) {
     if (value != state) {
         actuator->set(name, value);
         // std::cout << name << " changed to " << value << std::endl;

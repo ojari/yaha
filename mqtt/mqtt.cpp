@@ -1,6 +1,5 @@
 #include <mosquitto.h>
 #include <iostream>
-#include <string>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "mqtt.hpp"
@@ -93,5 +92,12 @@ void Mqtt::execute() {
         showError(mosquitto_strerror(rc));
         // sleep(10);
         mosquitto_reconnect(mosq);
+    }
+}
+
+void Mqtt::send(const std::string& topic, const std::string& payload) {
+    int rc = mosquitto_publish(mosq, NULL, topic.c_str(), payload.size(), payload.c_str(), 0, false);
+    if (rc) {
+        showError(mosquitto_strerror(rc));
     }
 }

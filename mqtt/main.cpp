@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "collect.hpp"
 #include "logic.hpp"
+#include "actuator.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
@@ -45,17 +46,18 @@ private:
  */
 int main() {
     std::unique_ptr<Database> db{createDatabase("data.db")};
+    Mqtt mqtt(db->history);
+    Actuator actuator(mqtt);
     std::shared_ptr<Collect> collect{new Collect()};
 
-    std::vector<Task*> tasks {
-        new Mqtt(db->history),
+    std::vector<ITask*> tasks {
+        &mqtt,
         new SourceTime(collect),
         new SourceTemperature(collect)
     };
 
     DebugOutput debugOutput;
     collect->subscribe(debugOutput);
-
 
     while (true) {
         for (auto task : tasks)

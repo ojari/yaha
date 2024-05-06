@@ -25,11 +25,11 @@ private:
 };
 
 
-class Mqtt : public Task {
+class Mqtt : public ITask, public IOutput {
 public:
     Mqtt(DataInsertHistory &history);
-    void execute();
-
+    void execute() override;
+    void send(const std::string& topic, const std::string& message) override;
 private:
     struct mosquitto *mosq;
     DeviceRegistry deviceRegistry;

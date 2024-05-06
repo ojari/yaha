@@ -3,17 +3,20 @@
 #include "actuator.hpp"
 #include <string>
 #include <memory>
+#include <functional>
 
 struct DebugOutput : public Observer {
     void onChange(const Values& state) override;
 };
 
-struct BooleanOutput {
-    BooleanOutput(std::shared_ptr<IActuator> actuator, const std::string& name) :
+struct BooleanController : public Observer {
+    BooleanController(std::shared_ptr<IActuator> actuator, const std::string& name) :
         actuator(actuator),
         state(false),
         name(name)
     {}
+
+    virtual void onChange(const Values& state) = 0;
 
     bool isOn() const {
         return state;
@@ -26,11 +29,11 @@ private:
     std::string name;
 };
 
-struct Lights : public BooleanOutput, public Observer {    
+struct Lights : public BooleanController  {    
     Lights(std::shared_ptr<IActuator> actuator, int onTime, int offTime) :
         onTime(onTime),
         offTime(offTime),
-        BooleanOutput(actuator, "Lights")
+        BooleanController(actuator, "Lights")
     {}
     void onChange(const Values& vars) override;
 private:
@@ -38,10 +41,10 @@ private:
     int offTime;
 };
 
-struct CarHeater : public BooleanOutput, public Observer {
+struct CarHeater : public BooleanController  {
     CarHeater(std::shared_ptr<IActuator> actuator, int leaveTime) :
         leaveTime(leaveTime),
-        BooleanOutput(actuator, "CarHeater")
+        BooleanController(actuator, "CarHeater")
     {}
     void onChange(const Values& state) override;
 private:
@@ -50,10 +53,10 @@ private:
     bool state;
 };
 
-class StorageHeater : public BooleanOutput, public Observer {
+class StorageHeater : public BooleanController  {
 public:
     StorageHeater(std::shared_ptr<IActuator> actuator) :
-        BooleanOutput(actuator, "StorageHeater")
+        BooleanController(actuator, "StorageHeater")
     {}
     void onChange(const Values& state) override;
 private:
@@ -61,18 +64,56 @@ private:
     int calculateEndTime(const Values& state);
 };
 
-class WaterHeater : public BooleanOutput, public Observer {
+class WaterHeater : public BooleanController  {
 public:
     WaterHeater(std::shared_ptr<IActuator> actuator) :
-        BooleanOutput(actuator, "WaterHeater")
+        BooleanController(actuator, "WaterHeater")
     {}
     void onChange(const Values& state) override;
 };
 
-class RoomHeater : public BooleanOutput, public Observer {
+class RoomHeater : public BooleanController  {
 public:
     RoomHeater(std::shared_ptr<IActuator> actuator) :
-        BooleanOutput(actuator, "RoomHeater")
+        BooleanController(actuator, "RoomHeater")
     {}
     void onChange(const Values& state) override;
+};
+
+class ControllerRegistry {
+public:
+    void registerCtrl(std::shared_ptr<BooleanController> output) {
+        controllers.push_back(output);
+    }
+
+private:
+    std::vector<std::shared_ptr<BooleanController>> controllers;
+
+    std::shared_ptr<BooleanController> createController(const std::string& type, std::shared_ptr<IActuator> actuator, int onTime, int offTime, int leaveTime) {
+        std::unordered_map<std::string, std::function<std::shared_ptr<BooleanController>()>> creators = {
+            {"Lights", [&]() {
+                return std::make_shared<Lights>(actuator, onTime, offTime);
+            }},
+            {"CarHeater", [&]() {
+                return std::make_shared<CarHeater>(actuator, leaveTime);
+            }},
+            {"StorageHeater", [&]() {
+                return std::make_shared<StorageHeater>(actuator);
+            }},
+            {"WaterHeater", [&]() {
+                return std::make_shared<WaterHeater>(actuator);
+            }},
+            {"RoomHeater", [&]() {
+                return std::make_shared<RoomHeater>(actuator);
+            }}
+        };
+
+        auto it = creators.find(type);
+        if (it != creators.end()) {
+            return it->second();
+        } else {
+            // Handle unknown type
+            return nullptr;
+        }
+    }
 };

@@ -26,7 +26,7 @@ protected:
 };
 
 
-class SourceTime : public BaseSource, public Task {
+class SourceTime : public BaseSource, public ITask {
 public:
     SourceTime(std::shared_ptr<Collect> collect) : BaseSource(collect)
     {}
@@ -42,7 +42,7 @@ private:
     int minute {0};
 };
 
-class SourceTemperature : public BaseSource, public Task {
+class SourceTemperature : public BaseSource, public ITask {
 public:
     SourceTemperature(std::shared_ptr<Collect> collect) : BaseSource(collect)
     {}

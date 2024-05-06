@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "common.hpp"
 
 class IActuator {
 public:
@@ -10,5 +11,11 @@ public:
 
 class Actuator : public IActuator {
 public:
+    Actuator(IOutput& output) : 
+        output(output) 
+    {}
     void set(std::string &device, bool value) override;
+    
+private:
+    IOutput& output;
 };
