@@ -1,7 +1,5 @@
 #pragma once
-#include <sqlite3.h>
 #include <string>
-#include "data.hpp"
 
 struct BaseData {
     long epoch;

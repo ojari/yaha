@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "data.hpp"
+#include "data/data.hpp"
 
 class Device {
 public:

@@ -1,7 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "mqtt_device.hpp"
-#include "database.hpp"
+#include "data/database.hpp"
 
 class MessageRouter {
 public:
