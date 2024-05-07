@@ -11,11 +11,9 @@ public:
     virtual ~BaseORM() {
     }
 
-protected:
-    void createTable(const char* sql) {
-        sqlite3_exec(db, sql, 0, 0, 0);
-    }
+    virtual const char* sqlCreateTable() = 0;
 
+protected:
     sqlite3* db;
 };
 

@@ -9,12 +9,14 @@
 class DataTemperatureORM : public BaseORM {
 public:
     DataTemperatureORM(sqlite3* db) :
-        BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS Temperature ("
-                          "epoch INTEGER PRIMARY KEY,"
-                          "temperature REAL,"
-                          "humidity REAL);";
-        createTable(sql);
+        BaseORM(db) 
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS Temperature ("
+               "epoch INTEGER PRIMARY KEY,"
+               "temperature REAL,"
+               "humidity REAL);";
     }
 
     void insert(const DataTemperature& data) {
@@ -60,9 +62,13 @@ public:
 
 class DataWeatherORM : public BaseORM {
 public:
-    DataWeatherORM(sqlite3* db) : BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS Weather ("
-                "epoch INTEGER PRIMARY KEY,"
+    DataWeatherORM(sqlite3* db) :
+        BaseORM(db)
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS Weather ("
+               "epoch INTEGER PRIMARY KEY,"
                "temperature REAL,"
                "humidity REAL,"
                "pressure REAL,"
@@ -71,8 +77,6 @@ public:
                "rain REAL,"
                "uv REAL,"
                "solarRadiation REAL);";
-
-        createTable(sql);
     }
 
     void insert(const DataWeather& data) {
@@ -114,11 +118,14 @@ public:
 
 class DataElPriceORM : public BaseORM {
 public:
-    DataElPriceORM(sqlite3* db) : BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS ElPrice ("
-                          "epoch INTEGER PRIMARY KEY,"
-                          "price REAL);";
-        createTable(sql);
+    DataElPriceORM(sqlite3* db) : 
+        BaseORM(db)
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS ElPrice ("
+               "epoch INTEGER PRIMARY KEY,"
+               "price REAL);";
     }
 
     void insert(const DataElPrice& data) {
@@ -146,15 +153,18 @@ public:
 
 class DataHistoryORM : public BaseORM, public DataInsertHistory {
 public:
-    DataHistoryORM(sqlite3* db) : BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS History ("
-                          "epoch INTEGER PRIMARY KEY,"
-                          "device TEXT,"
-                          "type INTEGER,"
-                          "val1 INTEGER,"
-                          "val2 INTEGER,"
-                          "val3 INTEGER);";
-        createTable(sql);
+    DataHistoryORM(sqlite3* db) :
+        BaseORM(db)
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS History ("
+               "epoch INTEGER PRIMARY KEY,"
+               "device TEXT,"
+               "type INTEGER,"
+               "val1 INTEGER,"
+               "val2 INTEGER,"
+               "val3 INTEGER);";
     }
 
     void insert(const DataHistory& data) override {
@@ -203,6 +213,13 @@ public:
     ~Database() {
         sqlite3_close(db);
     }
+
+    void createTables() {
+        createTable(temperature.sqlCreateTable());
+        createTable(weather.sqlCreateTable());
+        createTable(elPrice.sqlCreateTable());
+        createTable(history.sqlCreateTable());
+    }
     
     void insert(const DataTemperature& data) {
         temperature.insert(data);
@@ -223,6 +240,8 @@ public:
     DataHistoryORM history;
 
 private:
+    void createTable(const char* sql);
+
     sqlite3* db;
 };
 

@@ -7,11 +7,13 @@
 class ConfigDeviceORM : public BaseORM {
 public:
     ConfigDeviceORM(sqlite3* db) :
-        BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS Device ("
-                          "name TEXT PRIMARY KEY,"
-                          "type TEXT);";
-        createTable(sql);
+        BaseORM(db) 
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS Device ("
+               "name TEXT PRIMARY KEY,"
+               "type TEXT);";
     }
 
     void insert(const ConfigDevice& data) {
@@ -39,14 +41,16 @@ public:
 class ConfigControllerORM : public BaseORM {
 public:
     ConfigControllerORM(sqlite3* db) :
-        BaseORM(db) {
-        const char* sql = "CREATE TABLE IF NOT EXISTS Controller ("
-                          "name TEXT PRIMARY KEY,"
-                          "type TEXT,"
-                          "actuator TEXT,"
-                          "time1 INTEGER,"
-                          "time2 INTEGER);";
-        createTable(sql);
+        BaseORM(db) 
+    {}
+
+    const char* sqlCreateTable() override {
+        return "CREATE TABLE IF NOT EXISTS Controller ("
+               "name TEXT PRIMARY KEY,"
+               "type TEXT,"
+               "actuator TEXT,"
+               "time1 INTEGER,"
+               "time2 INTEGER);";
     }
 
     void insert(const ConfigController& data) {
@@ -104,4 +108,4 @@ public:
 
 private:
     sqlite3* db;
-}
+};
