@@ -113,6 +113,57 @@ void parse(const char* cache_file)
 }
 
 //------------------------------------------------------------------------------
+struct ICommand {
+    virtual void execute() = 0;
+    virtual string description() = 0;
+    virtual string flag() = 0;
+
+    bool active = false;
+};
+
+//------------------------------------------------------------------------------
+class DownloadCommand : public ICommand {
+public:
+    DownloadCommand(string url, string cache_file) : 
+        url(url),
+        cache_file(cache_file)
+    {}
+    void execute() override {
+        cout << "command download: " << url << " -> " << cache_file << endl;
+        download(url.c_str(), cache_file.c_str());
+    }
+    string description() override {
+        return "Download latest weather from network.";
+    }
+    string flag() override {
+        return "-d";
+    }
+private:
+    string url;
+    string cache_file;
+};
+
+//------------------------------------------------------------------------------
+class ParseCommand : public ICommand {
+public:
+    ParseCommand(string cache_file) :
+        cache_file(cache_file)
+    {}
+    void execute() override {
+        cout << "command parse: " << cache_file << endl;
+        parse(cache_file.c_str());
+    }
+    string description() override {
+        return "Get weather information from json cache file.";
+    }
+    string flag() override {
+        return "-p";
+    }
+private:
+    string cache_file;
+};
+
+//------------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
     CLI::App app;
@@ -124,26 +175,26 @@ int main(int argc, char** argv)
 
     char *location = getenv("LOCATION");
     if (location == NULL) {
-        std::cerr << "ERROR: Missing LOCATION environmental variable!" << std::endl;
+        cerr << "ERROR: Missing LOCATION environmental variable!" << std::endl;
         return 1;
     }
     url.append(location);
 
-    app.add_flag("-d", do_download, "Download latest weather from network.");
-    app.add_flag("-p", do_parse, "Get weather information from json cache file.");
+    vector<ICommand*> commands = {
+        new DownloadCommand(url, cache_file),
+        new ParseCommand(cache_file)
+    };
+
+    for (auto command : commands) {
+        app.add_flag(command->flag(), command->active, command->description());
+    }
 
     CLI11_PARSE(app, argc, argv);
 
-    if (do_download) {
-        download(url.c_str(), cache_file.c_str());
-    }
-    if (do_parse) {
-        parse(cache_file.c_str());
-    }
-    if (!do_download && !do_parse) {
-        std::cout << "Command line argument missing!" << std::endl;
-        download(url.c_str(), cache_file.c_str());
-        parse(cache_file.c_str());
+    for (auto command : commands) {
+        if (command->active) {
+            command->execute();
+        }
     }
     return 0;
 }
