@@ -5,11 +5,10 @@
 #include <vector>
 #include <memory>
 
-
-class DataTemperatureORM : public BaseORM {
+class DataTemperatureORM : public BaseORM<DataTemperature> {
 public:
     DataTemperatureORM(sqlite3* db) :
-        BaseORM(db) 
+        BaseORM<DataTemperature>(db) 
     {}
 
     const char* sqlCreateTable() override {
@@ -19,18 +18,18 @@ public:
                "humidity REAL);";
     }
 
-    void insert(const DataTemperature& data) {
+    void insert(const DataTemperature& data) override {
         auto sql = SqlInsert(db, "INSERT INTO Temperature (epoch, temperature, humidity) VALUES (?, ?, ?);");
         sql.add(data.epoch);
         sql.add(data.temperature);
         sql.add(data.humidity);
     }
 
-    SqlIterator<DataTemperature> begin() {
+    BaseIterator<DataTemperature>* begin() {
         const char* sql = "SELECT epoch, temperature, humidity FROM Temperature;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return SqlIterator<DataTemperature>(stmt, [](sqlite3_stmt* stmt) {
+        return new SqlIterator<DataTemperature>(stmt, [](sqlite3_stmt* stmt) {
             long epoch = sqlite3_column_int64(stmt, 0);
             float temperature = sqlite3_column_double(stmt, 1);
             float humidity = sqlite3_column_double(stmt, 2);
@@ -38,29 +37,12 @@ public:
         });
     }
 
-    SqlIterator<DataTemperature> end() {
-        return SqlIterator<DataTemperature>(nullptr, {});
-    }
-
-    std::vector<DataTemperature> getAll() {
-        const char* sql = "SELECT epoch, temperature, humidity FROM Temperature;";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-
-        std::vector<DataTemperature> data;
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            long epoch = sqlite3_column_int64(stmt, 0);
-            float temperature = sqlite3_column_double(stmt, 1);
-            float humidity = sqlite3_column_double(stmt, 2);
-            data.push_back(DataTemperature(epoch, temperature, humidity));
-        }
-
-        sqlite3_finalize(stmt);
-        return data;
+    BaseIterator<DataTemperature>* end() override {
+        return new SqlIterator<DataTemperature>(nullptr, {});
     }
 };
 
-class DataWeatherORM : public BaseORM {
+class DataWeatherORM : public BaseORM<DataWeather> {
 public:
     DataWeatherORM(sqlite3* db) :
         BaseORM(db)
@@ -92,13 +74,11 @@ public:
         sql.add(data.solarRadiation);
     }
 
-    std::vector<DataWeather> getAll() {
+    BaseIterator<DataWeather>* begin() override {
         const char* sql = "SELECT epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation FROM Weather;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-
-        std::vector<DataWeather> data;
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
+        return new SqlIterator<DataWeather>(stmt, [](sqlite3_stmt* stmt) {
             long epoch = sqlite3_column_int64(stmt, 0);
             float temperature = sqlite3_column_double(stmt, 1);
             float humidity = sqlite3_column_double(stmt, 2);
@@ -108,15 +88,16 @@ public:
             float rain = sqlite3_column_double(stmt, 6);
             float uv = sqlite3_column_double(stmt, 7);
             float solarRadiation = sqlite3_column_double(stmt, 8);
-            data.push_back(DataWeather(epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation));
-        }
+            return DataWeather(epoch, temperature, humidity, pressure, windSpeed, windDirection, rain, uv, solarRadiation);
+        });
+    }
 
-        sqlite3_finalize(stmt);
-        return data;
+    BaseIterator<DataWeather>* end() override {
+        return new SqlIterator<DataWeather>(nullptr, {});
     }
 };
 
-class DataElPriceORM : public BaseORM {
+class DataElPriceORM : public BaseORM<DataElPrice> {
 public:
     DataElPriceORM(sqlite3* db) : 
         BaseORM(db)
@@ -134,24 +115,23 @@ public:
         sql.add(data.price);
     }
 
-    std::vector<DataElPrice> getAll() {
+    BaseIterator<DataElPrice>* begin() override {
         const char* sql = "SELECT epoch, price FROM ElPrice;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-
-        std::vector<DataElPrice> data;
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
+        return new SqlIterator<DataElPrice>(stmt, [](sqlite3_stmt* stmt) {
             long epoch = sqlite3_column_int64(stmt, 0);
             float price = sqlite3_column_double(stmt, 1);
-            data.push_back(DataElPrice(epoch, price));
-        }
+            return DataElPrice(epoch, price);
+        });
+    }
 
-        sqlite3_finalize(stmt);
-        return data;
+    BaseIterator<DataElPrice>* end() override {
+        return new SqlIterator<DataElPrice>(nullptr, {});
     }
 };
 
-class DataHistoryORM : public BaseORM, public DataInsertHistory {
+class DataHistoryORM : public BaseORM<DataHistory>, public DataInsertHistory {
 public:
     DataHistoryORM(sqlite3* db) :
         BaseORM(db)
@@ -177,24 +157,23 @@ public:
         sql.add(data.val3);
     }
 
-    std::vector<DataHistory> getAll() {
+    BaseIterator<DataHistory>* begin() override {
         const char* sql = "SELECT epoch, device, type, val1, val2, val3 FROM History;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-
-        std::vector<DataHistory> data;
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
+        return new SqlIterator<DataHistory>(stmt, [](sqlite3_stmt* stmt) {
             long epoch = sqlite3_column_int64(stmt, 0);
             std::string device = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             DataType type = static_cast<DataType>(sqlite3_column_int(stmt, 2));
             int val1 = sqlite3_column_int(stmt, 3);
             int val2 = sqlite3_column_int(stmt, 4);
             int val3 = sqlite3_column_int(stmt, 5);
-            data.push_back(DataHistory(epoch, device, type, val1, val2, val3));
-        }
+            return DataHistory(epoch, device, type, val1, val2, val3);
+        });
+    }
 
-        sqlite3_finalize(stmt);
-        return data;
+    BaseIterator<DataHistory>* end() override {
+        return new SqlIterator<DataHistory>(nullptr, {});
     }
 };
 

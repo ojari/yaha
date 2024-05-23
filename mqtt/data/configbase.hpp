@@ -4,7 +4,8 @@
 #include "common.hpp"
 #include <memory>
 
-class ConfigDeviceORM : public BaseORM {
+
+class ConfigDeviceORM : public BaseORM<ConfigDevice> {
 public:
     ConfigDeviceORM(sqlite3* db) :
         BaseORM(db) 
@@ -22,23 +23,24 @@ public:
         sql.add(data.type);
     }
 
-    SqlIterator<ConfigDevice> begin() {
+    BaseIterator<ConfigDevice>* begin() override {
         const char* sql = "SELECT name, type FROM Device;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return SqlIterator<ConfigDevice>(stmt, [](sqlite3_stmt* stmt) {
+        return new SqlIterator<ConfigDevice>(stmt, [](sqlite3_stmt* stmt) {
             std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
             std::string type = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             return ConfigDevice(name, type);
         });
     }
 
-    SqlIterator<ConfigDevice> end() {
-        return SqlIterator<ConfigDevice>(nullptr, {});
+    BaseIterator<ConfigDevice>* end() override {
+        return new SqlIterator<ConfigDevice>(nullptr, {});
     }
 };
 
-class ConfigControllerORM : public BaseORM {
+
+class ConfigControllerORM : public BaseORM<ConfigController> {
 public:
     ConfigControllerORM(sqlite3* db) :
         BaseORM(db) 
@@ -62,11 +64,11 @@ public:
         sql.add(data.time2);
     }
 
-    SqlIterator<ConfigController> begin() {
+    SqlIterator<ConfigController>* begin() override {
         const char* sql = "SELECT name, type, actuator, time1, time2 FROM Controller;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return SqlIterator<ConfigController>(stmt, [](sqlite3_stmt* stmt) {
+        return new SqlIterator<ConfigController>(stmt, [](sqlite3_stmt* stmt) {
             std::string name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
             std::string type = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             std::string actuator = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
@@ -76,8 +78,8 @@ public:
         });
     }
 
-    SqlIterator<ConfigController> end() {
-        return SqlIterator<ConfigController>(nullptr, {});
+    SqlIterator<ConfigController>* end() {
+        return new SqlIterator<ConfigController>(nullptr, {});
     }
 };
 
