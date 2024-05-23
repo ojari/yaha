@@ -4,6 +4,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include "data/data.hpp"
+#include "common.hpp"
 
 class Device {
 public:
@@ -15,9 +16,21 @@ protected:
     }
 };
 
+struct IDeviceBoolOut {
+    virtual void send(IOutput& output, bool value) = 0;
+};
 
-class LightDevice : public Device {
+struct IDeviceLightOut {
+    virtual void send(IOutput& output, bool state, int brightness) = 0;
+};
+
+class LightDevice : public Device, public IDeviceLightOut {
 public:
+    LightDevice(const std::string& name) :
+        deviceName(name),
+        brightness(0),
+        state(false)
+    {}
     void on_message(std::string& deviceName, nlohmann::json& payload) override {
         brightness = payload["brightness"];
         state = str2bool(payload["state"]);
@@ -27,15 +40,30 @@ public:
         history.type = DataType::LIGHT;
         history.val1 = static_cast<int>(state);
     }
+    void send(IOutput& output, bool value, int brightness) override {
+        std::string topic = "zigbee2mqtt/" + deviceName + "/set";
+        std::string payload;
+        payload.append("{\"state\": \"");
+        payload.append(value ? "ON" : "OFF");
+        payload.append("\", \"brightness\": ");
+        payload.append(std::to_string(brightness));
+        payload.append("}");
+        output.send(topic, payload);
+    }
 
 private:
     int brightness;
     bool state;
+    std::string deviceName;
 };
 
 
-class SwitchDevice : public Device {
+class SwitchDevice : public Device, public IDeviceBoolOut {
 public:
+    SwitchDevice(const std::string& name) :
+        deviceName(name), 
+        state(false)
+    {}
     void on_message(std::string& deviceName, nlohmann::json& payload) override {
         state = str2bool(payload["state"]);
         std::cout << "Switch " << deviceName << " :: " << state << std::endl;
@@ -44,7 +72,16 @@ public:
         history.type = DataType::SWITCH;
         history.val1 = static_cast<int>(state);
     }
+    void send(IOutput& output, bool value) override {
+        std::string topic = "zigbee2mqtt/" + deviceName + "/set";
+        std::string payload;
+        payload.append("{\"state\": \"");
+        payload.append(value ? "ON" : "OFF");
+        payload.append("\"}");
+        output.send(topic, payload);
+    }
 private:
+    std::string deviceName;
     bool state;
 };
 
@@ -67,7 +104,6 @@ private:
 };
 
 
-
 class DeviceRegistry {
 public:
 
@@ -85,7 +121,7 @@ private:
    /* void registerDevice(const std::string& name, std::shared_ptr<Device> device) {
         devices_[name] = device;
     }*/
-    std::shared_ptr<Device> createDevice(const std::string& type) const;
+    std::shared_ptr<Device> createDevice(const std::string& name, const std::string& type) const;
 
     std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
