@@ -1,17 +1,5 @@
 
-if (WIN32)
-  set(VCPKG_DIR c:/usr/vcpkg)
-  set(VCPKG_ROOT ${VCPKG_DIR}/installed/x64-windows)
-  set(CURL_LIB libcurl)
-  set(EXTRA_LIBRARIES libcrypto libssl)
-else()
-  set(VCPKG_DIR /home/jari/vcpkg-2024.02.14)
-  set(VCPKG_ROOT ${VCPKG_DIR}/installed/x64-linux)
-  set(CURL_LIB curl)
-  set(EXTRA_LIBRARIES ssl crypto pthread dl z)
-endif()
-
-set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake)
+include(../setup.cmake)
 
 cmake_minimum_required(VERSION 3.10)
 
@@ -24,15 +12,16 @@ set(CMAKE_CXX_STANDARD 17)
 # add the executable
 add_executable(${PROJECT_NAME}
   main.cpp
-  test_orm.cpp
+  # test_orm.cpp
   test_logic.cpp
   test_collect.cpp
   test_time.cpp
+  test_datas.cpp
 
   ../mqtt/common.cpp
   ../mqtt/collect.cpp
   ../mqtt/logic.cpp
-  ../mqtt/database.cpp
+  ../mqtt/data/database.cpp
 )
 
 

@@ -1,5 +1,5 @@
 #include "catch2/catch_all.hpp"
-#include "../mqtt/database.hpp"
+#include "../mqtt/data/database.hpp"
 
 auto db = createDatabase("test.db");
 

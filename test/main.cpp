@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_RUNNER // Configure catch to use your main, and not its own.
-#include <catch.hpp>
+#include "catch2/catch_all.hpp"
 #include <iostream>
 #include <exception>
 #include <filesystem>
