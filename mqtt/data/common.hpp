@@ -1,6 +1,7 @@
 #pragma once
 #include <sqlite3.h>
 #include <string>
+#include <fstream>
 #include <functional>
 #include <stdexcept>
 
@@ -116,3 +117,40 @@ private:
     }
 };
 
+// text file based iterator
+//
+template <typename T>
+class FileIterator : public BaseIterator<T> {
+public:
+    FileIterator(std::ifstream& file, std::function<T(const std::string&)> rowToData) :
+        file(file), 
+        rowToData(rowToData)
+    {
+        step();
+    }
+
+    BaseIterator<T>& operator++() override {
+        step();
+        return *this;
+    }
+
+    T operator*() const override {
+        return rowToData(line);
+    }
+
+    bool operator!=(const BaseIterator<T>& other) const override {
+        const FileIterator<T>* otherPtr = dynamic_cast<const FileIterator<T>*>(&other);
+        if (!otherPtr) {
+            throw std::runtime_error("Incompatible iterators");
+        }
+        return !file.eof();
+    }
+private:
+    std::ifstream& file;
+    std::function<T(const std::string&)> rowToData;
+    std::string line;
+
+    void step() {
+        std::getline(file, line);
+    }
+};
