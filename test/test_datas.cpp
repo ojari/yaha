@@ -39,18 +39,27 @@ TEST_CASE("TableConfigController Test", "[TableConfigController]") {
 }
 
 TEST_CASE("SourceString Test", "[SourceString]") {
-    SourceString<ConfigDevice> source("foo bar\none two\n");
-    TableConfigDevice tableDevice;
+    SECTION("Read single line from source") {
+        SourceString<ConfigDevice> source("device1 type1\n");
+        TableConfigDevice tableDevice;
+        source.read(tableDevice);
+        auto device = tableDevice.getConfig();
+        REQUIRE(device.name == "device1");
+        REQUIRE(device.type == "type1");
+    }
+    SECTION("Insert single line to source") {
+        SourceString<ConfigDevice> source("");
+        TableConfigDevice tableDevice;
+        ConfigDevice config("device2", "type2");
+        tableDevice.set(config);
+        source.insert(tableDevice);
 
-    source.read(tableDevice);
-    auto device = tableDevice.getConfig();
-    REQUIRE(device.name == "foo");
-    REQUIRE(device.type == "bar");
-
-    source.read(tableDevice);
-    device = tableDevice.getConfig();
-    REQUIRE(device.name == "one");
-    REQUIRE(device.type == "two");
+        TableConfigDevice tableDevice2;
+        source.read(tableDevice2);
+        auto device = tableDevice2.getConfig();
+        REQUIRE(device.name == "device2");
+        REQUIRE(device.type == "type2");
+    }
 }
 
 TEST_CASE("SourceString 2nd Test", "[SourceString]") {

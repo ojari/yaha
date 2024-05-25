@@ -75,6 +75,26 @@ public:
     {
     }
 
+    void insert(IDataHeader& header) {
+        std::ostringstream out;
+
+        for (auto& value : header) {
+            switch (value.getType()) {
+                case DataType::INT:
+                    out << value.getValue<int>() << " ";
+                    break;
+                case DataType::DOUBLE:
+                    out << value.getValue<double>() << " ";
+                    break;
+                case DataType::STRING:
+                    out << value.getValue<std::string>() << " ";
+                    break;
+            }
+        }
+        out << "\n";
+        sstream << out.str();
+    }
+
     void read(IDataHeader& header) const {
         for (auto& value : header) {
             switch (value.getType()) {
@@ -97,7 +117,14 @@ public:
         }
     }
 
-    std::string test(IDataHeader& header) {
+private:
+    mutable std::stringstream sstream;
+};
+
+
+/*
+class SourceSqlite : public IDataSource {
+    std::string createSql(IDataHeader& header) {
         std::string output = "{";
         for (auto const& value : header) {
             output.append(" ");
@@ -106,12 +133,5 @@ public:
         output.append(" }");
         return output; 
     }
-private:
-    mutable std::istringstream sstream;
-};
-
-
-/*
-class SourceSqlite : public IDataSource {
 };
 */
