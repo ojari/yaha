@@ -1,36 +1,11 @@
 #pragma once
 #include <vector>
-#include <string>
-#include <variant>
 #include <stdexcept> // Add this line
 
 #include "config.hpp"
+#include "datasource.hpp"
 
-class DataValue {
-public:
-    DataValue(const std::string& name, int value) : name(name), value(value) {}
-    DataValue(const std::string& name, double value) : name(name), value(value) {}
-    DataValue(const std::string& name, const std::string& value) : name(name), value(value) {}
-
-    const std::string& getName() const {
-        return name;
-    }
-
-    template <typename T>
-    T getValue() const {
-        return std::get<T>(value);
-    }
-
-    template <typename T>
-    void setValue(T& value) {
-        this->value.emplace<T>(value);
-    }
-private:
-    std::string name;
-    std::variant<int, double, std::string> value;
-};
-
-class DataHeader {
+class DataHeader : public IDataHeader {
 public:
 
     template <typename T>
@@ -54,12 +29,14 @@ public:
         throw std::runtime_error("Value not found");
     }
 
-    std::string getNames() {
-        std::string names;
-        for (const DataValue& value : values) {
-            names += value.getName() + " ";
-        }
-        return names;
+    using iterator = std::vector<DataValue>::iterator;
+
+    iterator begin() override {
+        return values.begin();
+    }
+
+    iterator end() override {
+        return values.end();
     }
 
 protected:
@@ -71,16 +48,9 @@ private:
     std::vector<DataValue> values;
 };
 
-template <typename T>
-struct IDataTable {
-    virtual ~IDataTable() {}
-
-    virtual void set(const T& data) = 0;
-};
-
 class TableConfigDevice : public DataHeader, IDataTable<ConfigDevice> {
 public:
-    TableConfigDevice() {
+    TableConfigDevice() : IDataTable("device") {
         add(DataValue("name", ""));
         add(DataValue("type", ""));
     }
@@ -97,7 +67,7 @@ public:
 
 class TableConfigController : public DataHeader, IDataTable<ConfigController> {
 public:
-    TableConfigController() {
+    TableConfigController() : IDataTable("controller"){
         add(DataValue("name", ""));
         add(DataValue("type", ""));
         add(DataValue("actuator", ""));
