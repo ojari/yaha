@@ -48,7 +48,7 @@ private:
     std::vector<DataValue> values;
 };
 
-class TableConfigDevice : public DataHeader, IDataTable<ConfigDevice> {
+class TableConfigDevice : public DataHeader, public IDataTable<ConfigDevice> {
 public:
     TableConfigDevice() : IDataTable("device") {
         add(DataValue("name", ""));
@@ -65,7 +65,7 @@ public:
     }
 };
 
-class TableConfigController : public DataHeader, IDataTable<ConfigController> {
+class TableConfigController : public DataHeader, public IDataTable<ConfigController> {
 public:
     TableConfigController() : IDataTable("controller"){
         add(DataValue("name", ""));

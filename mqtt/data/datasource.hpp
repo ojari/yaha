@@ -2,8 +2,10 @@
 #include <string>
 #include <variant>
 #include <iostream>
+#include <sqlite3.h>
+#include "database.hpp"
 
-enum class DataType {
+enum class DataValueType {
     INT,
     DOUBLE,
     STRING
@@ -18,13 +20,13 @@ public:
     const std::string& getName() const {
         return name;
     }
-    DataType getType() const {
+    DataValueType getType() const {
         if (std::holds_alternative<int>(value)) {
-            return DataType::INT;
+            return DataValueType::INT;
         } else if (std::holds_alternative<double>(value)) {
-            return DataType::DOUBLE;
+            return DataValueType::DOUBLE;
         } else if (std::holds_alternative<std::string>(value)) {
-            return DataType::STRING;
+            return DataValueType::STRING;
         }
         throw std::runtime_error("Invalid data type");
     }
@@ -52,6 +54,10 @@ struct IDataTable {
     {}
     virtual ~IDataTable() {}
 
+    const std::string& getTableName() const {
+        return tableName;
+    }
+
     virtual void set(const T& data) = 0;
 
 protected:
@@ -75,18 +81,22 @@ public:
     {
     }
 
+    bool isEnd() {
+        return sstream.eof();
+    }
+
     void insert(IDataHeader& header) {
         std::ostringstream out;
 
         for (auto& value : header) {
             switch (value.getType()) {
-                case DataType::INT:
+                case DataValueType::INT:
                     out << value.getValue<int>() << " ";
                     break;
-                case DataType::DOUBLE:
+                case DataValueType::DOUBLE:
                     out << value.getValue<double>() << " ";
                     break;
-                case DataType::STRING:
+                case DataValueType::STRING:
                     out << value.getValue<std::string>() << " ";
                     break;
             }
@@ -98,17 +108,17 @@ public:
     void read(IDataHeader& header) const {
         for (auto& value : header) {
             switch (value.getType()) {
-                case DataType::INT:
+                case DataValueType::INT:
                     int i;
                     sstream >> i;
                     value.setValue<int>(i);
                     break;
-                case DataType::DOUBLE:
+                case DataValueType::DOUBLE:
                     double d;
                     sstream >> d;
                     value.setValue<double>(d);
                     break;
-                case DataType::STRING:
+                case DataValueType::STRING:
                     std::string s;
                     sstream >> s;
                     value.setValue<std::string>(s);
@@ -122,16 +132,48 @@ private:
 };
 
 
-/*
-class SourceSqlite : public IDataSource {
-    std::string createSql(IDataHeader& header) {
-        std::string output = "{";
+template <typename T>
+class SourceSqlite {
+public:
+    SourceSqlite(sqlite3* db) : 
+        db(db)
+    {
+    }
+
+    std::string createSql(IDataHeader& header, IDataTable<T>& table) {
+        std::string output = "CREATE TABLE IF NOT EXISTS ";
+        output.append(table.getTableName());
+        output.append("(");
         for (auto const& value : header) {
-            output.append(" ");
             output.append(value.getName());
+            output.append(" ");
+            switch (value.getType()) {
+                case DataValueType::INT:
+                    output.append("INTEGER");
+                    break;
+                case DataValueType::DOUBLE:
+                    output.append("DOUBLE");
+                    break;
+                case DataValueType::STRING:
+                    output.append("TEXT");
+                    break;
+            }
+            output.append(",");
         }
-        output.append(" }");
+        output.pop_back(); // remove last comma
+        output.append(");");
         return output; 
     }
+
+    void insert(IDataHeader& header) {
+        // std::string sql = createSql(header);
+    }
+    void read(IDataHeader& header) const {
+        // std::string sql = createSql(header);
+    }
+    bool isEnd() const {
+        return true;
+    }
+private:
+    sqlite3* db;
 };
-*/

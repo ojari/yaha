@@ -60,6 +60,17 @@ TEST_CASE("SourceString Test", "[SourceString]") {
         REQUIRE(device.name == "device2");
         REQUIRE(device.type == "type2");
     }
+    SECTION("Check isEof method") {
+        SourceString<ConfigDevice> source(
+            "device1 type1\n"
+            "device2 type2");  // No newline at the end
+        TableConfigDevice tableDevice;
+        REQUIRE(source.isEnd() == false);
+        source.read(tableDevice);
+        REQUIRE(source.isEnd() == false);
+        source.read(tableDevice);
+        REQUIRE(source.isEnd() == true);
+    }
 }
 
 TEST_CASE("SourceString 2nd Test", "[SourceString]") {
@@ -82,4 +93,53 @@ TEST_CASE("SourceString 2nd Test", "[SourceString]") {
         REQUIRE(controller.time1 == 10);
         REQUIRE(controller.time2 == 20);
     }
+}
+
+TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
+    SECTION("Read single row from SQLite database") {
+        // Create an in-memory SQLite database
+        sqlite3* db;
+        sqlite3_open(":memory:", &db);
+
+
+        // Create a SourceSqlite object and read the row
+        SourceSqlite<ConfigDevice> source(db);
+        TableConfigDevice tableDevice;
+
+        REQUIRE(source.createSql(tableDevice, tableDevice) == "create table");
+
+        source.read(tableDevice);
+        auto device = tableDevice.getConfig();
+
+        // Verify the values
+        REQUIRE(device.name == "device1");
+        REQUIRE(device.type == "type1");
+
+        // Close the database
+        sqlite3_close(db);
+    }
+
+    /*SECTION("Insert single row into SQLite database") {
+        // Create an in-memory SQLite database
+        sqlite3* db;
+        sqlite3_open(":memory:", &db);
+
+        // Create a SourceSqlite object and insert a row
+        SourceSqlite<ConfigDevice> source(db, "devices");
+        TableConfigDevice tableDevice;
+        ConfigDevice config("device2", "type2");
+        tableDevice.set(config);
+        source.insert(tableDevice);
+
+        // Query the database to verify the inserted row
+        sqlite3_stmt* stmt;
+        sqlite3_prepare_v2(db, "SELECT * FROM devices;", -1, &stmt, 0);
+        REQUIRE(sqlite3_step(stmt) == SQLITE_ROW);
+        REQUIRE(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))) == "device2");
+        REQUIRE(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))) == "type2");
+
+        // Close the database
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+    }*/
 }
