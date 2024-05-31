@@ -37,7 +37,7 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         TableConfigController tableController;
         ConfigController config("controller2", "type2", "actuator2", 30, 40);
         tableController.set(config);
-        source.insert(tableController);
+        source.insert(tableController, tableController);
 
         // Query the database to verify the inserted row
         sqlite3_stmt* stmt;

@@ -116,8 +116,49 @@ public:
             getValue<float>("humidity")
         );
     }
-
 };
+
+
+class TableWeather : public DataHeader, public IDataTable<DataWeather> {
+public:
+    TableWeather() : IDataTable("Weather") {
+        add(DataValue("epoch", 0L));
+        add(DataValue("temperature", 0.0f));
+        add(DataValue("humidity", 0.0f));
+        add(DataValue("pressure", 0.0f));
+        add(DataValue("windSpeed", 0.0f));
+        add(DataValue("windDirection", 0.0f));
+        add(DataValue("rain", 0.0f));
+        add(DataValue("uv", 0.0f));
+        add(DataValue("solarRadiation", 0.0f));
+    }
+
+    void set(const DataWeather& data) override {
+        setValue("epoch", data.epoch);
+        setValue("temperature", data.temperature);
+        setValue("humidity", data.humidity);
+        setValue("pressure", data.pressure);
+        setValue("windSpeed", data.windSpeed);
+        setValue("windDirection", data.windDirection);
+        setValue("rain", data.rain);
+        setValue("uv", data.uv);
+        setValue("solarRadiation", data.solarRadiation);
+    }
+    DataWeather get() const {
+        return DataWeather(
+            getValue<int>("epoch"),
+            getValue<float>("temperature"),
+            getValue<float>("humidity"),
+            getValue<float>("pressure"),
+            getValue<float>("windSpeed"),
+            getValue<float>("windDirection"),
+            getValue<float>("rain"),
+            getValue<float>("uv"),
+            getValue<float>("solarRadiation")
+        );
+    }
+};
+
 
 class DataTable {
 public:
@@ -125,6 +166,7 @@ public:
         tables.push_back(std::make_unique<TableConfigDevice>());
         tables.push_back(std::make_unique<TableConfigController>());
         tables.push_back(std::make_unique<TableTemperature>());
+        tables.push_back(std::make_unique<TableWeather>());
     }
 
     template <typename T>

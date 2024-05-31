@@ -5,42 +5,6 @@
 #include <vector>
 #include <memory>
 
-class DataTemperatureORM : public BaseORM<DataTemperature> {
-public:
-    DataTemperatureORM(sqlite3* db) :
-        BaseORM<DataTemperature>(db) 
-    {}
-
-    const char* sqlCreateTable() override {
-        return "CREATE TABLE IF NOT EXISTS Temperature ("
-               "epoch INTEGER PRIMARY KEY,"
-               "temperature REAL,"
-               "humidity REAL);";
-    }
-
-    void insert(const DataTemperature& data) override {
-        auto sql = SqlInsert(db, "INSERT INTO Temperature (epoch, temperature, humidity) VALUES (?, ?, ?);");
-        sql.add(data.epoch);
-        sql.add(data.temperature);
-        sql.add(data.humidity);
-    }
-
-    BaseIterator<DataTemperature>* begin() {
-        const char* sql = "SELECT epoch, temperature, humidity FROM Temperature;";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return new SqlIterator<DataTemperature>(stmt, [](sqlite3_stmt* stmt) {
-            long epoch = sqlite3_column_int64(stmt, 0);
-            float temperature = sqlite3_column_double(stmt, 1);
-            float humidity = sqlite3_column_double(stmt, 2);
-            return DataTemperature(epoch, temperature, humidity);
-        });
-    }
-
-    BaseIterator<DataTemperature>* end() override {
-        return new SqlIterator<DataTemperature>(nullptr, {});
-    }
-};
 
 class DataWeatherORM : public BaseORM<DataWeather> {
 public:
@@ -181,7 +145,7 @@ public:
 class Database {
 public:
     Database(sqlite3* db) : 
-        temperature(db),
+        // temperature(db),
         weather(db),
         elPrice(db),
         history(db),
@@ -194,15 +158,11 @@ public:
     }
 
     void createTables() {
-        createTable(temperature.sqlCreateTable());
         createTable(weather.sqlCreateTable());
         createTable(elPrice.sqlCreateTable());
         createTable(history.sqlCreateTable());
     }
     
-    void insert(const DataTemperature& data) {
-        temperature.insert(data);
-    }
     void insert(const DataWeather& data) {
         weather.insert(data);
     }
@@ -213,7 +173,6 @@ public:
         history.insert(data);
     }
 
-    DataTemperatureORM temperature;
     DataWeatherORM weather;
     DataElPriceORM elPrice;
     DataHistoryORM history;
