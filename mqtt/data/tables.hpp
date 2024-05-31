@@ -3,6 +3,7 @@
 #include <stdexcept> // Add this line
 
 #include "config.hpp"
+#include "data.hpp"
 #include "datasource.hpp"
 
 class DataHeader : public IDataHeader {
@@ -95,11 +96,35 @@ public:
 };
 
 
+class TableTemperature : public DataHeader, public IDataTable<DataTemperature> {
+public:
+    TableTemperature() : IDataTable("Temperature") {
+        add(DataValue("epoch", 0L));
+        add(DataValue("temperature", 0.0f));
+        add(DataValue("humidity", 0.0f));
+    }
+
+    void set(const DataTemperature& data) override {
+        setValue("epoch", data.epoch);
+        setValue("temperature", data.temperature);
+        setValue("humidity", data.humidity);
+    }
+    DataTemperature get() const {
+        return DataTemperature(
+            getValue<int>("epoch"),
+            getValue<float>("temperature"),
+            getValue<float>("humidity")
+        );
+    }
+
+};
+
 class DataTable {
 public:
     DataTable() {
         tables.push_back(std::make_unique<TableConfigDevice>());
         tables.push_back(std::make_unique<TableConfigController>());
+        tables.push_back(std::make_unique<TableTemperature>());
     }
 
     template <typename T>

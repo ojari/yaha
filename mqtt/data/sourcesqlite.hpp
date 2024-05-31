@@ -19,6 +19,7 @@ public:
             output.append(" ");
             switch (value.getType()) {
                 case DataValueType::INT:
+                case DataValueType::LONG:
                     output.append("INTEGER");
                     break;
                 case DataValueType::DOUBLE:

@@ -8,6 +8,7 @@
 
 enum class DataValueType {
     INT,
+    LONG,
     DOUBLE,
     STRING
 };
@@ -15,7 +16,8 @@ enum class DataValueType {
 class DataValue {
 public:
     DataValue(const std::string& name, int value) : name(name), value(value) {}
-    DataValue(const std::string& name, double value) : name(name), value(value) {}
+    DataValue(const std::string& name, long value) : name(name), value(value) {}
+    DataValue(const std::string& name, float value) : name(name), value(value) {}
     DataValue(const std::string& name, const std::string& value) : name(name), value(value) {}
 
     const std::string& getName() const {
@@ -25,7 +27,9 @@ public:
     DataValueType getType() const {
         if (std::holds_alternative<int>(value)) {
             return DataValueType::INT;
-        } else if (std::holds_alternative<double>(value)) {
+        } else if (std::holds_alternative<long>(value)) {
+            return DataValueType::LONG;
+        } else if (std::holds_alternative<float>(value)) {
             return DataValueType::DOUBLE;
         } else if (std::holds_alternative<std::string>(value)) {
             return DataValueType::STRING;
@@ -44,7 +48,7 @@ public:
     }
 private:
     std::string name;
-    std::variant<int, double, std::string> value;
+    std::variant<int, long, float, std::string> value;
 };
 
 

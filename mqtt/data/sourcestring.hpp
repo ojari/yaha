@@ -22,8 +22,11 @@ public:
                 case DataValueType::INT:
                     out << value.getValue<int>() << " ";
                     break;
+                case DataValueType::LONG:
+                    out << value.getValue<long>() << " ";
+                    break;
                 case DataValueType::DOUBLE:
-                    out << value.getValue<double>() << " ";
+                    out << value.getValue<float>() << " ";
                     break;
                 case DataValueType::STRING:
                     out << value.getValue<std::string>() << " ";
@@ -42,10 +45,15 @@ public:
                     sstream >> i;
                     value.setValue<int>(i);
                     break;
+                case DataValueType::LONG:
+                    long li;
+                    sstream >> li;
+                    value.setValue<long>(li);
+                    break;
                 case DataValueType::DOUBLE:
-                    double d;
+                    float d;
                     sstream >> d;
-                    value.setValue<double>(d);
+                    value.setValue<float>(d);
                     break;
                 case DataValueType::STRING:
                     std::string s;

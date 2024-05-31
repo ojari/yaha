@@ -1,14 +1,14 @@
 #include "catch2/catch_all.hpp"
-#include "../mqtt/data/datas.hpp"
+#include "../mqtt/data/tables.hpp"
 
 TEST_CASE("DataValue Test", "[DataValue]") {
     DataValue value1("name1", 10);
     REQUIRE(value1.getName() == "name1");
     REQUIRE(value1.getValue<int>() == 10);
 
-    DataValue value2("name2", 3.14);
+    DataValue value2("name2", 3.14f);
     REQUIRE(value2.getName() == "name2");
-    REQUIRE(value2.getValue<double>() == 3.14);
+    REQUIRE(value2.getValue<float>() == 3.14f);
 
     DataValue value3("name3", "hello");
     REQUIRE(value3.getName() == "name3");
