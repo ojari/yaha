@@ -31,7 +31,7 @@ target_link_libraries(${PROJECT_NAME}
     ${MOSQUITTO_LIB}
     ${EXTRA_LIBRARIES}
     sqlite3
-    redis++
+ #   redis++
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
