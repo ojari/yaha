@@ -14,3 +14,4 @@ void Database::createTable(const char* sql) {
         showError(sqlite3_errstr(rc));
     }
 }
+
