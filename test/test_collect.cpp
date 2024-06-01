@@ -17,7 +17,7 @@ TEST_CASE("Collect class tests") {
     collect.subscribe(observer);
 
     SECTION("Feed temperature") {
-        float temperature = 25.5;
+        float temperature = 25.5f;
         collect.set(ValueType::TEMPERATURE, temperature);
         REQUIRE(observer.values.getFloat(ValueType::TEMPERATURE) == temperature);
 
@@ -29,11 +29,12 @@ TEST_CASE("Collect class tests") {
     SECTION("Feed electricity price") {
         int elPrice = 10;
         collect.set(ValueType::ELECTRICITY_PRICE, elPrice);
-        REQUIRE(observer.values.getFloat(ValueType::ELECTRICITY_PRICE) == elPrice);
+
+        REQUIRE(observer.values.getInt(ValueType::ELECTRICITY_PRICE) == elPrice);
         
         elPrice = 32;
         collect.set(ValueType::ELECTRICITY_PRICE, elPrice);
-        REQUIRE(observer.values.getFloat(ValueType::ELECTRICITY_PRICE) == elPrice);
+        REQUIRE(observer.values.getInt(ValueType::ELECTRICITY_PRICE) == elPrice);
     }
     
     SECTION("Feed time") {

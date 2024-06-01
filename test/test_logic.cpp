@@ -43,7 +43,7 @@ TEST_CASE("CarHeaer class test") {
         std::make_pair(  4,  30)
     );
     SECTION("Temperature test") {
-        int temperature = data.first;
+        float temperature = data.first;
         int offset = data.second;
 
         state.set(ValueType::TEMPERATURE, temperature);

@@ -115,7 +115,13 @@ struct Values : public Observable, public IValues {
     }
 
     void set(ValueType type, int value) {
+        // values[type] = ValueItem(type, value);
+        int old = getInt(type);
+        if (old == value) {
+            return;
+        }
         values[type] = ValueItem(type, value);
+        notify(*this);
     }
 
     bool set(ValueType type, float value) {

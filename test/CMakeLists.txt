@@ -3,7 +3,7 @@ include(../setup.cmake)
 
 cmake_minimum_required(VERSION 3.10)
 
-project(test)
+project(utest)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -44,3 +44,5 @@ target_link_libraries(${PROJECT_NAME}
     pthread
     dl
 )
+
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
