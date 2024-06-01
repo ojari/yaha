@@ -38,6 +38,7 @@ private:
 };
 
 
+// @todo: move sql statement creation to cpp file.
 template <typename T>
 class SourceSqlite {
 public:
@@ -89,6 +90,21 @@ public:
         }
         output.pop_back(); // remove last comma
         output.append(");");
+        return output;
+    }
+
+    std::string selectSql(IDataHeader& header, IDataTable<T>& table) {
+        std::string output = "SELECT ";
+
+        for (auto const& value : header) {
+            output.append(value.getName());
+            output.append(",");
+        }
+        output.pop_back(); // remove last comma
+
+        output.append(" FROM ");
+        output.append(table.getTableName());
+        output.append(";");
         return output;
     }
 

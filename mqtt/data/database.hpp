@@ -6,40 +6,6 @@
 #include <memory>
 
 
-class DataElPriceORM : public BaseORM<DataElPrice> {
-public:
-    DataElPriceORM(sqlite3* db) : 
-        BaseORM(db)
-    {}
-
-    const char* sqlCreateTable() override {
-        return "CREATE TABLE IF NOT EXISTS ElPrice ("
-               "epoch INTEGER PRIMARY KEY,"
-               "price REAL);";
-    }
-
-    void insert(const DataElPrice& data) {
-        auto sql = SqlInsert(db, "INSERT INTO ElPrice (epoch, price) VALUES (?, ?);");
-        sql.add(data.epoch);
-        sql.add(data.price);
-    }
-
-    BaseIterator<DataElPrice>* begin() override {
-        const char* sql = "SELECT epoch, price FROM ElPrice;";
-        sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return new SqlIterator<DataElPrice>(stmt, [](sqlite3_stmt* stmt) {
-            long epoch = sqlite3_column_int64(stmt, 0);
-            float price = sqlite3_column_double(stmt, 1);
-            return DataElPrice(epoch, price);
-        });
-    }
-
-    BaseIterator<DataElPrice>* end() override {
-        return new SqlIterator<DataElPrice>(nullptr, {});
-    }
-};
-
 class DataHistoryORM : public BaseORM<DataHistory>, public DataInsertHistory {
 public:
     DataHistoryORM(sqlite3* db) :

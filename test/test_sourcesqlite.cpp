@@ -13,13 +13,21 @@ void close_db(sqlite3* db) {
 }
 
 TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
-    SECTION("Read single row from SQLite database") {
+    SECTION("SQL statement creation for ConfigDevice table") {
         sqlite3* db = create_db();
         SourceSqlite<ConfigDevice> source(db);
         TableConfigDevice tableDevice;
 
         REQUIRE(source.createSql(tableDevice, tableDevice) == "CREATE TABLE IF NOT EXISTS device(name TEXT,type TEXT);");
         REQUIRE(source.insertSql(tableDevice, tableDevice) == "INSERT INFO device(name,type ) VALUES (?,?);");
+        REQUIRE(source.selectSql(tableDevice, tableDevice) == "SELECT name,type FROM device;");
+
+        close_db(db);
+    }
+    SECTION("Read single row from SQLite database") {
+        sqlite3* db = create_db();
+        SourceSqlite<ConfigDevice> source(db);
+        TableConfigDevice tableDevice;
 
         source.read(tableDevice);
         auto device = tableDevice.getConfig();

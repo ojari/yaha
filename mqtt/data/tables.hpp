@@ -160,6 +160,57 @@ public:
 };
 
 
+class TableElPrice : public DataHeader, public IDataTable<DataElPrice> {
+public:
+    TableElPrice() : IDataTable("ElPrice") {
+        add(DataValue("epoch", 0L));
+        add(DataValue("price", 0.0f));
+    }
+
+    void set(const DataElPrice& data) override {
+        setValue("epoch", data.epoch);
+        setValue("price", data.price);
+    }
+    DataElPrice get() const {
+        return DataElPrice(
+            getValue<int>("epoch"),
+            getValue<float>("price")
+        );
+    }
+};
+
+
+class TableHistory : public DataHeader, public IDataTable<DataHistory> {
+public:
+    TableHistory() : IDataTable("History") {
+        add(DataValue("epoch", 0L));
+        add(DataValue("device", ""));
+        add(DataValue("type", 0));
+        add(DataValue("val1", 0));
+        add(DataValue("val2", 0));
+        add(DataValue("val3", 0));
+    }
+
+    void set(const DataHistory& data) override {
+        setValue("epoch", data.epoch);
+        setValue("device", data.device);
+        setValue("type", static_cast<int>(data.type));
+        setValue("val1", data.val1);
+        setValue("val2", data.val2);
+        setValue("val3", data.val3);
+    }
+    DataHistory get() const {
+        return DataHistory(
+            getValue<long>("epoch"),
+            getValue<std::string>("device"),
+            static_cast<DataType>(getValue<int>("type")),
+            getValue<int>("val1"),
+            getValue<int>("val2"),
+            getValue<int>("val3")
+        );
+    }
+};
+
 class DataTable {
 public:
     DataTable() {
