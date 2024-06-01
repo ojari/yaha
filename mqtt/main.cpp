@@ -48,7 +48,7 @@ int main() {
     std::unique_ptr<Database> db{createDatabase("data.db")};
     Mqtt mqtt(db->history);
     Actuator actuator(mqtt);
-    std::shared_ptr<Collect> collect{new Collect()};
+    std::shared_ptr<Values> collect{new Values()};
 
     std::vector<ITask*> tasks {
         &mqtt,

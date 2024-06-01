@@ -6,7 +6,7 @@
 #include <functional>
 
 struct DebugOutput : public Observer {
-    void onChange(const Values& state) override;
+    void onChange(const IValues& state) override;
 };
 
 struct BooleanController : public Observer {
@@ -16,7 +16,7 @@ struct BooleanController : public Observer {
         name(name)
     {}
 
-    virtual void onChange(const Values& state) = 0;
+    virtual void onChange(const IValues& state) = 0;
 
     bool isOn() const {
         return state;
@@ -35,7 +35,7 @@ struct Lights : public BooleanController  {
         offTime(offTime),
         BooleanController(actuator, "Lights")
     {}
-    void onChange(const Values& vars) override;
+    void onChange(const IValues& vars) override;
 private:
     int onTime;
     int offTime;
@@ -46,9 +46,9 @@ struct CarHeater : public BooleanController  {
         leaveTime(leaveTime),
         BooleanController(actuator, "CarHeater")
     {}
-    void onChange(const Values& state) override;
+    void onChange(const IValues& state) override;
 private:
-    int calculateDuration(const Values& state);
+    int calculateDuration(const IValues& state);
     int leaveTime;
     bool state;
 };
@@ -58,7 +58,7 @@ public:
     StorageHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "StorageHeater")
     {}
-    void onChange(const Values& state) override;
+    void onChange(const IValues& state) override;
 private:
     int calculateStartTime(const Values& state);
     int calculateEndTime(const Values& state);
@@ -69,7 +69,7 @@ public:
     WaterHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "WaterHeater")
     {}
-    void onChange(const Values& state) override;
+    void onChange(const IValues& state) override;
 };
 
 class RoomHeater : public BooleanController  {
@@ -77,7 +77,7 @@ public:
     RoomHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "RoomHeater")
     {}
-    void onChange(const Values& state) override;
+    void onChange(const IValues& state) override;
 };
 
 class ControllerRegistry {

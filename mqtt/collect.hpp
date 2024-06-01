@@ -4,36 +4,25 @@
 #include "common.hpp"
 #include <memory>
 
-/** Collects temperature, elprice and time from sources and publish result into observers.*/
-class Collect : public Observable {
-public:
-    void feedTemperature(float temperature);
-    void feedElPrice(int elPrice);
-    void feedTime(int hour, int minute);
-
-private:
-    Values values;
-};
-
-
 class BaseSource {
 public:
-    BaseSource(std::shared_ptr<Collect> collect) : 
+    BaseSource(std::shared_ptr<IValues> collect) : 
         collect(collect)
     {}
 protected:
-    std::shared_ptr<Collect> collect;
+    std::shared_ptr<IValues> collect;
 };
 
 
 class SourceTime : public BaseSource, public ITask {
 public:
-    SourceTime(std::shared_ptr<Collect> collect) : BaseSource(collect)
+    SourceTime(std::shared_ptr<IValues> collect) : BaseSource(collect)
     {}
 
     void execute() {
         incrementTime(1);
-        collect->feedTime(hour, minute);
+        int time = hm2time(hour, minute);
+        collect->set(ValueType::TIME, time);
     }
 private:
     void incrementTime(int minutes);
@@ -44,15 +33,15 @@ private:
 
 class SourceTemperature : public BaseSource, public ITask {
 public:
-    SourceTemperature(std::shared_ptr<Collect> collect) : BaseSource(collect)
+    SourceTemperature(std::shared_ptr<IValues> collect) : BaseSource(collect)
     {}
 
     void execute() {
         if (counter < 10) {
-            collect->feedTemperature(20.0);
+            collect->set(ValueType::TEMPERATURE, 20.0f);
         }
         else if (counter < 20) {
-            collect->feedTemperature(21.0);
+            collect->set(ValueType::TEMPERATURE, 21.0f);
         }
         else {
             counter = 0;

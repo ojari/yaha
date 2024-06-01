@@ -2,8 +2,13 @@
 #include "common.hpp"
 #include <iostream>
 
-void DebugOutput::onChange(const Values& vars) {
-    std::cout << "Temperature: " << vars.getTemperature() << " ElPrice: " << vars.getElPrice() << " Time: " << vars.getTime() << std::endl;
+void DebugOutput::onChange(const IValues& state) {
+    const Values& vars = dynamic_cast<const Values&>(state);
+    std::cout << vars;
+    /*std::cout << "Temperature: " << vars.getFloat(ValueType::TEMPERATURE) 
+              << " ElPrice: " << vars.getFloat(ValueType::ELECTRICITY_PRICE)
+              << " Time: " << vars.getInt(ValueType::TIME)
+              << std::endl;*/
 }
 
 void BooleanController::set(bool value) {
@@ -15,8 +20,8 @@ void BooleanController::set(bool value) {
 }
 
 
-void Lights::onChange(const Values& vars) {
-    int time = vars.getTime();
+void Lights::onChange(const IValues& vars) {
+    int time = vars.getInt(ValueType::TIME);
     if (time >= onTime && time < offTime) {
         set(true);
     } else {
@@ -24,8 +29,8 @@ void Lights::onChange(const Values& vars) {
     }
 }
 
-void CarHeater::onChange(const Values& vars) {
-    int time = vars.getTime();
+void CarHeater::onChange(const IValues& vars) {
+    int time = vars.getInt(ValueType::TIME);
     int startTime = timeAdd(leaveTime, -calculateDuration(vars));
     if ((time >= startTime) && time < leaveTime) {
         set(true);
@@ -34,8 +39,8 @@ void CarHeater::onChange(const Values& vars) {
     }
 }
 
-int CarHeater::calculateDuration(const Values& state) {
-    int temperature = state.getTemperature();
+int CarHeater::calculateDuration(const IValues& state) {
+    float temperature = state.getFloat(ValueType::TEMPERATURE);
     if (temperature < -20) {
         return 120;
     } else if (temperature < -10) {

@@ -18,13 +18,13 @@ TEST_CASE("Lights class test") {
     Lights lights(actuator, hm2time(10, 0), hm2time(20, 0));
     Values state;
     SECTION("Turn on lights") {
-        state.setTime(hm2time(12, 0));
+        state.set(ValueType::TIME, hm2time(12, 0));
         lights.onChange(state);
         REQUIRE(lights.isOn() == true);
     }
 
     SECTION("Turn off lights") {
-        state.setTime(hm2time(21, 0));
+        state.set(ValueType::TIME, hm2time(21, 0));
         lights.onChange(state);
         REQUIRE(lights.isOn() == false);
     }
@@ -46,15 +46,21 @@ TEST_CASE("CarHeaer class test") {
         int temperature = data.first;
         int offset = data.second;
 
-        state.setTemperature(temperature);
-        state.setTime(timeAdd(leaveTime, -(offset+2)));
+        state.set(ValueType::TEMPERATURE, temperature);
+        state.set(ValueType::TIME, timeAdd(leaveTime, -(offset+2)));
         heater.onChange(state);
-        INFO("Temperature: " << temperature << ", Offset: " << offset << ", Time: " << state.getTime() << ", on: " << heater.isOn());
+        INFO("Temperature: " << temperature 
+             << ", Offset: " << offset 
+             << ", Time: " << state.getInt(ValueType::TIME) 
+             << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == false);
 
-        state.setTime(timeAdd(leaveTime, -(offset - 2)));
+        state.set(ValueType::TIME, timeAdd(leaveTime, -(offset - 2)));
         heater.onChange(state);
-        INFO("Temperature: " << temperature << ", Offset: " << offset << ", Time: " << state.getTime() << ", on: " << heater.isOn());
+        INFO("Temperature: " << temperature 
+             << ", Offset: " << offset
+             << ", Time: " << state.getInt(ValueType::TIME)
+             << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == true);
     }
 }
