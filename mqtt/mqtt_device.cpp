@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 #include <nlohmann/json.hpp>
-#include "data/configbase.hpp"
 
 void DeviceRegistry::load(const std::string& filename) {
     std::ifstream ifile(filename);

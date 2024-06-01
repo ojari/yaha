@@ -16,7 +16,6 @@ add_executable(${PROJECT_NAME}
   actuator.cpp
   logic.cpp
   collect.cpp
-  data/configbase.cpp
   data/database.cpp
 )
 

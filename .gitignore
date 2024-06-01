@@ -33,5 +33,6 @@
 mqtt/build
 test/build
 coro/build
+doc/C4*.puml
 build
 .cccc
