@@ -179,10 +179,6 @@ public:
         return output;
     }
 
-    void read(IDataHeader& header) const {
-        // std::string sql = createSql(header);
-    }
-
     SqlIterator* begin(IDataHeader& header) {
         std::string sql = selectSql(header);
         sqlite3_stmt* stmt;

@@ -8,6 +8,7 @@ find_package(tinyxml2 REQUIRED)
 
 add_executable(${PROJECT_NAME}
   main.cpp
+  parse.cpp
   ../common/utils.cpp
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
