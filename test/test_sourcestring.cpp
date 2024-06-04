@@ -8,7 +8,7 @@ TEST_CASE("SourceString Test", "[SourceString]") {
         SourceString<ConfigDevice> source("device1 type1\n");
         TableConfigDevice tableDevice;
         source.read(tableDevice);
-        auto device = tableDevice.getConfig();
+        auto device = tableDevice.get();
         REQUIRE(device.name == "device1");
         REQUIRE(device.type == "type1");
     }
@@ -21,7 +21,7 @@ TEST_CASE("SourceString Test", "[SourceString]") {
 
         TableConfigDevice tableDevice2;
         source.read(tableDevice2);
-        auto device = tableDevice2.getConfig();
+        auto device = tableDevice2.get();
         REQUIRE(device.name == "device2");
         REQUIRE(device.type == "type2");
     }
@@ -45,13 +45,13 @@ TEST_CASE("SourceString 2nd Test", "[SourceString]") {
         SourceString<ConfigDevice> source("device1 type1\ncontroller1 type2 actuator1 10 20\n");
         TableConfigDevice tableDevice;
         source.read(tableDevice);
-        auto device = tableDevice.getConfig();
+        auto device = tableDevice.get();
         REQUIRE(device.name == "device1");
         REQUIRE(device.type == "type1");
 
         TableConfigController tableController;
         source.read(tableController);
-        auto controller = tableController.getConfig();
+        auto controller = tableController.get();
         REQUIRE(controller.name == "controller1");
         REQUIRE(controller.type == "type2");
         REQUIRE(controller.actuator == "actuator1");

@@ -20,23 +20,6 @@ public:
     virtual bool operator!=(const BaseIterator& other) const = 0;
 };
 
-template <typename T>
-class BaseORM {
-public:
-    BaseORM<T>(sqlite3* db) : db(db) {
-    }
-
-    virtual ~BaseORM() {
-    }
-
-    virtual const char* sqlCreateTable() = 0;
-    virtual void insert(const T& data) = 0;
-    virtual BaseIterator<T>* begin() = 0;
-    virtual BaseIterator<T>* end() = 0;
-
-protected:
-    sqlite3* db;
-};
 
 class SqlInsert {
 public:
@@ -77,9 +60,9 @@ private:
 // Sqlite iterator
 //
 template <typename T>
-class SqlIterator : public BaseIterator<T> {
+class SqlIteratorOld : public BaseIterator<T> {
 public:
-    SqlIterator(sqlite3_stmt* stmt, std::function<T(sqlite3_stmt*)> rowToData) :
+    SqlIteratorOld(sqlite3_stmt* stmt, std::function<T(sqlite3_stmt*)> rowToData) :
         stmt(stmt), 
         rowToData(rowToData), 
         done(false)
@@ -97,7 +80,7 @@ public:
     }
 
     bool operator!=(const BaseIterator<T>& other) const override {
-        const SqlIterator<T>* otherPtr = dynamic_cast<const SqlIterator<T>*>(&other);
+        const SqlIteratorOld<T>* otherPtr = dynamic_cast<const SqlIteratorOld<T>*>(&other);
         if (!otherPtr) {
             throw std::runtime_error("Incompatible iterators");
         }

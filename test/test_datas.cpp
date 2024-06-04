@@ -21,8 +21,8 @@ TEST_CASE("TableConfigDevice Test", "[TableConfigDevice]") {
     ConfigDevice config("device1", "type1");
     table.set(config);
 
-    REQUIRE(table.getConfig().name == "device1");
-    REQUIRE(table.getConfig().type == "type1");
+    REQUIRE(table.get().name == "device1");
+    REQUIRE(table.get().type == "type1");
 }
 
 TEST_CASE("TableConfigController Test", "[TableConfigController]") {
@@ -31,9 +31,9 @@ TEST_CASE("TableConfigController Test", "[TableConfigController]") {
     ConfigController config("controller1", "type1", "actuator1", 10, 20);
     table.set(config);
 
-    REQUIRE(table.getConfig().name == "controller1");
-    REQUIRE(table.getConfig().type == "type1");
-    REQUIRE(table.getConfig().actuator == "actuator1");
-    REQUIRE(table.getConfig().time1 == 10);
-    REQUIRE(table.getConfig().time2 == 20);
+    REQUIRE(table.get().name == "controller1");
+    REQUIRE(table.get().type == "type1");
+    REQUIRE(table.get().actuator == "actuator1");
+    REQUIRE(table.get().time1 == 10);
+    REQUIRE(table.get().time2 == 20);
 }

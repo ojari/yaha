@@ -31,6 +31,8 @@ public:
                 case DataValueType::STRING:
                     out << value.getValue<std::string>() << " ";
                     break;
+                default:
+                    throw std::runtime_error("Unknown data type");
             }
         }
         out << "\n";
@@ -38,6 +40,7 @@ public:
     }
 
     void read(IDataHeader& header) const {
+        std::string s;
         for (auto& value : header) {
             switch (value.getType()) {
                 case DataValueType::INT:
@@ -56,10 +59,11 @@ public:
                     value.setValue<float>(d);
                     break;
                 case DataValueType::STRING:
-                    std::string s;
                     sstream >> s;
                     value.setValue<std::string>(s);
                     break;
+                default:
+                    throw std::runtime_error("Unknown data type");
             }
         }
     }

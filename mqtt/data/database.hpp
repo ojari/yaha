@@ -5,6 +5,23 @@
 #include <vector>
 #include <memory>
 
+template <typename T>
+class BaseORM {
+public:
+    BaseORM<T>(sqlite3* db) : db(db) {
+    }
+
+    virtual ~BaseORM() {
+    }
+
+    virtual const char* sqlCreateTable() = 0;
+    virtual void insert(const T& data) = 0;
+    virtual BaseIterator<T>* begin() = 0;
+    virtual BaseIterator<T>* end() = 0;
+
+protected:
+    sqlite3* db;
+};
 
 class DataHistoryORM : public BaseORM<DataHistory>, public DataInsertHistory {
 public:
@@ -36,7 +53,7 @@ public:
         const char* sql = "SELECT epoch, device, type, val1, val2, val3 FROM History;";
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-        return new SqlIterator<DataHistory>(stmt, [](sqlite3_stmt* stmt) {
+        return new SqlIteratorOld<DataHistory>(stmt, [](sqlite3_stmt* stmt) {
             long epoch = sqlite3_column_int64(stmt, 0);
             std::string device = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             DataType type = static_cast<DataType>(sqlite3_column_int(stmt, 2));
@@ -48,7 +65,7 @@ public:
     }
 
     BaseIterator<DataHistory>* end() override {
-        return new SqlIterator<DataHistory>(nullptr, {});
+        return new SqlIteratorOld<DataHistory>(nullptr, {});
     }
 };
 

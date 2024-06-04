@@ -15,22 +15,22 @@ void close_db(sqlite3* db) {
 TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
     SECTION("SQL statement creation for ConfigDevice table") {
         sqlite3* db = create_db();
-        SourceSqlite<ConfigDevice> source(db);
+        SourceSqlite source(db);
         TableConfigDevice tableDevice;
 
-        REQUIRE(source.createSql(tableDevice, tableDevice) == "CREATE TABLE IF NOT EXISTS device(name TEXT,type TEXT);");
-        REQUIRE(source.insertSql(tableDevice, tableDevice) == "INSERT INFO device(name,type ) VALUES (?,?);");
-        REQUIRE(source.selectSql(tableDevice, tableDevice) == "SELECT name,type FROM device;");
+        REQUIRE(source.createSql(tableDevice) == "CREATE TABLE IF NOT EXISTS device(name TEXT,type TEXT);");
+        REQUIRE(source.insertSql(tableDevice) == "INSERT INFO device(name,type ) VALUES (?,?);");
+        REQUIRE(source.selectSql(tableDevice) == "SELECT name,type FROM device;");
 
         close_db(db);
     }
     SECTION("Read single row from SQLite database") {
         sqlite3* db = create_db();
-        SourceSqlite<ConfigDevice> source(db);
+        SourceSqlite source(db);
         TableConfigDevice tableDevice;
 
         source.read(tableDevice);
-        auto device = tableDevice.getConfig();
+        auto device = tableDevice.get();
 
         // Verify the values
         //REQUIRE(device.name == "device1");
@@ -41,11 +41,11 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
     SECTION("Insert single row into SQLite database") {
         sqlite3* db = create_db();
 
-        SourceSqlite<ConfigController> source(db);
+        SourceSqlite source(db);
         TableConfigController tableController;
         ConfigController config("controller2", "type2", "actuator2", 30, 40);
         tableController.set(config);
-        source.insert(tableController, tableController);
+        source.insert(tableController);
 /*
         // Query the database to verify the inserted row
         sqlite3_stmt* stmt;
@@ -83,4 +83,25 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         sqlite3_finalize(stmt);
         close_db(db);
     }*/
+}
+
+TEST_CASE("Insert and Read item from SQLite database") {
+    sqlite3* db = create_db();
+    SourceSqlite source(db);
+    TableConfigDevice tableDevice;
+    ConfigDevice config("device1", "type1");
+    tableDevice.set(config);
+    source.insert(tableDevice);
+
+    // Read the inserted item
+    
+    auto iter = source.begin(tableDevice);
+    //IDataHeader& header = *(*iter);
+    //auto device = tableDevice.get(); 
+
+    // Verify the values
+    //REQUIRE(device.name == "device1");
+    //REQUIRE(device.type == "type1");
+
+    close_db(db);
 }

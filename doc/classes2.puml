@@ -1,0 +1,58 @@
+@startuml
+
+class ConfigDevice {
+    -std::string name
+    -std::string type
+}
+
+class ConfigController {
+    -std::string name
+    -std::string type
+    -std::string actuator
+    -int time1
+    -int time2
+}
+
+class DataValue {
+    -std::string name
+    -std::variant value
+}
+
+class IDataTable<T> {
+    +virtual T get() const = 0
+    +virtual void set(const T& data) = 0
+}
+
+class IDataHeader {
+    +virtual iterator begin() = 0
+    +virtual iterator end() = 0
+    +virtual const string& getTableName() const = 0
+}
+
+class DataHeader {
+    -std::string tableName
+    -std::vector<DataValue> values
+    +void setValue<T>(const std::string& name, T value)
+    +T getValue<T>(const std::string& name) const
+    +const std::string& getTableName() const
+}
+
+class TableConfigDevice {
+    +const ConfigDevice& get() const
+    +void set(const ConfigDevice& config)
+}
+
+class TableConfigController {
+    +const ConfigController& get() const
+    +void set(const ConfigController& config)
+}
+TableConfigDevice --|> IDataTable : Inheritance
+TableConfigDevice --|> DataHeader
+TableConfigDevice --> ConfigDevice : uses
+TableConfigController --|> IDataTable : Inheritance
+TableConfigController --|> DataHeader
+TableConfigController --> ConfigController : uses
+DataHeader --|> IDataHeader : Inheritance
+DataHeader --> DataValue : uses
+
+@enduml

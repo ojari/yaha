@@ -4,8 +4,6 @@
 #include <vector>
 #include <stdexcept>
 
-//#include "database.hpp"
-
 enum class DataValueType {
     INT,
     LONG,
@@ -55,19 +53,8 @@ private:
 
 template <typename T>
 struct IDataTable {
-    IDataTable(const std::string& tableName) : 
-        tableName(tableName)
-    {}
-    virtual ~IDataTable() {}
-
-    const std::string& getTableName() const {
-        return tableName;
-    }
-
+    virtual T get() const = 0;
     virtual void set(const T& data) = 0;
-
-protected:
-    std::string tableName;
 };
 
 
@@ -76,4 +63,6 @@ struct IDataHeader {
 
     virtual iterator begin() = 0;
     virtual iterator end() = 0;
+
+    virtual const std::string& getTableName() const = 0;
 };

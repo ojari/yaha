@@ -8,6 +8,11 @@
 
 class DataHeader : public IDataHeader {
 public:
+    DataHeader(const std::string& tableName) : 
+        tableName(tableName)
+    {}
+
+    virtual ~DataHeader() = default;
 
     template <typename T>
     void setValue(const std::string& name, T value) {
@@ -40,6 +45,10 @@ public:
         return values.end();
     }
 
+    const std::string& getTableName() const {
+        return tableName;
+    }
+
 protected:
     void add(const DataValue& value) {
         values.push_back(value);
@@ -47,11 +56,12 @@ protected:
 
 private:
     std::vector<DataValue> values;
+    std::string tableName;
 };
 
 class TableConfigDevice : public DataHeader, public IDataTable<ConfigDevice> {
 public:
-    TableConfigDevice() : IDataTable("device") {
+    TableConfigDevice() : DataHeader("device") {
         add(DataValue("name", ""));
         add(DataValue("type", ""));
     }
@@ -61,14 +71,17 @@ public:
         setValue("type", config.type);
     }
 
-    ConfigDevice getConfig() const {
-        return ConfigDevice(getValue<std::string>("name"), getValue<std::string>("type"));
+    ConfigDevice get() const override {
+        return ConfigDevice(
+            getValue<std::string>("name"),
+            getValue<std::string>("type")
+        );
     }
 };
 
 class TableConfigController : public DataHeader, public IDataTable<ConfigController> {
 public:
-    TableConfigController() : IDataTable("controller"){
+    TableConfigController() : DataHeader("controller"){
         add(DataValue("name", ""));
         add(DataValue("type", ""));
         add(DataValue("actuator", ""));
@@ -84,7 +97,7 @@ public:
         setValue("time2", config.time2);
     }
 
-    ConfigController getConfig() const {
+    ConfigController get() const override {
         return ConfigController(
             getValue<std::string>("name"),
             getValue<std::string>("type"),
@@ -98,7 +111,7 @@ public:
 
 class TableTemperature : public DataHeader, public IDataTable<DataTemperature> {
 public:
-    TableTemperature() : IDataTable("Temperature") {
+    TableTemperature() : DataHeader("Temperature") {
         add(DataValue("epoch", 0L));
         add(DataValue("temperature", 0.0f));
         add(DataValue("humidity", 0.0f));
@@ -109,7 +122,7 @@ public:
         setValue("temperature", data.temperature);
         setValue("humidity", data.humidity);
     }
-    DataTemperature get() const {
+    DataTemperature get() const override {
         return DataTemperature(
             getValue<int>("epoch"),
             getValue<float>("temperature"),
@@ -121,7 +134,7 @@ public:
 
 class TableWeather : public DataHeader, public IDataTable<DataWeather> {
 public:
-    TableWeather() : IDataTable("Weather") {
+    TableWeather() : DataHeader("Weather") {
         add(DataValue("epoch", 0L));
         add(DataValue("temperature", 0.0f));
         add(DataValue("humidity", 0.0f));
@@ -144,7 +157,8 @@ public:
         setValue("uv", data.uv);
         setValue("solarRadiation", data.solarRadiation);
     }
-    DataWeather get() const {
+
+    DataWeather get() const override {
         return DataWeather(
             getValue<int>("epoch"),
             getValue<float>("temperature"),
@@ -162,7 +176,7 @@ public:
 
 class TableElPrice : public DataHeader, public IDataTable<DataElPrice> {
 public:
-    TableElPrice() : IDataTable("ElPrice") {
+    TableElPrice() : DataHeader("ElPrice") {
         add(DataValue("epoch", 0L));
         add(DataValue("price", 0.0f));
     }
@@ -171,7 +185,7 @@ public:
         setValue("epoch", data.epoch);
         setValue("price", data.price);
     }
-    DataElPrice get() const {
+    DataElPrice get() const override {
         return DataElPrice(
             getValue<int>("epoch"),
             getValue<float>("price")
@@ -182,7 +196,7 @@ public:
 
 class TableHistory : public DataHeader, public IDataTable<DataHistory> {
 public:
-    TableHistory() : IDataTable("History") {
+    TableHistory() : DataHeader("History") {
         add(DataValue("epoch", 0L));
         add(DataValue("device", ""));
         add(DataValue("type", 0));
@@ -199,7 +213,7 @@ public:
         setValue("val2", data.val2);
         setValue("val3", data.val3);
     }
-    DataHistory get() const {
+    DataHistory get() const override {
         return DataHistory(
             getValue<long>("epoch"),
             getValue<std::string>("device"),
