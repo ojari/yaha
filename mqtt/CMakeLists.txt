@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
   logic.cpp
   collect.cpp
   data/database.cpp
+  data/tables.cpp
 )
 
 

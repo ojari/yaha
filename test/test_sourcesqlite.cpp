@@ -28,9 +28,10 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         sqlite3* db = create_db();
         SourceSqlite source(db);
         TableConfigDevice tableDevice;
+        ConfigDevice device;
 
         source.read(tableDevice);
-        auto device = tableDevice.get();
+        dataFromHeader(tableDevice, device);
 
         // Verify the values
         //REQUIRE(device.name == "device1");
@@ -44,7 +45,7 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         SourceSqlite source(db);
         TableConfigController tableController;
         ConfigController config("controller2", "type2", "actuator2", 30, 40);
-        tableController.set(config);
+        dataToHeader(tableController, config);
         source.insert(tableController);
 /*
         // Query the database to verify the inserted row
@@ -90,7 +91,8 @@ TEST_CASE("Insert and Read item from SQLite database") {
     SourceSqlite source(db);
     TableConfigDevice tableDevice;
     ConfigDevice config("device1", "type1");
-    tableDevice.set(config);
+    dataToHeader(tableDevice, config);
+
     source.insert(tableDevice);
 
     // Read the inserted item

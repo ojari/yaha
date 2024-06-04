@@ -59,27 +59,17 @@ private:
     std::string tableName;
 };
 
-class TableConfigDevice : public DataHeader, public IDataTable<ConfigDevice> {
+class TableConfigDevice : public DataHeader {
 public:
     TableConfigDevice() : DataHeader("device") {
         add(DataValue("name", ""));
         add(DataValue("type", ""));
     }
-
-    void set(const ConfigDevice& config) override {
-        setValue("name", config.name);
-        setValue("type", config.type);
-    }
-
-    ConfigDevice get() const override {
-        return ConfigDevice(
-            getValue<std::string>("name"),
-            getValue<std::string>("type")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const ConfigDevice& config);
+extern void dataFromHeader(DataHeader& header, ConfigDevice& config);
 
-class TableConfigController : public DataHeader, public IDataTable<ConfigController> {
+class TableConfigController : public DataHeader {
 public:
     TableConfigController() : DataHeader("controller"){
         add(DataValue("name", ""));
@@ -88,51 +78,23 @@ public:
         add(DataValue("time1", 0));
         add(DataValue("time2", 0));
     }
-
-    void set(const ConfigController& config) override {
-        setValue("name", config.name);
-        setValue("type", config.type);
-        setValue("actuator", config.actuator);
-        setValue("time1", config.time1);
-        setValue("time2", config.time2);
-    }
-
-    ConfigController get() const override {
-        return ConfigController(
-            getValue<std::string>("name"),
-            getValue<std::string>("type"),
-            getValue<std::string>("actuator"),
-            getValue<int>("time1"),
-            getValue<int>("time2")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const ConfigController& config);
+extern void dataFromHeader(DataHeader& header, ConfigController& config);
 
 
-class TableTemperature : public DataHeader, public IDataTable<DataTemperature> {
+class TableTemperature : public DataHeader {
 public:
     TableTemperature() : DataHeader("Temperature") {
         add(DataValue("epoch", 0L));
         add(DataValue("temperature", 0.0f));
         add(DataValue("humidity", 0.0f));
     }
-
-    void set(const DataTemperature& data) override {
-        setValue("epoch", data.epoch);
-        setValue("temperature", data.temperature);
-        setValue("humidity", data.humidity);
-    }
-    DataTemperature get() const override {
-        return DataTemperature(
-            getValue<int>("epoch"),
-            getValue<float>("temperature"),
-            getValue<float>("humidity")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const DataTemperature& data);
+extern void dataFromHeader(DataHeader& header, DataTemperature& data);
 
-
-class TableWeather : public DataHeader, public IDataTable<DataWeather> {
+class TableWeather : public DataHeader {
 public:
     TableWeather() : DataHeader("Weather") {
         add(DataValue("epoch", 0L));
@@ -145,56 +107,21 @@ public:
         add(DataValue("uv", 0.0f));
         add(DataValue("solarRadiation", 0.0f));
     }
-
-    void set(const DataWeather& data) override {
-        setValue("epoch", data.epoch);
-        setValue("temperature", data.temperature);
-        setValue("humidity", data.humidity);
-        setValue("pressure", data.pressure);
-        setValue("windSpeed", data.windSpeed);
-        setValue("windDirection", data.windDirection);
-        setValue("rain", data.rain);
-        setValue("uv", data.uv);
-        setValue("solarRadiation", data.solarRadiation);
-    }
-
-    DataWeather get() const override {
-        return DataWeather(
-            getValue<int>("epoch"),
-            getValue<float>("temperature"),
-            getValue<float>("humidity"),
-            getValue<float>("pressure"),
-            getValue<float>("windSpeed"),
-            getValue<float>("windDirection"),
-            getValue<float>("rain"),
-            getValue<float>("uv"),
-            getValue<float>("solarRadiation")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const DataWeather& data);
+extern void dataFromHeader(DataHeader& header, DataWeather& data);
 
-
-class TableElPrice : public DataHeader, public IDataTable<DataElPrice> {
+class TableElPrice : public DataHeader {
 public:
     TableElPrice() : DataHeader("ElPrice") {
         add(DataValue("epoch", 0L));
         add(DataValue("price", 0.0f));
     }
-
-    void set(const DataElPrice& data) override {
-        setValue("epoch", data.epoch);
-        setValue("price", data.price);
-    }
-    DataElPrice get() const override {
-        return DataElPrice(
-            getValue<int>("epoch"),
-            getValue<float>("price")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const DataElPrice& data);
+extern void dataFromHeader(DataHeader& header, DataElPrice& data);
 
-
-class TableHistory : public DataHeader, public IDataTable<DataHistory> {
+class TableHistory : public DataHeader {
 public:
     TableHistory() : DataHeader("History") {
         add(DataValue("epoch", 0L));
@@ -204,26 +131,9 @@ public:
         add(DataValue("val2", 0));
         add(DataValue("val3", 0));
     }
-
-    void set(const DataHistory& data) override {
-        setValue("epoch", data.epoch);
-        setValue("device", data.device);
-        setValue("type", static_cast<int>(data.type));
-        setValue("val1", data.val1);
-        setValue("val2", data.val2);
-        setValue("val3", data.val3);
-    }
-    DataHistory get() const override {
-        return DataHistory(
-            getValue<long>("epoch"),
-            getValue<std::string>("device"),
-            static_cast<DataType>(getValue<int>("type")),
-            getValue<int>("val1"),
-            getValue<int>("val2"),
-            getValue<int>("val3")
-        );
-    }
 };
+extern void dataToHeader(DataHeader& header, const DataHistory& data);
+extern void dataFromHeader(DataHeader& header, DataHistory& data);
 
 class DataTable {
 public:
@@ -232,6 +142,8 @@ public:
         tables.push_back(std::make_unique<TableConfigController>());
         tables.push_back(std::make_unique<TableTemperature>());
         tables.push_back(std::make_unique<TableWeather>());
+        tables.push_back(std::make_unique<TableElPrice>());
+        tables.push_back(std::make_unique<TableHistory>());
     }
 
     template <typename T>

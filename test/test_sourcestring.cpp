@@ -7,8 +7,11 @@ TEST_CASE("SourceString Test", "[SourceString]") {
     SECTION("Read single line from source") {
         SourceString<ConfigDevice> source("device1 type1\n");
         TableConfigDevice tableDevice;
+        ConfigDevice device;
+
         source.read(tableDevice);
-        auto device = tableDevice.get();
+        dataFromHeader(tableDevice, device);
+
         REQUIRE(device.name == "device1");
         REQUIRE(device.type == "type1");
     }
@@ -16,14 +19,14 @@ TEST_CASE("SourceString Test", "[SourceString]") {
         SourceString<ConfigDevice> source("");
         TableConfigDevice tableDevice;
         ConfigDevice config("device2", "type2");
-        tableDevice.set(config);
+        dataToHeader(tableDevice, config);
         source.insert(tableDevice);
 
         TableConfigDevice tableDevice2;
         source.read(tableDevice2);
-        auto device = tableDevice2.get();
-        REQUIRE(device.name == "device2");
-        REQUIRE(device.type == "type2");
+        dataFromHeader(tableDevice2, config);
+        REQUIRE(config.name == "device2");
+        REQUIRE(config.type == "type2");
     }
     SECTION("Check isEof method") {
         SourceString<ConfigDevice> source(
@@ -44,14 +47,19 @@ TEST_CASE("SourceString 2nd Test", "[SourceString]") {
     SECTION("Read multiple lines from source") {
         SourceString<ConfigDevice> source("device1 type1\ncontroller1 type2 actuator1 10 20\n");
         TableConfigDevice tableDevice;
+        ConfigDevice device;
+
         source.read(tableDevice);
-        auto device = tableDevice.get();
+        dataFromHeader(tableDevice, device);
+
         REQUIRE(device.name == "device1");
         REQUIRE(device.type == "type1");
 
         TableConfigController tableController;
         source.read(tableController);
-        auto controller = tableController.get();
+        ConfigController controller;
+        dataFromHeader(tableController, controller);
+
         REQUIRE(controller.name == "controller1");
         REQUIRE(controller.type == "type2");
         REQUIRE(controller.actuator == "actuator1");

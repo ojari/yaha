@@ -19,21 +19,24 @@ TEST_CASE("TableConfigDevice Test", "[TableConfigDevice]") {
     TableConfigDevice table;
 
     ConfigDevice config("device1", "type1");
-    table.set(config);
+    dataToHeader(table, config);
 
-    REQUIRE(table.get().name == "device1");
-    REQUIRE(table.get().type == "type1");
+    const std::string name = table.getValue<std::string>("name");
+    REQUIRE(name == "device1");
+
+    std::string type = table.getValue<std::string>("type");
+    REQUIRE(type == "type1");
 }
 
 TEST_CASE("TableConfigController Test", "[TableConfigController]") {
     TableConfigController table;
 
     ConfigController config("controller1", "type1", "actuator1", 10, 20);
-    table.set(config);
+    dataToHeader(table, config);
 
-    REQUIRE(table.get().name == "controller1");
-    REQUIRE(table.get().type == "type1");
-    REQUIRE(table.get().actuator == "actuator1");
-    REQUIRE(table.get().time1 == 10);
-    REQUIRE(table.get().time2 == 20);
+    REQUIRE(table.getValue<std::string>("name") == "controller1");
+    REQUIRE(table.getValue<std::string>("type") == "type1");
+    REQUIRE(table.getValue<std::string>("actuator") == "actuator1");
+    REQUIRE(table.getValue<int>("time1") == 10);
+    REQUIRE(table.getValue<int>("time2") == 20);
 }

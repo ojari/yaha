@@ -33,6 +33,9 @@ void on_connect(struct mosquitto *mosq, void *obj, int result) {
     }
 }
 
+void on_disconnect(struct mosquitto *mosq, void *obj, int rc) {
+    std::cout << "MQTT Disconnected " << rc << std::endl;  
+}
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message) {
     MessageRouter* router = static_cast<MessageRouter*>(obj);
@@ -52,6 +55,9 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
     mosquitto_sub_topic_tokens_free(&topics, topic_count);
 }
 
+void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
+    std::cout << "MQTT: " << level << " " << str << std::endl;
+}
 
 //------------------------------------------------------------------
 Mqtt::Mqtt(DataInsertHistory &da) : 
@@ -68,7 +74,7 @@ Mqtt::Mqtt(DataInsertHistory &da) :
     }
 
     mosquitto_lib_init();
-    mosq = mosquitto_new(NULL, true, static_cast<void*>(&messageRouter));
+    mosq = mosquitto_new("yaha", true, static_cast<void*>(&messageRouter));
     if (!mosq) {
         showError("Out of memory");
         return;
@@ -76,6 +82,8 @@ Mqtt::Mqtt(DataInsertHistory &da) :
 
     mosquitto_connect_callback_set(mosq, on_connect);
     mosquitto_message_callback_set(mosq, on_message);
+    mosquitto_disconnect_callback_set(mosq, on_disconnect);
+    mosquitto_log_callback_set(mosq, on_logging);
 
     rc = mosquitto_connect(mosq, hostname, 1883, 60);
     if (rc) {

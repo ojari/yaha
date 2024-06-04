@@ -26,6 +26,7 @@ add_executable(${PROJECT_NAME}
   ../mqtt/data/database.cpp
   ../mqtt/data/sourcesqlite.cpp
   ../mqtt/data/sourcestring.cpp
+  ../mqtt/data/tables.cpp
 )
 
 
