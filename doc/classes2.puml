@@ -1,26 +1,22 @@
 @startuml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
 
 class ConfigDevice {
-    -std::string name
-    -std::string type
+    string name
+    string type
 }
 
 class ConfigController {
-    -std::string name
-    -std::string type
-    -std::string actuator
-    -int time1
-    -int time2
+    string name
+    string type
+    string actuator
+    int time1
+    int time2
 }
 
 class DataValue {
-    -std::string name
-    -std::variant value
-}
-
-class IDataTable<T> {
-    +virtual T get() const = 0
-    +virtual void set(const T& data) = 0
+    string name
+    variant value
 }
 
 class IDataHeader {
@@ -30,29 +26,44 @@ class IDataHeader {
 }
 
 class DataHeader {
-    -std::string tableName
-    -std::vector<DataValue> values
-    +void setValue<T>(const std::string& name, T value)
-    +T getValue<T>(const std::string& name) const
-    +const std::string& getTableName() const
+    -string tableName
+    +void setValue<T>(const string& name, T value)
+    +T getValue<T>(const string& name) const
+    +const string& getTableName() const
 }
 
 class TableConfigDevice {
-    +const ConfigDevice& get() const
-    +void set(const ConfigDevice& config)
 }
 
 class TableConfigController {
-    +const ConfigController& get() const
-    +void set(const ConfigController& config)
 }
-TableConfigDevice --|> IDataTable : Inheritance
+
 TableConfigDevice --|> DataHeader
 TableConfigDevice --> ConfigDevice : uses
-TableConfigController --|> IDataTable : Inheritance
 TableConfigController --|> DataHeader
 TableConfigController --> ConfigController : uses
-DataHeader --|> IDataHeader : Inheritance
-DataHeader --> DataValue : uses
+DataHeader --|> IDataHeader
+DataHeader *-- DataValue : values
+
+
+class SqlInsert {
+}
+
+class SqlIterator {
+}
+
+class SourceSqlite {
+    -createSql()
+    -insertSql()
+    -selectSql()
+
+    begin()
+    insert()
+}
+
+SourceSqlite --> SqlInsert : uses
+SourceSqlite --> SqlIterator : uses
+SourceSqlite --> IDataHeader : uses
+
 
 @enduml

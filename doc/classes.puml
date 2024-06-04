@@ -1,0 +1,24 @@
+@startuml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+class Observable
+class Observer
+class Collect
+class TimeSource
+class ElPriceSource
+class TemperatureSource
+
+Observable *-- Observer
+Collect --> Observable
+TimeSource o-- Collect
+ElPriceSource o-- Collect
+TemperatureSource o-- Collect
+
+
+Lights --> Observer
+CarHeater --> Observer
+StorageHeater --> Observer
+WaterHeater --> Observer
+RoomHeater --> Observer
+
+@enduml
