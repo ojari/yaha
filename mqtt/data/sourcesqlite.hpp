@@ -1,8 +1,43 @@
 #pragma once
 #include <sqlite3.h>
 #include <functional>
-#include "common.hpp"
 #include "datasource.hpp"
+
+
+class SqlInsert {
+public:
+    SqlInsert(sqlite3* db, const char* sql) {
+        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    }
+
+    ~SqlInsert() {
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+    }
+
+    void add(long value) {
+        sqlite3_bind_int64(stmt, index, value);
+        index++;
+    }
+
+    void add(int value) {
+        sqlite3_bind_int(stmt, index, value);
+        index++;
+    }
+
+    void add(float value) {
+        sqlite3_bind_double(stmt, index, value);
+        index++;
+    }
+
+    void add(const std::string& value) {
+        sqlite3_bind_text(stmt, index, value.c_str(), -1, SQLITE_TRANSIENT);
+        index++;
+    }
+private:
+    sqlite3_stmt* stmt;
+    int index = 1;
+};
 
 class SqlIterator {
 public:
@@ -186,4 +221,5 @@ private:
     sqlite3* db;
 };
 
-#include "sourcesqlite.cpp"
+
+extern sqlite3* createDatabase(const std::string& filename);

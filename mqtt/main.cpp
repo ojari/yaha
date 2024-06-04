@@ -40,13 +40,18 @@ private:
     int minute;
 };
 
+struct DummyHistory : public DataInsertHistory {
+    void insert(const DataHistory& data) override {
+    }
+};
+
 
 /**
  * @brief The main function of the program.
  */
 int main() {
-    std::unique_ptr<Database> db{createDatabase("data.db")};
-    Mqtt mqtt(db->history);
+    DummyHistory history;
+    Mqtt mqtt(history);
     Actuator actuator(mqtt);
     std::shared_ptr<Values> collect{new Values()};
 

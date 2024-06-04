@@ -16,7 +16,7 @@ add_executable(${PROJECT_NAME}
   actuator.cpp
   logic.cpp
   collect.cpp
-  data/database.cpp
+  data/sourcesqlite.cpp
   data/tables.cpp
 )
 

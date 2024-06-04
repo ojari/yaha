@@ -2,19 +2,13 @@
 #include "../mqtt/data/tables.hpp"
 #include "../mqtt/data/sourcesqlite.hpp"
 
-sqlite3* create_db() {
-    sqlite3* db;
-    sqlite3_open(":memory:", &db);
-    return db;
-}
-
 void close_db(sqlite3* db) {
     sqlite3_close(db);
 }
 
 TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
     SECTION("SQL statement creation for ConfigDevice table") {
-        sqlite3* db = create_db();
+        sqlite3* db = createDatabase("");
         SourceSqlite source(db);
         TableConfigDevice tableDevice;
 
@@ -25,7 +19,7 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         close_db(db);
     }
     SECTION("Read single row from SQLite database") {
-        sqlite3* db = create_db();
+        sqlite3* db = createDatabase("");
         SourceSqlite source(db);
         TableConfigDevice tableDevice;
         ConfigDevice device;
@@ -40,7 +34,7 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         close_db(db);
     }
     SECTION("Insert single row into SQLite database") {
-        sqlite3* db = create_db();
+        sqlite3* db = createDatabase("");
 
         SourceSqlite source(db);
         TableConfigController tableController;
@@ -87,7 +81,7 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
 }
 
 TEST_CASE("Insert and Read item from SQLite database") {
-    sqlite3* db = create_db();
+    sqlite3* db = createDatabase("");
     SourceSqlite source(db);
     TableConfigDevice tableDevice;
     ConfigDevice config("device1", "type1");

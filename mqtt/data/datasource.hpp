@@ -50,14 +50,6 @@ private:
 };
 
 
-
-template <typename T>
-struct IDataTable {
-    virtual T get() const = 0;
-    virtual void set(const T& data) = 0;
-};
-
-
 struct IDataHeader {
     using iterator = std::vector<DataValue>::iterator;
 
