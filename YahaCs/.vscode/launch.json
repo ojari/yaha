@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "name": ".NET Launch (remote)",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build",
+        "program": "/usr/share/dotnet/dotnet",
+        "args": ["/home/root/demo/Demo1.dll"],
+        "cwd": "/home/root/demo",
+        "stopAtEntry": true,
+        "console": "internalConsole",
+        "pipeTransport": {
+            "pipeCwd": "${workspaceFolder}",
+            "pipeProgram": "c:\\usr\\PLINK.EXE",
+            "pipeArgs": [
+                "root@10.2.2.10"
+            ],
+            "debuggerPath": "/home/root/.vs-debugger/vs2022/vsdbg2"
+        }
+    }]
+}

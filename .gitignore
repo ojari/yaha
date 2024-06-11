@@ -34,5 +34,7 @@ mqtt/build
 test/build
 coro/build
 doc/C4*.puml
+etc/
+.vscode/settings.json
 build
 .cccc
