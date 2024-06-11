@@ -5,6 +5,7 @@ project(weather VERSION 0.1)
 find_package(curl REQUIRED)
 find_package(SQLite3 REQUIRED)
 find_package(tinyxml2 REQUIRED)
+find_package(CLI11 REQUIRED)
 
 add_executable(${PROJECT_NAME}
   main.cpp
@@ -20,6 +21,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}
   tinyxml2
+  CLI11
   ${CURL_LIB}
   ${EXTRA_LIBRARIES}
 )

@@ -5,7 +5,7 @@
 
 TEST_CASE("SourceString Test", "[SourceString]") {
     SECTION("Read single line from source") {
-        SourceString<ConfigDevice> source("device1 type1\n");
+        SourceString<ConfigDevice> source("{ device1 type1 }\n");
         TableConfigDevice tableDevice;
         ConfigDevice device;
 
@@ -30,8 +30,8 @@ TEST_CASE("SourceString Test", "[SourceString]") {
     }
     SECTION("Check isEof method") {
         SourceString<ConfigDevice> source(
-            "device1 type1\n"
-            "device2 type2");  // No newline at the end
+            "{ device1 type1 }\n"
+            "{ device2 type2 }");  // No newline at the end
         TableConfigDevice tableDevice;
         REQUIRE(source.isEnd() == false);
         source.read(tableDevice);
@@ -45,7 +45,7 @@ TEST_CASE("SourceString 2nd Test", "[SourceString]") {
     // Existing tests...
 
     SECTION("Read multiple lines from source") {
-        SourceString<ConfigDevice> source("device1 type1\ncontroller1 type2 actuator1 10 20\n");
+        SourceString<ConfigDevice> source("{ device1 type1 }\n{ controller1 type2 actuator1 10 20 }\n");
         TableConfigDevice tableDevice;
         ConfigDevice device;
 

@@ -41,6 +41,10 @@ public:
 
     void read(IDataHeader& header) const {
         std::string s;
+        char c = readNonSpace();
+        if (c != '{') {
+            throw std::runtime_error("Expected '{' at the beginning of the data");
+        }
         for (auto& value : header) {
             switch (value.getType()) {
                 case DataValueType::INT:
@@ -66,8 +70,20 @@ public:
                     throw std::runtime_error("Unknown data type");
             }
         }
+        c = readNonSpace();
+        if (c != '}') {
+            throw std::runtime_error("Expected '}' at the end of the data");
+        }
     }
 
 private:
+    // method that reads stream until first non-whitespace character or end of stream.
+    // The first non-whitespace character is returned.
+    char readNonSpace() const {
+        char c;
+        while (sstream.get(c) && std::isspace(c));
+        return c;
+    }
+
     mutable std::stringstream sstream;
 };

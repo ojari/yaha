@@ -1,7 +1,7 @@
 #pragma once
 #include <sqlite3.h>
 #include <functional>
-#include "datasource.hpp"
+#include "tables.hpp"
 
 
 class SqlInsert {
@@ -41,7 +41,7 @@ private:
 
 class SqlIterator {
 public:
-    SqlIterator(sqlite3_stmt* stmt, IDataHeader &header) :
+    SqlIterator(sqlite3_stmt* stmt, DataHeader &header) :
         stmt(stmt),
         header(header),
         done(false)
@@ -54,7 +54,7 @@ public:
         return *this;
     }
 
-    IDataHeader& operator*() const {
+    DataHeader& operator*() const {
         int index = 1;
         std::string s;
         int i;
@@ -96,7 +96,7 @@ public:
 
 private:
     sqlite3_stmt* stmt;
-    IDataHeader& header;
+    DataHeader& header;
     bool done;
 
     void step() {
@@ -179,11 +179,11 @@ public:
         return output;
     }
 
-    SqlIterator* begin(IDataHeader& header) {
+    SqlIterator begin(DataHeader& header) {
         std::string sql = selectSql(header);
         sqlite3_stmt* stmt;
         sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, 0);
-        return new SqlIterator(stmt, header);
+        return SqlIterator(stmt, header);
     }
 
 

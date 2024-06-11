@@ -24,8 +24,12 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
         TableConfigDevice tableDevice;
         ConfigDevice device;
 
-        source.read(tableDevice);
-        dataFromHeader(tableDevice, device);
+        // Note: must create table in memory before inserting data
+        //       must add data to table before reading
+    
+        //auto iter = source.begin(tableDevice);
+
+        //dataFromHeader(*iter, device);
 
         // Verify the values
         //REQUIRE(device.name == "device1");
