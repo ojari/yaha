@@ -39,10 +39,9 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}
     Catch2d
-    mosquitto_static
+    ${MOSQUITTO_LIB}
     sqlite3
-    pthread
-    dl
+    ${EXTRA_LIBRARIES}
 )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

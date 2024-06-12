@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(yaha)
 
-# specify the C++ standard
-# set(CMAKE_CXX_STANDARD 17)
-# target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # add the executable
 add_executable(${PROJECT_NAME}
@@ -19,6 +16,10 @@ add_executable(${PROJECT_NAME}
   data/sourcesqlite.cpp
   data/tables.cpp
 )
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 17)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE 

@@ -2,11 +2,6 @@ include(../setup.cmake)
 cmake_minimum_required(VERSION 3.20)
 project(weather VERSION 0.1)
 
-find_package(curl REQUIRED)
-find_package(SQLite3 REQUIRED)
-find_package(tinyxml2 REQUIRED)
-find_package(CLI11 REQUIRED)
-
 add_executable(${PROJECT_NAME}
   main.cpp
   parse.cpp
