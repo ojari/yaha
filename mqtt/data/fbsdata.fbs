@@ -1,0 +1,60 @@
+namespace Fbs;
+
+table Temperature {
+    epoch: long;
+    temperature: float;
+    humidity: float;
+}
+
+table Temperatures {
+  items: [Temperature];
+}
+
+table Weather {
+  epoch: long;
+  temperature: float;
+  humidity: float;
+  pressure: float;
+  wind_speed: float;
+  wind_direction: float;
+  rain: float;
+  uv: float;
+  solar_radiation: float;
+}
+
+table Weathers {
+  items: [Weather];
+}
+
+table ElPrice {
+  epoch: long;
+  price: float;
+}
+
+table ElPrices {
+  items: [ElPrice];
+}
+
+
+table ConfigDevice {
+  name: string;
+  type: string;
+}
+
+table ConfigController {
+  name: string;
+  type: string;
+  actuator: string;
+  time1: int;
+  time2: int;
+}
+
+table Configurations {
+  devices: [ConfigDevice];
+  controllers: [ConfigController];
+}
+
+root_type Configurations;
+root_type Temperatures;
+root_type Weathers;
+root_type ElPrices;
