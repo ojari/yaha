@@ -4,7 +4,7 @@
 struct BaseData {
     long epoch;
 
-    BaseData(long time) : epoch(time) {}
+    explicit BaseData(long time) : epoch(time) {}
 };
 
 struct DataTemperature : public BaseData {
@@ -83,5 +83,7 @@ struct DataHistory : public BaseData {
 };
 
 struct DataInsertHistory {
+    virtual ~DataInsertHistory() = default;
+
     virtual void insert(const DataHistory& data) = 0;
 };

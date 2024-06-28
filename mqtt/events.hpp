@@ -35,7 +35,7 @@ public:
         return isInteger;
     }
 
-    std::string name() {
+    std::string name() const {
         switch (type) {
             case ValueType::TEMPERATURE:
                 return "Temperature";
@@ -65,6 +65,8 @@ private:
 };
 
 struct IValues {
+    virtual ~IValues() = default;
+
     virtual int getInt(ValueType type) const = 0;
     virtual float getFloat(ValueType type) const = 0;
     virtual void set(ValueType type, int value) = 0;
@@ -72,12 +74,14 @@ struct IValues {
 };
 
 struct Observer {
+    virtual ~Observer() = default;
+
     virtual void onChange(const IValues& state) = 0;
 };
 
 
 struct Observable {
-    void notify(const IValues& state) {
+    void notify(const IValues& state) const {
         for (auto observer : observers)
             observer->onChange(state);
     }
@@ -105,17 +109,17 @@ struct Values : public Observable, public IValues {
         values[ValueType::ELECTRICITY_PRICE] = ValueItem(ValueType::ELECTRICITY_PRICE, 0);
     }
 
-    int getInt(ValueType type) const {
+    virtual ~Values() = default;
+
+    int getInt(ValueType type) const override {
         return values.at(type).getInt();
-        // return values[type].getInt();
     }
 
-    float getFloat(ValueType type) const {
+    float getFloat(ValueType type) const override {
         return values.at(type).getFloat();
     }
 
-    void set(ValueType type, int value) {
-        // values[type] = ValueItem(type, value);
+    void set(ValueType type, int value) override {
         int old = getInt(type);
         if (old == value) {
             return;
@@ -124,7 +128,7 @@ struct Values : public Observable, public IValues {
         notify(*this);
     }
 
-    bool set(ValueType type, float value) {
+    bool set(ValueType type, float value) override {
         float old = getFloat(type);
         if (old == value) {
             return false;

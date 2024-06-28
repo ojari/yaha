@@ -26,7 +26,6 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 void on_connect(struct mosquitto *mosq, void *obj, int result) {
     if (!result) {
         std::cout << "Connected" << std::endl;
-        //mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+/state", 0);
         mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
     } else {
         std::cerr << "Connect failed: " << result << std::endl;
@@ -38,7 +37,7 @@ void on_disconnect(struct mosquitto *mosq, void *obj, int rc) {
 }
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message) {
-    MessageRouter* router = static_cast<MessageRouter*>(obj);
+    auto* router = static_cast<MessageRouter*>(obj);
     char **topics;
     int topic_count;
     int rc;
@@ -68,7 +67,7 @@ Mqtt::Mqtt(DataInsertHistory &da) :
 
     deviceRegistry.load("devices.json");
 
-    if (hostname == NULL) {
+    if (hostname == nullptr) {
         showError("Missing RPI_HOST environmental variable");
         return;
     }
@@ -98,7 +97,6 @@ void Mqtt::execute() {
     rc = mosquitto_loop(mosq, -1, 1);
     if (rc) {
         showError(mosquitto_strerror(rc));
-        // sleep(10);
         mosquitto_reconnect(mosq);
     }
 }

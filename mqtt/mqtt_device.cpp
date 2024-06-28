@@ -15,7 +15,6 @@ void DeviceRegistry::load(const std::string& filename) {
             const std::string type = deviceData["type"].get<std::string>();
 
             devices_[name] = createDevice(name, type);
-            // std::cout << "Device: " << name << " Type: " << type << std::endl;
         }
 
         ifile.close();

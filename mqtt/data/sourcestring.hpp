@@ -2,22 +2,27 @@
 #include "datasource.hpp"
 #include <sstream>
 
+class StringException : public std::runtime_error {
+public:
+    using runtime_error::runtime_error;
+};
+
 template <typename T>
 class SourceString {
 public:
-    SourceString(std::string data) : 
+    explicit SourceString(const std::string& data) : 
         sstream(data)
     {
     }
 
-    bool isEnd() {
+    bool isEnd() const {
         return sstream.eof();
     }
 
     void insert(IDataHeader& header) {
         std::ostringstream out;
 
-        for (auto& value : header) {
+        for (const auto& value : header) {
             switch (value.getType()) {
                 case DataValueType::INT:
                     out << value.getValue<int>() << " ";
@@ -32,7 +37,7 @@ public:
                     out << value.getValue<std::string>() << " ";
                     break;
                 default:
-                    throw std::runtime_error("Unknown data type");
+                    throw StringException("Unknown data type");
             }
         }
         out << "\n";
@@ -43,7 +48,7 @@ public:
         std::string s;
         char c = readNonSpace();
         if (c != '{') {
-            throw std::runtime_error("Expected '{' at the beginning of the data");
+            throw StringException("Expected '{' at the beginning of the data");
         }
         for (auto& value : header) {
             switch (value.getType()) {
@@ -67,12 +72,12 @@ public:
                     value.setValue<std::string>(s);
                     break;
                 default:
-                    throw std::runtime_error("Unknown data type");
+                    throw StringException("Unknown data type");
             }
         }
         c = readNonSpace();
         if (c != '}') {
-            throw std::runtime_error("Expected '}' at the end of the data");
+            throw StringException("Expected '}' at the end of the data");
         }
     }
 

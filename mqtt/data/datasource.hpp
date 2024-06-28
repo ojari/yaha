@@ -41,8 +41,8 @@ public:
     }
 
     template <typename T>
-    void setValue(T& value) {
-        this->value.emplace<T>(value);
+    void setValue(T& newValue) {
+        this->value.emplace<T>(newValue);
     }
 private:
     std::string name;
@@ -52,6 +52,7 @@ private:
 
 struct IDataHeader {
     using iterator = std::vector<DataValue>::iterator;
+    virtual ~IDataHeader() = default;
 
     virtual iterator begin() = 0;
     virtual iterator end() = 0;

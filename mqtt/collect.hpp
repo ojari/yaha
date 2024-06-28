@@ -6,23 +6,30 @@
 
 class BaseSource {
 public:
-    BaseSource(std::shared_ptr<IValues> collect) : 
+    explicit BaseSource(std::shared_ptr<IValues> collect) : 
         collect(collect)
     {}
 protected:
+    void set(ValueType name, float value) const {
+        collect->set(name, value);
+    }
+    void set(ValueType name, int value) const {
+        collect->set(name, value);
+    }
+private:
     std::shared_ptr<IValues> collect;
 };
 
 
 class SourceTime : public BaseSource, public ITask {
 public:
-    SourceTime(std::shared_ptr<IValues> collect) : BaseSource(collect)
+    explicit SourceTime(std::shared_ptr<IValues> collect) : BaseSource(collect)
     {}
 
-    void execute() {
+    void execute() override {
         incrementTime(1);
         int time = hm2time(hour, minute);
-        collect->set(ValueType::TIME, time);
+        set(ValueType::TIME, time);
     }
 private:
     void incrementTime(int minutes);
@@ -33,15 +40,15 @@ private:
 
 class SourceTemperature : public BaseSource, public ITask {
 public:
-    SourceTemperature(std::shared_ptr<IValues> collect) : BaseSource(collect)
+    explicit SourceTemperature(std::shared_ptr<IValues> collect) : BaseSource(collect)
     {}
 
-    void execute() {
+    void execute() override {
         if (counter < 10) {
-            collect->set(ValueType::TEMPERATURE, 20.0f);
+            set(ValueType::TEMPERATURE, 20.0f);
         }
         else if (counter < 20) {
-            collect->set(ValueType::TEMPERATURE, 21.0f);
+            set(ValueType::TEMPERATURE, 21.0f);
         }
         else {
             counter = 0;

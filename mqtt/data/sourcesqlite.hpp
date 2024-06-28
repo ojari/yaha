@@ -3,6 +3,10 @@
 #include <functional>
 #include "tables.hpp"
 
+class SqlException : public std::runtime_error {
+public:
+    using runtime_error::runtime_error;
+};
 
 class SqlInsert {
 public:
@@ -43,8 +47,7 @@ class SqlIterator {
 public:
     SqlIterator(sqlite3_stmt* stmt, DataHeader &header) :
         stmt(stmt),
-        header(header),
-        done(false)
+        header(header)
     {
         step();
     }
@@ -71,7 +74,7 @@ public:
                     value.setValue<long>(l);
                     break;
                 case DataValueType::DOUBLE:
-                    f = sqlite3_column_double(stmt, index);
+                    f = static_cast<float>(sqlite3_column_double(stmt, index));
                     value.setValue<float>(f);
                     break;
                 case DataValueType::STRING:
@@ -79,7 +82,7 @@ public:
                     value.setValue<std::string>(s);
                     break;
                 default:
-                    throw std::runtime_error("Unknown data type");
+                    throw SqlException("Unknown data type");
             }
             index++;
         }
@@ -87,9 +90,9 @@ public:
     }
 
     bool operator!=(const SqlIterator& other) const {
-        const SqlIterator* otherPtr = dynamic_cast<const SqlIterator*>(&other);
+        const auto* otherPtr = dynamic_cast<const SqlIterator*>(&other);
         if (!otherPtr) {
-            throw std::runtime_error("Incompatible iterators");
+            throw SqlException("Incompatible iterators");
         }
         return done != otherPtr->done;
     }
@@ -97,7 +100,7 @@ public:
 private:
     sqlite3_stmt* stmt;
     DataHeader& header;
-    bool done;
+    bool done = false;
 
     void step() {
         if (sqlite3_step(stmt) != SQLITE_ROW) {
@@ -111,12 +114,12 @@ private:
 // @todo: move sql statement creation to cpp file.
 class SourceSqlite {
 public:
-    SourceSqlite(sqlite3* db) : 
+    explicit SourceSqlite(sqlite3* db) : 
         db(db)
     {
     }
 
-    std::string createSql(IDataHeader& header) {
+    std::string createSql(IDataHeader& header) const {
         std::string output = "CREATE TABLE IF NOT EXISTS ";
         output.append(header.getTableName());
         output.append("(");
@@ -135,7 +138,7 @@ public:
                     output.append("TEXT");
                     break;
                 default:
-                    throw std::runtime_error("Unknown data type");
+                    throw SqlException("Unknown data type");
             }
             output.append(",");
         }
@@ -144,7 +147,7 @@ public:
         return output; 
     }
 
-    std::string insertSql(IDataHeader& header) {
+    std::string insertSql(IDataHeader& header) const {
         std::string output = "INSERT INFO ";
         output.append(header.getTableName());
         output.append("(");
@@ -164,7 +167,7 @@ public:
         return output;
     }
 
-    std::string selectSql(IDataHeader& header) {
+    std::string selectSql(IDataHeader& header) const {
         std::string output = "SELECT ";
 
         for (auto const& value : header) {
@@ -182,7 +185,7 @@ public:
     SqlIterator begin(DataHeader& header) {
         std::string sql = selectSql(header);
         sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, 0);
+        sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
         return SqlIterator(stmt, header);
     }
 
@@ -205,7 +208,7 @@ public:
                     sql.add(value.getValue<std::string>());
                     break;
                 default:
-                    throw std::runtime_error("Unknown data type");
+                    throw SqlException("Unknown data type");
             }
         }
     }
