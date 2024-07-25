@@ -8,14 +8,14 @@
 
 class DataHeader : public IDataHeader {
 public:
-    DataHeader(const std::string& tableName) : 
+    explicit DataHeader(const std::string& tableName) : 
         tableName(tableName)
     {}
 
-    virtual ~DataHeader() = default;
+    ~DataHeader() override = default;
 
     template <typename T>
-    void setValue(const std::string& name, T value) {
+    void setValue(std::string_view name, T value) {
         for (DataValue& data : values) {
             if (data.getName() == name) {
                 data.setValue(value);
@@ -26,7 +26,7 @@ public:
     }
 
     template <typename T>
-    T getValue(const std::string& name) const {
+    T getValue(std::string_view name) const {
         for (const DataValue& value : values) {
             if (value.getName() == name) {
                 return value.getValue<T>();
@@ -45,7 +45,7 @@ public:
         return values.end();
     }
 
-    const std::string& getTableName() const {
+    const std::string& getTableName() const override {
         return tableName;
     }
 
@@ -67,7 +67,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const ConfigDevice& config);
-extern void dataFromHeader(DataHeader& header, ConfigDevice& config);
+extern void dataFromHeader(const DataHeader& header, ConfigDevice& config);
 
 class TableConfigController : public DataHeader {
 public:
@@ -80,7 +80,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const ConfigController& config);
-extern void dataFromHeader(DataHeader& header, ConfigController& config);
+extern void dataFromHeader(const DataHeader& header, ConfigController& config);
 
 
 class TableTemperature : public DataHeader {
@@ -92,7 +92,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const DataTemperature& data);
-extern void dataFromHeader(DataHeader& header, DataTemperature& data);
+extern void dataFromHeader(const DataHeader& header, DataTemperature& data);
 
 class TableWeather : public DataHeader {
 public:
@@ -109,7 +109,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const DataWeather& data);
-extern void dataFromHeader(DataHeader& header, DataWeather& data);
+extern void dataFromHeader(const DataHeader& header, DataWeather& data);
 
 class TableElPrice : public DataHeader {
 public:
@@ -119,7 +119,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const DataElPrice& data);
-extern void dataFromHeader(DataHeader& header, DataElPrice& data);
+extern void dataFromHeader(const DataHeader& header, DataElPrice& data);
 
 class TableHistory : public DataHeader {
 public:
@@ -133,7 +133,7 @@ public:
     }
 };
 extern void dataToHeader(DataHeader& header, const DataHistory& data);
-extern void dataFromHeader(DataHeader& header, DataHistory& data);
+extern void dataFromHeader(const DataHeader& header, DataHistory& data);
 
 class DataTable {
 public:

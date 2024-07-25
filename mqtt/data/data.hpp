@@ -25,20 +25,26 @@ struct DataWeather : public BaseData {
     float windSpeed;
     float windDirection;
     float rain;
-    float uv;
-    float solarRadiation;
+    float uv = 0.0;
+    float solarRadiation = 0.0;
 
-    DataWeather(long time, float temp, float hum, float press, float windSpd, float windDir, float r, float uv, float solarRad) :
+    DataWeather(long time, float temp, float hum, float press, float windSpd, float windDir, float r) :
         BaseData(time),
         temperature(temp),
         humidity(hum),
         pressure(press),
         windSpeed(windSpd),
         windDirection(windDir),
-        rain(r),
-        uv(uv),
-        solarRadiation(solarRad)
+        rain(r)
     {}
+
+    void setSolarRadiation(float value) {
+        solarRadiation = value;
+    }
+
+    void setUv(float value) {
+        uv = value;
+    }
 };
 
 
@@ -51,7 +57,7 @@ struct DataElPrice : public BaseData {
     {}
 };
 
-enum DataType {
+enum class DataType {
     LIGHT = 0,
     SWITCH = 1,
     TEMPERATURE = 2

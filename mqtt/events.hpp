@@ -138,8 +138,8 @@ struct Values : public Observable, public IValues {
         return true;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Values& values) {
-        for (auto& [type, item] : values.values) {
+    friend std::ostream& operator<<(std::ostream& os, const Values& list) {
+        for (auto& [type, item] : list.values) {
             os << item;
         }
         return os;

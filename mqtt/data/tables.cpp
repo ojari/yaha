@@ -5,7 +5,7 @@ void dataToHeader(DataHeader& header, const ConfigDevice& config) {
     header.setValue("type", config.type);
 }
 
-void dataFromHeader(DataHeader& header, ConfigDevice& config) {
+void dataFromHeader(const DataHeader& header, ConfigDevice& config) {
     config.name = header.getValue<std::string>("name");
     config.type = header.getValue<std::string>("type"); 
 }
@@ -19,7 +19,7 @@ void dataToHeader(DataHeader& header, const ConfigController& config) {
     header.setValue("time2", config.time2);
 }
 
-void dataFromHeader(DataHeader& header, ConfigController& config) {
+void dataFromHeader(const DataHeader& header, ConfigController& config) {
     config.name = header.getValue<std::string>("name");
     config.type = header.getValue<std::string>("type");
     config.actuator = header.getValue<std::string>("actuator");
@@ -33,7 +33,7 @@ void dataToHeader(DataHeader& header, const DataTemperature& data) {
     header.setValue("temperature", data.temperature);
     header.setValue("humidity", data.humidity);
 }
-void dataFromHeader(DataHeader& header, DataTemperature& data) {
+void dataFromHeader(const DataHeader& header, DataTemperature& data) {
     data.epoch = header.getValue<int>("epoch");
     data.temperature = header.getValue<float>("temperature");
     data.humidity = header.getValue<float>("humidity");
@@ -52,7 +52,7 @@ void dataToHeader(DataHeader& header, const DataWeather& data) {
     header.setValue("solarRadiation", data.solarRadiation);
 }
 
-void dataFromHeader(DataHeader& header, DataWeather& data) {
+void dataFromHeader(const DataHeader& header, DataWeather& data) {
     data.epoch = header.getValue<int>("epoch");
     data.temperature = header.getValue<float>("temperature");
     data.humidity = header.getValue<float>("humidity");
@@ -69,7 +69,7 @@ void dataToHeader(DataHeader& header, const DataElPrice& data) {
     header.setValue("epoch", data.epoch);
     header.setValue("price", data.price);
 }
-void dataFromHeader(DataHeader& header, DataElPrice& data) {
+void dataFromHeader(const DataHeader& header, DataElPrice& data) {
     data.epoch = header.getValue<int>("epoch");
     data.price = header.getValue<float>("price");
 }
@@ -83,7 +83,7 @@ void dataToHeader(DataHeader& header, const DataHistory& data) {
     header.setValue("val2", data.val2);
     header.setValue("val3", data.val3);
 }
-void dataFromHeader(DataHeader& header, DataHistory& data) {
+void dataFromHeader(const DataHeader& header, DataHistory& data) {
     data.epoch = header.getValue<int>("epoch");
     data.device = header.getValue<std::string>("device");
     data.type = static_cast<DataType>(header.getValue<int>("type"));

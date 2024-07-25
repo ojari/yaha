@@ -11,7 +11,7 @@ public:
 class SqlInsert {
 public:
     SqlInsert(sqlite3* db, const char* sql) {
-        sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+        sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     }
 
     ~SqlInsert() {
