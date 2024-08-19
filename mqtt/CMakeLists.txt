@@ -34,13 +34,13 @@ endforeach()
 add_executable(${PROJECT_NAME}
   main.cpp
   mqtt.cpp
-  mqtt_device.cpp
   common.cpp
   actuator.cpp
   logic.cpp
-  collect.cpp
+  tasks.cpp
   data/sourcesqlite.cpp
   data/tables.cpp
+  device/registry.cpp
 )
 
 # specify the C++ standard
