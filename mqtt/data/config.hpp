@@ -6,8 +6,7 @@ struct ConfigDevice {
     std::string name;
     std::string type;
 
-    ConfigDevice()
-    {}
+    ConfigDevice() = default;
 
     ConfigDevice(const std::string& name, const std::string& type) :
         name(name),
@@ -22,8 +21,8 @@ struct ConfigController {
     int time1;
     int time2;
 
-    ConfigController()
-    {}
+    ConfigController() = default;
+
     ConfigController(const std::string& name, const std::string& type, const std::string& actuator, int time1, int time2) :
         name(name),
         type(type),

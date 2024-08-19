@@ -8,7 +8,7 @@ using json = nlohmann::json;
 
 
 void MessageRouter::route(std::string& deviceName, std::string& payload) {
-    std::shared_ptr<Device> device = deviceRegistry->getDevice(deviceName);
+    std::shared_ptr<device::Device> device = deviceRegistry->getDevice(deviceName);
     if (device) {
         json jsonPayload = json::parse(payload);
         device->on_message(deviceName, jsonPayload);
@@ -63,7 +63,7 @@ Mqtt::Mqtt(DataInsertHistory &da) :
     messageRouter(&deviceRegistry, da)
 {
     int rc = 0;
-    char* hostname = getenv("RPI_HOST");
+    const char* hostname = getenv("RPI_HOST");
 
     deviceRegistry.load("devices.json");
 

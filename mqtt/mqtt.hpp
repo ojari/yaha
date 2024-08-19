@@ -1,11 +1,11 @@
 #pragma once
 #include "common.hpp"
-#include "mqtt_device.hpp"
+#include "device/registry.hpp"
 #include "data/sourcesqlite.hpp"
 
 class MessageRouter {
 public:
-    MessageRouter(DeviceRegistry* deviceReg, DataInsertHistory &history) : 
+    MessageRouter(device::Registry *deviceReg, DataInsertHistory &history) : 
         deviceRegistry(deviceReg),
         history(history)
     {}
@@ -13,7 +13,7 @@ public:
     void route(std::string& deviceName, std::string& payload);
 
 private:
-    DeviceRegistry* deviceRegistry;
+    device::Registry* deviceRegistry;
     DataInsertHistory &history;
 
     /*std::string extractDeviceName(const std::string& topic) {
@@ -32,6 +32,6 @@ public:
     void send(const std::string& topic, const std::string& message) override;
 private:
     struct mosquitto *mosq;
-    DeviceRegistry deviceRegistry;
+    device::Registry deviceRegistry;
     MessageRouter messageRouter;
 };

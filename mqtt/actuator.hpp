@@ -13,11 +13,11 @@ public:
 
 class Actuator : public IActuator {
 public:
-    explicit Actuator(IOutput& output) : 
+    explicit Actuator(const IOutput* output) : 
         output(output) 
     {}
     void set(std::string &device, bool value) override;
     
 private:
-    IOutput& output;
+    const IOutput* output;
 };

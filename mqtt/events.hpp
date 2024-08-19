@@ -120,8 +120,7 @@ struct Values : public Observable, public IValues {
     }
 
     void set(ValueType type, int value) override {
-        int old = getInt(type);
-        if (old == value) {
+        if (getInt(type) == value) {
             return;
         }
         values[type] = ValueItem(type, value);
@@ -129,8 +128,7 @@ struct Values : public Observable, public IValues {
     }
 
     bool set(ValueType type, float value) override {
-        float old = getFloat(type);
-        if (old == value) {
+        if (getFloat(type) == value) {
             return false;
         }
         values[type] = ValueItem(type, value);
