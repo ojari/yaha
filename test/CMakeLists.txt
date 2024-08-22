@@ -14,14 +14,14 @@ add_executable(${PROJECT_NAME}
   main.cpp
   # test_orm.cpp
   test_logic.cpp
-  test_collect.cpp
+  # test_collect.cpp
   test_time.cpp
   test_datas.cpp
   test_sourcesqlite.cpp
   test_sourcestring.cpp
 
   ../mqtt/common.cpp
-  ../mqtt/collect.cpp
+  ../mqtt/tasks.cpp
   ../mqtt/logic.cpp
   ../mqtt/data/sourcesqlite.cpp
   ../mqtt/data/sourcestring.cpp

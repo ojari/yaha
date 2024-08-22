@@ -1,12 +1,12 @@
 #include "catch2/catch_all.hpp"
-#include "../mqtt/collect.hpp"
+#include "../mqtt/tasks.hpp"
 
 class TestObserver : public Observer {
 public:
-    void onChange(const IValues& state) override {
-        values = dynamic_cast<const Values&>(state);
+    void onChange(const ValueItem& value) override {
+        item.set(value);
     }
-    Values values;
+    ValueItem item;
 };
 
 

@@ -16,16 +16,15 @@ std::shared_ptr<IActuator> actuator{new TestActuator()};
 
 TEST_CASE("Lights class test") {
     Lights lights(actuator, hm2time(10, 0), hm2time(20, 0));
-    Values state;
     SECTION("Turn on lights") {
-        state.set(ValueType::TIME, hm2time(12, 0));
-        lights.onChange(state);
+        ValueItem item(ValueType::TIME, hm2time(12, 0));
+        lights.onChange(item);
         REQUIRE(lights.isOn() == true);
     }
 
     SECTION("Turn off lights") {
-        state.set(ValueType::TIME, hm2time(21, 0));
-        lights.onChange(state);
+        ValueItem item(ValueType::TIME, hm2time(21, 0));
+        lights.onChange(item);
         REQUIRE(lights.isOn() == false);
     }
 }
@@ -34,7 +33,6 @@ TEST_CASE("Lights class test") {
 TEST_CASE("CarHeaer class test") {
     int leaveTime = hm2time(10, 0);
     CarHeater heater(actuator, leaveTime);
-    Values state;
     auto data = GENERATE(
         std::make_pair(-21, 120),
         std::make_pair(-11,  90),
@@ -46,20 +44,21 @@ TEST_CASE("CarHeaer class test") {
         float temperature = data.first;
         int offset = data.second;
 
-        state.set(ValueType::TEMPERATURE, temperature);
-        state.set(ValueType::TIME, timeAdd(leaveTime, -(offset+2)));
-        heater.onChange(state);
+        ValueItem item(ValueType::TEMPERATURE, temperature);
+        heater.onChange(item);
+        ValueItem item2(ValueType::TIME, timeAdd(leaveTime, -(offset+2)));
+        heater.onChange(item2);
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset 
-             << ", Time: " << state.getInt(ValueType::TIME) 
+             << ", Time: " << item2.getInt() 
              << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == false);
 
-        state.set(ValueType::TIME, timeAdd(leaveTime, -(offset - 2)));
-        heater.onChange(state);
+        ValueItem item3(ValueType::TIME, timeAdd(leaveTime, -(offset - 2)));
+        heater.onChange(item3);
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset
-             << ", Time: " << state.getInt(ValueType::TIME)
+             << ", Time: " << item3.getInt()
              << ", on: " << heater.isOn());
         REQUIRE(heater.isOn() == true);
     }

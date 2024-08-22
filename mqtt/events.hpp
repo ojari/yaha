@@ -9,6 +9,9 @@ enum class ValueType {
   TEMPERATURE,
   ELECTRICITY_PRICE,
   TIME,
+  WEEKDAY,
+  SUN_RISE,
+  SUN_SET,
   UNKNOWN
 };
 
@@ -43,6 +46,12 @@ public:
                 return "Electricity Price";
             case ValueType::TIME:
                 return "Time";
+            case ValueType::WEEKDAY:
+                return "Weekday";
+            case ValueType::SUN_RISE:
+                return "Sun Rise";
+            case ValueType::SUN_SET:
+                return "Sun Set";
             default:
                 return "Unknown";
         }
@@ -56,6 +65,17 @@ public:
             os << "Value: " << item.getFloat() << std::endl;
         }
         return os;
+    }
+
+    void set(ValueItem item) {
+        type = item.getType();
+        if (item.isInt()) {
+            value = item.getInt();
+            isInteger = true;
+        } else {
+            value = item.getFloat();
+            isInteger = false;
+        }
     }
 
 private:
@@ -76,14 +96,14 @@ struct IValues {
 struct Observer {
     virtual ~Observer() = default;
 
-    virtual void onChange(const IValues& state) = 0;
+    virtual void onChange(const ValueItem& value) = 0;
 };
 
 
 struct Observable {
-    void notify(const IValues& state) const {
+    void notify(const ValueItem& value) const {
         for (auto observer : observers)
-            observer->onChange(state);
+            observer->onChange(value);
     }
 
     void subscribe(Observer& observer) {
@@ -107,9 +127,10 @@ struct Values : public Observable, public IValues {
         values[ValueType::TIME] = ValueItem(ValueType::TIME, 0);
         values[ValueType::TEMPERATURE] = ValueItem(ValueType::TEMPERATURE, 0.0f);
         values[ValueType::ELECTRICITY_PRICE] = ValueItem(ValueType::ELECTRICITY_PRICE, 0);
+        values[ValueType::WEEKDAY] = ValueItem(ValueType::WEEKDAY, 0);
+        values[ValueType::SUN_RISE] = ValueItem(ValueType::SUN_RISE, 0);
+        values[ValueType::SUN_SET] = ValueItem(ValueType::SUN_SET, 0);
     }
-
-    virtual ~Values() = default;
 
     int getInt(ValueType type) const override {
         return values.at(type).getInt();
@@ -124,7 +145,7 @@ struct Values : public Observable, public IValues {
             return;
         }
         values[type] = ValueItem(type, value);
-        notify(*this);
+        notify(values[type]);
     }
 
     bool set(ValueType type, float value) override {
@@ -132,7 +153,7 @@ struct Values : public Observable, public IValues {
             return false;
         }
         values[type] = ValueItem(type, value);
-        notify(*this);
+        notify(values[type]);
         return true;
     }
 

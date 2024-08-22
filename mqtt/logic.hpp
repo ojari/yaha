@@ -6,7 +6,7 @@
 #include <functional>
 
 struct DebugOutput : public Observer {
-    void onChange(const IValues& state) override;
+    void onChange(const ValueItem& value) override;
 };
 
 struct BooleanController : public Observer {
@@ -18,11 +18,18 @@ struct BooleanController : public Observer {
     bool isOn() const {
         return state;
     }
+
+    void setVerbose() {
+        verbose = true;
+    }
+
 protected:
-    std::shared_ptr<IActuator> actuator;
     void set(bool value);
+
 private:
+    std::shared_ptr<IActuator> actuator;
     bool state = false;
+    bool verbose = false;
     std::string name;
 };
 
@@ -32,7 +39,7 @@ struct Lights : public BooleanController  {
         onTime(onTime),
         offTime(offTime)
     {}
-    void onChange(const IValues& vars) override;
+    void onChange(const ValueItem& value) override;
 private:
     int onTime;
     int offTime;
@@ -43,10 +50,11 @@ struct CarHeater : public BooleanController  {
         BooleanController(actuator, "CarHeater"),
         leaveTime(leaveTime)
     {}
-    void onChange(const IValues& state) override;
+    void onChange(const ValueItem& value) override;
 private:
-    int calculateDuration(const IValues& state);
+    int calculateDuration(const ValueItem& value) const;
     int leaveTime;
+    int offset = 60;
     bool state;
 };
 
@@ -55,10 +63,10 @@ public:
     explicit StorageHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "StorageHeater")
     {}
-    void onChange(const IValues& state) override;
+    void onChange(const ValueItem& value) override;
 private:
-    int calculateStartTime(const Values& state);
-    int calculateEndTime(const Values& state);
+    int calculateStartTime(const ValueItem& value);
+    int calculateEndTime(const ValueItem& value);
 };
 
 class WaterHeater : public BooleanController  {
@@ -66,7 +74,7 @@ public:
     explicit WaterHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "WaterHeater")
     {}
-    void onChange(const IValues& state) override;
+    void onChange(const ValueItem& value) override;
 };
 
 class RoomHeater : public BooleanController  {
@@ -74,7 +82,7 @@ public:
     explicit RoomHeater(std::shared_ptr<IActuator> actuator) :
         BooleanController(actuator, "RoomHeater")
     {}
-    void onChange(const IValues& state) override;
+    void onChange(const ValueItem& value) override;
 };
 
 class ControllerRegistry {
