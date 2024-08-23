@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
   common.cpp
   actuator.cpp
   logic.cpp
-  tasks.cpp
+  task/time.cpp
   data/sourcesqlite.cpp
   data/tables.cpp
   device/registry.cpp

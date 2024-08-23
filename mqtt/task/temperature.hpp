@@ -1,0 +1,34 @@
+#pragma once
+#include "../events.hpp"
+#include "../common.hpp"
+
+namespace task {
+
+class TaskTemperature : public Observable, public ITask {
+public:
+    explicit TaskTemperature() = default;
+
+    void execute() override {
+        if (counter < 10) {
+            update(20.0f);
+        }
+        else if (counter < 20) {
+            update(21.0f);
+        }
+        else {
+            counter = 0;
+        }
+        counter++;
+    }
+private:
+    void update(float temp) {
+        if (temperature.getFloat() != temp) {
+            temperature.set(temp);
+            notify(temperature);
+        }
+    }
+    ValueItem temperature {ValueType::TEMPERATURE, 20.0f};
+    int counter {0};
+};
+
+}

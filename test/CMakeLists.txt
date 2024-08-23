@@ -21,7 +21,7 @@ add_executable(${PROJECT_NAME}
   test_sourcestring.cpp
 
   ../mqtt/common.cpp
-  ../mqtt/tasks.cpp
+  ../mqtt/task/time.cpp
   ../mqtt/logic.cpp
   ../mqtt/data/sourcesqlite.cpp
   ../mqtt/data/sourcestring.cpp

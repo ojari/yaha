@@ -1,6 +1,8 @@
-#include "collect.hpp"
+#include "time.hpp"
 
-void SourceTime::incrementTime(int minutes) {
+namespace task {
+
+void TaskTime::incrementTime(int minutes) {
     minute += minutes;
     if (minute >= 60) {
         hour += minute / 60;
@@ -9,4 +11,6 @@ void SourceTime::incrementTime(int minutes) {
             hour %= 24;
         }
     }
+}
+
 }

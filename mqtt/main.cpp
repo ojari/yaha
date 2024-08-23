@@ -1,6 +1,7 @@
 #include "mqtt.hpp"
 #include "common.hpp"
-#include "collect.hpp"
+#include "task/time.hpp"
+#include "task/temperature.hpp"
 #include "logic.hpp"
 #include "actuator.hpp"
 #include <iostream>
@@ -42,6 +43,7 @@ private:
 
 struct DummyHistory : public DataInsertHistory {
     void insert(const DataHistory& data) override {
+        // dummy implementation: do nothing
     }
 };
 
@@ -51,30 +53,28 @@ struct DummyHistory : public DataInsertHistory {
  */
 int main() {
     DummyHistory history;
-    Mqtt mqtt(history);
-    Actuator actuator(mqtt);
-    std::shared_ptr<Values> collect{new Values()};
+    auto mqtt = std::make_unique<Mqtt>(history);
+    Actuator actuator(dynamic_cast<IOutput*>(mqtt.get()));
+
+    auto task_time = std::make_unique<task::TaskTime>();
+    auto task_temp = std::make_unique<task::TaskTemperature>();
 
     std::vector<ITask*> tasks {
-        &mqtt,
-        new SourceTime(collect),
-        new SourceTemperature(collect)
+        dynamic_cast<ITask*>(mqtt.get()),
+        dynamic_cast<ITask*>(task_time.get()),
+        dynamic_cast<ITask*>(task_temp.get())
     };
-
+    
     DebugOutput debugOutput;
-    collect->subscribe(debugOutput);
+    task_temp->subscribe(debugOutput);
+    task_time->subscribe(debugOutput);
 
     while (true) {
-        for (auto task : tasks)
+        for (const auto& task : tasks)
             task->execute();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    // cleanup
-    //
-    for (auto task : tasks) {
-        delete task;
-    }
     return 0;
 }

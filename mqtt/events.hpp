@@ -10,8 +10,8 @@ enum class ValueType {
   ELECTRICITY_PRICE,
   TIME,
   WEEKDAY,
-  SUN_RISE,
-  SUN_SET,
+  SUNRISE,
+  SUNSET,
   UNKNOWN
 };
 
@@ -48,9 +48,9 @@ public:
                 return "Time";
             case ValueType::WEEKDAY:
                 return "Weekday";
-            case ValueType::SUN_RISE:
+            case ValueType::SUNRISE:
                 return "Sun Rise";
-            case ValueType::SUN_SET:
+            case ValueType::SUNSET:
                 return "Sun Set";
             default:
                 return "Unknown";
@@ -76,6 +76,16 @@ public:
             value = item.getFloat();
             isInteger = false;
         }
+    }
+
+    void set(int aValue) {
+        this->value = aValue;
+        isInteger = true;
+    }
+
+    void set(float aValue) {
+        this->value = aValue;
+        isInteger = false;
     }
 
 private:
@@ -128,8 +138,8 @@ struct Values : public Observable, public IValues {
         values[ValueType::TEMPERATURE] = ValueItem(ValueType::TEMPERATURE, 0.0f);
         values[ValueType::ELECTRICITY_PRICE] = ValueItem(ValueType::ELECTRICITY_PRICE, 0);
         values[ValueType::WEEKDAY] = ValueItem(ValueType::WEEKDAY, 0);
-        values[ValueType::SUN_RISE] = ValueItem(ValueType::SUN_RISE, 0);
-        values[ValueType::SUN_SET] = ValueItem(ValueType::SUN_SET, 0);
+        values[ValueType::SUNRISE] = ValueItem(ValueType::SUNRISE, 0);
+        values[ValueType::SUNSET] = ValueItem(ValueType::SUNSET, 0);
     }
 
     int getInt(ValueType type) const override {
