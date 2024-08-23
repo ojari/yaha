@@ -94,14 +94,6 @@ private:
     bool isInteger;
 };
 
-struct IValues {
-    virtual ~IValues() = default;
-
-    virtual int getInt(ValueType type) const = 0;
-    virtual float getFloat(ValueType type) const = 0;
-    virtual void set(ValueType type, int value) = 0;
-    virtual bool set(ValueType type, float value) = 0;
-};
 
 struct Observer {
     virtual ~Observer() = default;
@@ -129,51 +121,4 @@ struct Observable {
 
 private:
     std::vector<Observer*> observers;
-};
-
-
-struct Values : public Observable, public IValues {
-    Values() {
-        values[ValueType::TIME] = ValueItem(ValueType::TIME, 0);
-        values[ValueType::TEMPERATURE] = ValueItem(ValueType::TEMPERATURE, 0.0f);
-        values[ValueType::ELECTRICITY_PRICE] = ValueItem(ValueType::ELECTRICITY_PRICE, 0);
-        values[ValueType::WEEKDAY] = ValueItem(ValueType::WEEKDAY, 0);
-        values[ValueType::SUNRISE] = ValueItem(ValueType::SUNRISE, 0);
-        values[ValueType::SUNSET] = ValueItem(ValueType::SUNSET, 0);
-    }
-
-    int getInt(ValueType type) const override {
-        return values.at(type).getInt();
-    }
-
-    float getFloat(ValueType type) const override {
-        return values.at(type).getFloat();
-    }
-
-    void set(ValueType type, int value) override {
-        if (getInt(type) == value) {
-            return;
-        }
-        values[type] = ValueItem(type, value);
-        notify(values[type]);
-    }
-
-    bool set(ValueType type, float value) override {
-        if (getFloat(type) == value) {
-            return false;
-        }
-        values[type] = ValueItem(type, value);
-        notify(values[type]);
-        return true;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Values& list) {
-        for (auto& [type, item] : list.values) {
-            os << item;
-        }
-        return os;
-    }
-
-private:
-    std::map<ValueType, ValueItem> values;
 };
