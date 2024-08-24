@@ -36,7 +36,13 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   common.cpp
   actuator.cpp
-  logic.cpp
+  controller/registry.cpp
+  controller/boolean_controller.cpp
+  controller/lights.cpp
+  controller/car_heater.cpp
+  controller/room_heater.cpp
+  controller/storage_heater.cpp
+  controller/water_heater.cpp
   task/time.cpp
   data/sourcesqlite.cpp
   data/tables.cpp

@@ -1,38 +1,6 @@
-#include "logic.hpp"
-#include "common.hpp"
-#include <iostream>
+#include "car_heater.hpp"
 
-void DebugOutput::onChange(const ValueItem& value) {
-    std::cout << value.name() << " changed to ";
-    if (value.isInt()) {
-        std::cout << value.getInt();
-    } else {
-        std::cout << value.getFloat();
-    }
-    std::cout << std::endl;
-}
-
-void BooleanController::set(bool value) {
-    if (value != state) {
-        actuator->set(name, value);
-        if (verbose) {
-            std::cout << name << " changed to " << value << std::endl;
-        }
-        state = value;
-    }
-}
-
-
-void Lights::onChange(const ValueItem& value) {
-    if (value.getType() == ValueType::TIME) {
-        int time = value.getInt();
-        if (time >= onTime && time < offTime) {
-            set(true);
-        } else {
-            set(false);
-        }
-    }
-}
+namespace controller {
 
 void CarHeater::onChange(const ValueItem& value) {
     if (value.getType() == ValueType::TIME) {
@@ -66,4 +34,6 @@ int CarHeater::calculateDuration(const ValueItem& value) const {
     } else {
         return 0;
     }
+}
+
 }

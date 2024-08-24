@@ -2,13 +2,33 @@
 #include "common.hpp"
 #include "task/time.hpp"
 #include "task/temperature.hpp"
-#include "logic.hpp"
 #include "actuator.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
 #include <thread>
 #include <iomanip>
+
+struct DebugOutput : public Observer {
+    void onChange(const ValueItem& value) override {
+        if (value.getType() == ValueType::TIME) {
+            time = value.getInt();
+        }
+        else {
+            std::cout << "Time: " << time << "  " << value.name() << " changed to ";
+            if (value.isInt()) {
+                std::cout << value.getInt();
+            } else {
+                std::cout << value.getFloat();
+            }
+            std::cout << std::endl;
+        }
+    }
+
+private:
+    int time {-1};
+};
+
 
 class IntTime {
 public:
@@ -73,7 +93,7 @@ int main() {
         for (const auto& task : tasks)
             task->execute();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 
     return 0;

@@ -9,10 +9,10 @@ public:
     explicit TaskTemperature() = default;
 
     void execute() override {
-        if (counter < 10) {
-            update(20.0f);
+        if (counter < 30) {
+            update(19.0f);
         }
-        else if (counter < 20) {
+        else if (counter < 60) {
             update(21.0f);
         }
         else {

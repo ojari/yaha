@@ -94,7 +94,7 @@ Mqtt::Mqtt(DataInsertHistory &da) :
 void Mqtt::execute() {
     int rc = 0;
 
-    rc = mosquitto_loop(mosq, -1, 1);
+    rc = mosquitto_loop(mosq, 5, 1);
     if (rc) {
         showError(mosquitto_strerror(rc));
         mosquitto_reconnect(mosq);
