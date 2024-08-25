@@ -9,6 +9,8 @@ void TaskTime::incrementTime(int minutes) {
         minute %= 60;
         if (hour >= 24) {
             hour %= 24;
+            weekday = (weekday + 1) % 7;
+            notify(ValueItem(ValueType::WEEKDAY, weekday));
         }
     }
 }

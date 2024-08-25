@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   common.cpp
   actuator.cpp
+  task_manager.cpp
   controller/registry.cpp
   controller/boolean_controller.cpp
   controller/lights.cpp

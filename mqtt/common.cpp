@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip> // Add this line
 
 void showError(const char* message) {
     std::cerr << "ERROR: " << message << std::endl;
@@ -10,6 +11,14 @@ void showError(const char* message, const char* arg) {
 
 int hm2time(int hour, int minute) {
     return hour * 100 + minute;
+}
+
+std::string time2str(int time) {
+    int hour = time / 100;
+    int minute = time % 100;
+    std::ostringstream oss;
+    oss << std::setw(2) << std::setfill('0') << hour << ":" << std::setw(2) << std::setfill('0') << minute;
+    return oss.str();
 }
 
 int timeAdd(int time, int minutes) {

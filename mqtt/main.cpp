@@ -1,7 +1,6 @@
 #include "mqtt.hpp"
 #include "common.hpp"
-#include "task/time.hpp"
-#include "task/temperature.hpp"
+#include "task_manager.hpp"
 #include "actuator.hpp"
 #include <iostream>
 #include <map>
@@ -9,13 +8,16 @@
 #include <thread>
 #include <iomanip>
 
-struct DebugOutput : public Observer {
+struct DebugOutput : public IObserver {
     void onChange(const ValueItem& value) override {
         if (value.getType() == ValueType::TIME) {
             time = value.getInt();
         }
+        else if (value.getType() == ValueType::TEMPERATURE) {
+            // do not show temperature changes
+        }
         else {
-            std::cout << "Time: " << time << "  " << value.name() << " changed to ";
+            std::cout << time2str(time) << "  " << value.name() << " changed to ";
             if (value.isInt()) {
                 std::cout << value.getInt();
             } else {
@@ -75,23 +77,15 @@ int main() {
     DummyHistory history;
     auto mqtt = std::make_unique<Mqtt>(history);
     Actuator actuator(dynamic_cast<IOutput*>(mqtt.get()));
-
-    auto task_time = std::make_unique<task::TaskTime>();
-    auto task_temp = std::make_unique<task::TaskTemperature>();
-
-    std::vector<ITask*> tasks {
-        dynamic_cast<ITask*>(mqtt.get()),
-        dynamic_cast<ITask*>(task_time.get()),
-        dynamic_cast<ITask*>(task_temp.get())
-    };
-    
+    TaskManager taskManager;
     DebugOutput debugOutput;
-    task_temp->subscribe(debugOutput);
-    task_time->subscribe(debugOutput);
+
+    taskManager.subscribe(ETask::TEMPERATURE, debugOutput);
+    taskManager.subscribe(ETask::TIME, debugOutput);
 
     while (true) {
-        for (const auto& task : tasks)
-            task->execute();
+        mqtt->execute();
+        taskManager.execute();
 
         // std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }

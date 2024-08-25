@@ -1,6 +1,5 @@
 #pragma once
 #include "../events.hpp"
-#include "../common.hpp"
 
 namespace task {
 
@@ -26,6 +25,7 @@ private:
     ValueItem time {ValueType::TIME, 0};
     int hour {0};
     int minute {0};
+    int weekday {0};
 
     int sunrise {hm2time(6, 0)};
     int sunset {hm2time(20, 0)};

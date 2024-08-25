@@ -6,7 +6,7 @@
 
 namespace controller {
 
-struct BooleanController : public Observer {
+struct BooleanController : public IObserver {
     BooleanController(std::shared_ptr<IActuator> actuator, const std::string& name) :
         actuator(actuator),
         name(name)

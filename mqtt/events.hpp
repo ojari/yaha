@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <ostream>
 #include <variant>
+#include "common.hpp"
 
 enum class ValueType {
   TEMPERATURE,
@@ -94,13 +95,11 @@ private:
     bool isInteger;
 };
 
-
-struct Observer {
-    virtual ~Observer() = default;
+struct IObserver {
+    virtual ~IObserver() = default;
 
     virtual void onChange(const ValueItem& value) = 0;
 };
-
 
 struct Observable {
     void notify(const ValueItem& value) const {
@@ -108,11 +107,11 @@ struct Observable {
             observer->onChange(value);
     }
 
-    void subscribe(Observer& observer) {
+    void subscribe(IObserver& observer) {
         observers.push_back(&observer);
     }
 
-    void unsubscribe(Observer& observer) {
+    void unsubscribe(IObserver& observer) {
         observers.erase(
             remove(observers.begin(), observers.end(), &observer),
             observers.end()
@@ -120,5 +119,21 @@ struct Observable {
     }
 
 private:
-    std::vector<Observer*> observers;
+    std::vector<IObserver*> observers;
 };
+
+
+enum class ETask {
+    TEMPERATURE,
+    TIME,
+    MQTT
+};
+
+struct ITaskManager {
+    virtual ~ITaskManager() = default;
+
+    virtual void subscribe(ETask taskId, IObserver& observer) = 0;
+
+    virtual void execute() = 0;
+};
+
