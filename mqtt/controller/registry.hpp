@@ -18,6 +18,7 @@ private:
     std::vector<std::shared_ptr<BooleanController>> controllers;
 
     std::shared_ptr<BooleanController> createController(
+        ITaskManager& tasks,
         const std::string& type,
         std::shared_ptr<IActuator> actuator,
         int onTime,
