@@ -7,7 +7,7 @@
 namespace controller {
 
 struct BooleanController : public IObserver {
-    BooleanController(std::shared_ptr<IActuator> actuator, const std::string& name) :
+    BooleanController(std::shared_ptr<IActuator> actuator, std::string_view name) :
         actuator(actuator),
         name(name)
     {}
@@ -20,7 +20,7 @@ struct BooleanController : public IObserver {
         verbose = true;
     }
 
-    const std::string& getName() const {
+    std::string_view getName() const {
         return name;
     }
 
@@ -31,7 +31,7 @@ private:
     std::shared_ptr<IActuator> actuator;
     bool state = false;
     bool verbose = false;
-    std::string name;
+    std::string_view name;
 };
 
 }

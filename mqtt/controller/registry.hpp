@@ -5,13 +5,38 @@
 #include <functional>
 #include <vector>
 #include "boolean_controller.hpp"
+#include "../data/config.hpp"
 
 namespace controller {
 
 class ControllerRegistry {
 public:
-    void registerCtrl(std::shared_ptr<BooleanController> output) {
-        controllers.push_back(output);
+    void registerCtrl(
+        ITaskManager& tasks,
+        const std::string_view& name,
+        const std::string& type,
+        std::shared_ptr<IActuator> actuator,
+        int onTime,
+        int offTime,
+        int leaveTime)
+    {
+        auto ctrl = createController(tasks, name, type, actuator, onTime, offTime, leaveTime);
+        controllers.push_back(ctrl);
+    }
+    void registerCtrl(
+        ITaskManager& tasks,
+        std::shared_ptr<IActuator> actuator,
+        const ConfigController& output)
+    {
+        auto ctrl = createController(
+            tasks,
+            output.name,
+            output.type,
+            actuator,
+            output.time1,
+            output.time2,
+            output.time1);
+        controllers.push_back(ctrl);
     }
 
 private:
@@ -19,6 +44,7 @@ private:
 
     std::shared_ptr<BooleanController> createController(
         ITaskManager& tasks,
+        const std::string_view& name,
         const std::string& type,
         std::shared_ptr<IActuator> actuator,
         int onTime,

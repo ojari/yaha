@@ -1,0 +1,14 @@
+
+namespace Fbs;
+
+table ElPrice {
+  epoch: long;
+  price: float;
+}
+
+table ElPriceList {
+  items: [ElPrice];
+}
+
+root_type ElPriceList;
+

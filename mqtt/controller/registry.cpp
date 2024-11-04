@@ -12,6 +12,7 @@ namespace controller {
 
 std::shared_ptr<BooleanController> ControllerRegistry::createController(
     ITaskManager& tasks,
+    const std::string_view& name,
     const std::string& type,
     std::shared_ptr<IActuator> actuator,
     int onTime,
@@ -22,7 +23,7 @@ std::shared_ptr<BooleanController> ControllerRegistry::createController(
         return CarHeater::create(tasks, actuator, leaveTime);
     }
     else if (type == "Lights") {
-        return Lights::create(tasks, actuator, onTime, offTime);
+        return Lights::create(tasks, name, actuator, onTime, offTime);
     }
     else if (type == "StorageHeater") {
         return StorageHeater::create(tasks, actuator);

@@ -7,12 +7,13 @@ project(yaha)
 #
 
 # Specify the directories where the .fbs files are located
-set(FBS_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
+set(FBS_SRC_DIR ${CMAKE_SOURCE_DIR}/etc)
 set(FBS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(FLATC ${VCPKG_ROOT}/tools/flatbuffers/flatc)
 
 set(FBS_FILES
     ${FBS_SRC_DIR}/fbsdata.fbs
+    ${FBS_SRC_DIR}/elprice.fbs
 )
 
 # Add custom command to compile .fbs files
@@ -48,6 +49,7 @@ add_executable(${PROJECT_NAME}
   data/sourcesqlite.cpp
   data/tables.cpp
   device/registry.cpp
+  ${GENERATED_HEADERS}
 )
 
 # specify the C++ standard

@@ -26,16 +26,6 @@ table Weathers {
   items: [Weather];
 }
 
-table ElPrice {
-  epoch: long;
-  price: float;
-}
-
-table ElPrices {
-  items: [ElPrice];
-}
-
-
 table ConfigDevice {
   name: string;
   type: string;
@@ -57,4 +47,3 @@ table Configurations {
 root_type Configurations;
 root_type Temperatures;
 root_type Weathers;
-root_type ElPrices;

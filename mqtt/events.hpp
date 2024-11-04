@@ -126,6 +126,7 @@ private:
 enum class ETask {
     TEMPERATURE,
     TIME,
+    PRICE,
     MQTT
 };
 

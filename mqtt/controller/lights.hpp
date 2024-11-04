@@ -6,8 +6,8 @@
 namespace controller {
 
 struct Lights : public BooleanController  {    
-    Lights(std::shared_ptr<IActuator> actuator, int onTime, int offTime) :
-        BooleanController(actuator, "Lights"),
+    Lights(std::shared_ptr<IActuator> actuator, std::string_view name, int onTime, int offTime) :
+        BooleanController(actuator, name),
         onTime(onTime),
         offTime(offTime)
     {}
@@ -15,12 +15,13 @@ struct Lights : public BooleanController  {
     void onChange(const ValueItem& value) override;
 
     static std::shared_ptr<BooleanController> create(
-        ITaskManager& tasks, 
+        ITaskManager& tasks,
+        std::string_view name,
         std::shared_ptr<IActuator> actuator,
         int onTime,
         int offTime)
     {
-        auto ptr = std::make_shared<Lights>(actuator, onTime, offTime);
+        auto ptr = std::make_shared<Lights>(actuator, name, onTime, offTime);
         tasks.subscribe(ETask::TIME, *ptr);
         return ptr;
     }
