@@ -6,40 +6,30 @@
 #include <variant>
 #include "common.hpp"
 
-enum class ValueType {
-  TEMPERATURE,
-  ELECTRICITY_PRICE,
-  TIME,
-  WEEKDAY,
-  SUNRISE,
-  SUNSET,
-  UNKNOWN
-};
 
-
-class ValueItem {
+class ValueItem : public IValueItem {
 public:
     ValueItem () : type(ValueType::UNKNOWN), value(0), isInteger(true) {}
     ValueItem(ValueType type, int value) : type(type), value(value), isInteger(true) {}
     ValueItem(ValueType type, float value) : type(type), value(value), isInteger(false) {}
 
-    ValueType getType() const {
+    ValueType getType() const override {
         return type;
     }
 
-    int getInt() const {
+    int getInt() const override {
         return std::get<int>(value);
     }
 
-    float getFloat() const {
+    float getFloat() const override {
         return std::get<float>(value);
     }
 
-    bool isInt() const {
+    bool isInt() const override {
         return isInteger;
     }
 
-    std::string name() const {
+    std::string name() const override {
         switch (type) {
             case ValueType::TEMPERATURE:
                 return "Temperature";
@@ -68,7 +58,7 @@ public:
         return os;
     }
 
-    void set(ValueItem item) {
+    void setv(IValueItem &item) override {
         type = item.getType();
         if (item.isInt()) {
             value = item.getInt();
@@ -79,12 +69,12 @@ public:
         }
     }
 
-    void set(int aValue) {
+    void set(int aValue) override {
         this->value = aValue;
         isInteger = true;
     }
 
-    void set(float aValue) {
+    void set(float aValue) override {
         this->value = aValue;
         isInteger = false;
     }
@@ -95,46 +85,4 @@ private:
     bool isInteger;
 };
 
-struct IObserver {
-    virtual ~IObserver() = default;
-
-    virtual void onChange(const ValueItem& value) = 0;
-};
-
-struct Observable {
-    void notify(const ValueItem& value) const {
-        for (auto observer : observers)
-            observer->onChange(value);
-    }
-
-    void subscribe(IObserver& observer) {
-        observers.push_back(&observer);
-    }
-
-    void unsubscribe(IObserver& observer) {
-        observers.erase(
-            remove(observers.begin(), observers.end(), &observer),
-            observers.end()
-        );
-    }
-
-private:
-    std::vector<IObserver*> observers;
-};
-
-
-enum class ETask {
-    TEMPERATURE,
-    TIME,
-    PRICE,
-    MQTT
-};
-
-struct ITaskManager {
-    virtual ~ITaskManager() = default;
-
-    virtual void subscribe(ETask taskId, IObserver& observer) = 0;
-
-    virtual void execute() = 0;
-};
 

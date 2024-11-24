@@ -2,7 +2,7 @@
 
 namespace controller {
 
-void RoomHeater::onChange(const ValueItem& value) {
+void RoomHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         // implement the logic here
     }

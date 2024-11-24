@@ -10,7 +10,7 @@
 #include <iomanip>
 
 struct DebugOutput : public IObserver {
-    void onChange(const ValueItem& value) override {
+    void onChange(const IValueItem& value) override {
         if (value.getType() == ValueType::TIME) {
             time = value.getInt();
         }

@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "task.hpp"
 #include "device/registry.hpp"
 #include "data/sourcesqlite.hpp"
 

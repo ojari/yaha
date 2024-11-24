@@ -2,7 +2,7 @@
 
 #include <string>
 #include "common.hpp"
-#include "events.hpp"
+#include "observer.hpp"
 
 class IActuator {
 public:
@@ -19,7 +19,7 @@ public:
     {}
     void set(std::string_view device, bool value) override;
 
-    void onChange(const ValueItem& value) override;
+    void onChange(const IValueItem& value) override;
     
 private:
     const IOutput* output;

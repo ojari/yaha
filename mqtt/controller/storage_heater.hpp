@@ -1,17 +1,18 @@
 #pragma once
-#include "boolean_controller.hpp"
+#include "automation.hpp"
+#include "../task.hpp"
 
 namespace controller {
 
-class StorageHeater : public BooleanController  {
+class StorageHeater : public Automation {
 public:
     explicit StorageHeater(std::shared_ptr<IActuator> actuator) :
-        BooleanController(actuator, "StorageHeater")
+        Automation(actuator, "StorageHeater")
     {}
 
-    void onChange(const ValueItem& value) override;
+    void onChange(const IValueItem& value) override;
 
-    static std::shared_ptr<BooleanController> create(
+    static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
         std::shared_ptr<IActuator> actuator)
     {
@@ -21,8 +22,8 @@ public:
     }
 
 private:
-    int calculateStartTime(const ValueItem& value);
-    int calculateEndTime(const ValueItem& value);
+    int calculateStartTime(const IValueItem& value);
+    int calculateEndTime(const IValueItem& value);
 };
 
 }

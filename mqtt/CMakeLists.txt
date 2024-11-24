@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
   actuator.cpp
   task_manager.cpp
   controller/registry.cpp
-  controller/boolean_controller.cpp
+  controller/automation.cpp
   controller/lights.cpp
   controller/car_heater.cpp
   controller/room_heater.cpp

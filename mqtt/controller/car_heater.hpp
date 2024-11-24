@@ -1,17 +1,17 @@
 #pragma once
-#include "boolean_controller.hpp"
-#include "../events.hpp"
+#include "automation.hpp"
+#include "../task.hpp"
 
 namespace controller {
 
-struct CarHeater : public BooleanController  {
+struct CarHeater : public Automation  {
     CarHeater(std::shared_ptr<IActuator> actuator, int leaveTime) :
-        BooleanController(actuator, "CarHeater"),
+        Automation(actuator, "CarHeater"),
         leaveTime(leaveTime)
     {}
-    void onChange(const ValueItem& value) override;
+    void onChange(const IValueItem& value) override;
 
-    static std::shared_ptr<BooleanController> create(
+    static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
         std::shared_ptr<IActuator> actuator,
         int leaveTime)
@@ -22,7 +22,7 @@ struct CarHeater : public BooleanController  {
         return ptr;
     }
 private:
-    int calculateDuration(const ValueItem& value) const;
+    int calculateDuration(const IValueItem& value) const;
     int leaveTime;
     int offset = 60;
     bool state;

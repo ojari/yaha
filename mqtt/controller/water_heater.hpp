@@ -1,17 +1,18 @@
 #pragma once
-#include "boolean_controller.hpp"
+#include "automation.hpp"
+#include "../task_manager.hpp"
 
 namespace controller {
 
-class WaterHeater : public BooleanController  {
+class WaterHeater : public Automation  {
 public:
     explicit WaterHeater(std::shared_ptr<IActuator> actuator) :
-        BooleanController(actuator, "WaterHeater")
+        Automation(actuator, "WaterHeater")
     {}
 
-    void onChange(const ValueItem& value) override;
+    void onChange(const IValueItem& value) override;
 
-    static std::shared_ptr<BooleanController> create(
+    static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
         std::shared_ptr<IActuator> actuator)
     {

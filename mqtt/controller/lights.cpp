@@ -2,7 +2,7 @@
 
 namespace controller {
 
-void Lights::onChange(const ValueItem& value) {
+void Lights::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         int time = value.getInt();
         if (time >= onTime && time < offTime) {

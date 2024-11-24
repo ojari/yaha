@@ -1,7 +1,6 @@
 #include <memory>
-#include "../events.hpp"
+#include "../task.hpp"
 #include "registry.hpp"
-#include "boolean_controller.hpp"
 #include "lights.hpp"
 #include "car_heater.hpp"
 #include "storage_heater.hpp"
@@ -10,7 +9,7 @@
 
 namespace controller {
 
-std::shared_ptr<BooleanController> ControllerRegistry::createController(
+std::shared_ptr<Automation> ControllerRegistry::createController(
     ITaskManager& tasks,
     const std::string_view& name,
     const std::string& type,

@@ -2,7 +2,7 @@
 
 namespace controller {
 
-void WaterHeater::onChange(const ValueItem& value) {
+void WaterHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         // implement the logic here
     }

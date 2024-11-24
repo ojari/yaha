@@ -1,8 +1,7 @@
 #include "actuator.hpp"
-#include "events.hpp"
 #include <iostream>
 
-void Actuator::onChange(const ValueItem& value) {
+void Actuator::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         time = value.getInt();
     }   

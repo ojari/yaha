@@ -2,7 +2,7 @@
 
 namespace controller {
 
-void CarHeater::onChange(const ValueItem& value) {
+void CarHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         int time = value.getInt();
         int startTime = timeAdd(leaveTime, -offset);
@@ -21,7 +21,7 @@ void CarHeater::onChange(const ValueItem& value) {
 // The duration is calculated in minutes
 // The temperature is in degrees Celsius
 //
-int CarHeater::calculateDuration(const ValueItem& value) const {
+int CarHeater::calculateDuration(const IValueItem& value) const {
     float temperature = value.getFloat();
     if (temperature < -20.0f) {
         return 120;

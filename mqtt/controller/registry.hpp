@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <functional>
 #include <vector>
-#include "boolean_controller.hpp"
+#include "automation.hpp"
 #include "../data/config.hpp"
 
 namespace controller {
@@ -40,9 +40,9 @@ public:
     }
 
 private:
-    std::vector<std::shared_ptr<BooleanController>> controllers;
+    std::vector<std::shared_ptr<Automation>> controllers;
 
-    std::shared_ptr<BooleanController> createController(
+    std::shared_ptr<Automation> createController(
         ITaskManager& tasks,
         const std::string_view& name,
         const std::string& type,

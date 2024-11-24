@@ -2,7 +2,7 @@
 
 namespace controller {
 
-void StorageHeater::onChange(const ValueItem& value) {
+void StorageHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {
         // implement the logic here
     }

@@ -1,20 +1,21 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "boolean_controller.hpp"
+#include "automation.hpp"
+#include "../task_manager.hpp"
 
 namespace controller {
 
-struct Lights : public BooleanController  {    
+struct Lights : public Automation {
     Lights(std::shared_ptr<IActuator> actuator, std::string_view name, int onTime, int offTime) :
-        BooleanController(actuator, name),
+        Automation(actuator, name),
         onTime(onTime),
         offTime(offTime)
     {}
 
-    void onChange(const ValueItem& value) override;
+    void onChange(const IValueItem& value) override;
 
-    static std::shared_ptr<BooleanController> create(
+    static std::shared_ptr<Automation> create(
         ITaskManager& tasks,
         std::string_view name,
         std::shared_ptr<IActuator> actuator,
