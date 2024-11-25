@@ -38,13 +38,13 @@ add_executable(${PROJECT_NAME}
   common.cpp
   actuator.cpp
   task_manager.cpp
-  controller/registry.cpp
-  controller/automation.cpp
-  controller/lights.cpp
-  controller/car_heater.cpp
-  controller/room_heater.cpp
-  controller/storage_heater.cpp
-  controller/water_heater.cpp
+  automation/registry.cpp
+  automation/automation.cpp
+  automation/lights.cpp
+  automation/car_heater.cpp
+  automation/room_heater.cpp
+  automation/storage_heater.cpp
+  automation/water_heater.cpp
   task/time.cpp
   data/sourcesqlite.cpp
   data/tables.cpp

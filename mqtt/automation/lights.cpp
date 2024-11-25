@@ -1,6 +1,6 @@
 #include "lights.hpp"
 
-namespace controller {
+namespace automation {
 
 void Lights::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {

@@ -1,6 +1,6 @@
 #include "water_heater.hpp"
 
-namespace controller {
+namespace automation {
 
 void WaterHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {

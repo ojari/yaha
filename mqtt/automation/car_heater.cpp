@@ -1,6 +1,6 @@
 #include "car_heater.hpp"
 
-namespace controller {
+namespace automation {
 
 void CarHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {

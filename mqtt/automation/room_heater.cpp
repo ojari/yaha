@@ -1,6 +1,6 @@
 #include "room_heater.hpp"
 
-namespace controller {
+namespace automation {
 
 void RoomHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {

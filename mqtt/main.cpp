@@ -2,7 +2,7 @@
 #include "common.hpp"
 #include "task_manager.hpp"
 #include "actuator.hpp"
-#include "controller/registry.hpp"
+#include "automation/registry.hpp"
 #include <iostream>
 #include <map>
 #include <chrono>
@@ -79,15 +79,17 @@ int main() {
     auto mqtt = std::make_unique<Mqtt>(history);
     auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));
     TaskManager taskManager;
-    controller::ControllerRegistry controllers;
+    automation::Registry automations;
     DebugOutput debugOutput;
 
     taskManager.subscribe(ETask::TEMPERATURE, debugOutput);
     taskManager.subscribe(ETask::TIME, debugOutput);
     taskManager.subscribe(ETask::TIME, *actuator);
 
-    controllers.registerCtrl(taskManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
-    controllers.registerCtrl(taskManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
+    automations.add(taskManager, "Demo1", "Lights", actuator, 1000, 1300);
+    automations.add(taskManager, "Demo2", "Lights", actuator, 1200, 1500);
+    //automations.add(taskManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
+    //automations.add(taskManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
     while (true) {
         mqtt->execute();
         taskManager.execute();

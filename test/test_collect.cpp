@@ -3,7 +3,7 @@
 
 class TestObserver : public Observer {
 public:
-    void onChange(const ValueItem& value) override {
+    void onChange(const IValueItem& value) override {
         item.set(value);
     }
     ValueItem item;

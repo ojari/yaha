@@ -2,21 +2,24 @@
 #include "automation.hpp"
 #include "../task.hpp"
 
-namespace controller {
+namespace automation {
 
 struct CarHeater : public Automation  {
-    CarHeater(std::shared_ptr<IActuator> actuator, int leaveTime) :
-        Automation(actuator, "CarHeater"),
+    CarHeater(std::shared_ptr<IActuator> actuator, std::string_view name, const int& leaveTime) :
+        Automation(actuator, name),
         leaveTime(leaveTime)
-    {}
+    {
+        initial_value(false);
+    }
     void onChange(const IValueItem& value) override;
 
     static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
+        std::string_view name,
         std::shared_ptr<IActuator> actuator,
-        int leaveTime)
+        const int& leaveTime)
     {
-        auto ptr = std::make_shared<CarHeater>(actuator, leaveTime);
+        auto ptr = std::make_shared<CarHeater>(actuator, name, leaveTime);
         tasks.subscribe(ETask::TIME, *ptr);
         tasks.subscribe(ETask::TEMPERATURE, *ptr);
         return ptr;
@@ -25,7 +28,6 @@ private:
     int calculateDuration(const IValueItem& value) const;
     int leaveTime;
     int offset = 60;
-    bool state;
 };
 
 }

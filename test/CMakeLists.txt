@@ -22,9 +22,9 @@ add_executable(${PROJECT_NAME}
 
   ../mqtt/common.cpp
   ../mqtt/task/time.cpp
-  ../mqtt/controller/lights.cpp
-  ../mqtt/controller/car_heater.cpp
-  ../mqtt/controller/boolean_controller.cpp
+  ../mqtt/automation/lights.cpp
+  ../mqtt/automation/car_heater.cpp
+  ../mqtt/automation/automation.cpp
   ../mqtt/data/sourcesqlite.cpp
   ../mqtt/data/sourcestring.cpp
   ../mqtt/data/tables.cpp

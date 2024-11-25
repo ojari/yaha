@@ -1,6 +1,6 @@
 #include "storage_heater.hpp"
 
-namespace controller {
+namespace automation {
 
 void StorageHeater::onChange(const IValueItem& value) {
     if (value.getType() == ValueType::TIME) {

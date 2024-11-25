@@ -6,7 +6,7 @@
 #include "../actuator.hpp"
 #include "../observer.hpp"
 
-namespace controller {
+namespace automation {
 
 struct Automation : public IObserver {
     Automation(std::shared_ptr<IActuator> actuator, std::string_view name) :
@@ -31,6 +31,9 @@ struct Automation : public IObserver {
     }
 
 protected:
+    void initial_value(int value);
+    void initial_value(bool value);
+
     void set(int value);
     void set(bool value);
 

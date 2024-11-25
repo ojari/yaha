@@ -1,19 +1,21 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "base_controller.hpp"
+#include "automation.hpp"
 #include "../task_manager.hpp"
 
-namespace controller {
+namespace automation {
 
-struct SwitchLights : public BaseController<int>  {    
+struct SwitchLights : public Automation  {    
     SwitchLights(std::shared_ptr<IActuator> actuator, std::string_view name) :
-        BaseController(actuator, name)
-    {}
+        Automation(actuator, name)
+    {
+        initial_value(0);
+    }
 
     void onChange(const IValueItem& value) override;
 
-    static std::shared_ptr<BaseController> create(
+    static std::shared_ptr<Automation> create(
         ITaskManager& tasks,
         std::string_view name,
         std::shared_ptr<IActuator> actuator)

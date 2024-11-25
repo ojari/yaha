@@ -1,7 +1,16 @@
 #include "automation.hpp"
 #include <iostream>
 
-namespace controller {
+namespace automation {
+
+void Automation::initial_value(int value) {
+    state = value;
+}
+
+void Automation::initial_value(bool value) {
+    state = value;
+}
+
 
 void Automation::set(int value) {
     if (value != std::get<int>(state)) {

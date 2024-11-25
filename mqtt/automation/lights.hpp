@@ -4,14 +4,16 @@
 #include "automation.hpp"
 #include "../task_manager.hpp"
 
-namespace controller {
+namespace automation {
 
 struct Lights : public Automation {
-    Lights(std::shared_ptr<IActuator> actuator, std::string_view name, int onTime, int offTime) :
+    Lights(std::shared_ptr<IActuator> actuator, std::string_view name, const int& onTime, const int& offTime) :
         Automation(actuator, name),
         onTime(onTime),
         offTime(offTime)
-    {}
+    {
+        initial_value(false);
+    }
 
     void onChange(const IValueItem& value) override;
 
@@ -19,8 +21,8 @@ struct Lights : public Automation {
         ITaskManager& tasks,
         std::string_view name,
         std::shared_ptr<IActuator> actuator,
-        int onTime,
-        int offTime)
+        const int& onTime,
+        const int& offTime)
     {
         auto ptr = std::make_shared<Lights>(actuator, name, onTime, offTime);
         tasks.subscribe(ETask::TIME, *ptr);
