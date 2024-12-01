@@ -36,11 +36,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ../mqtt
 )
 target_link_directories(${PROJECT_NAME} PRIVATE
-    ${VCPKG_ROOT}/debug/lib
-    ${VCPKG_ROOT}/debug/lib/manual-link
+    ${VCPKG_ROOT}/lib
+    ${VCPKG_ROOT}/lib/manual-link
 )
 target_link_libraries(${PROJECT_NAME}
-    Catch2d
+    Catch2
     ${MOSQUITTO_LIB}
     sqlite3
     ${EXTRA_LIBRARIES}

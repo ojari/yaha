@@ -1,12 +1,12 @@
 #include "catch2/catch_all.hpp"
-#include "../mqtt/controller/lights.hpp"
-#include "../mqtt/controller/car_heater.hpp"
+#include "../mqtt/automation/lights.hpp"
+#include "../mqtt/automation/car_heater.hpp"
 #include "../mqtt/common.hpp"
 #include <memory>
 
 class TestActuator : public IActuator {
 public:
-    void set(std::string &device, bool value) override {
+    void set(std::string_view device, bool value) override {
         //this->device = device;
         //this->value = value;
     }
@@ -16,24 +16,24 @@ std::shared_ptr<IActuator> actuator{new TestActuator()};
 
 
 TEST_CASE("Lights class test") {
-    controller::Lights lights(actuator, hm2time(10, 0), hm2time(20, 0));
+    automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
     SECTION("Turn on lights") {
         ValueItem item(ValueType::TIME, hm2time(12, 0));
         lights.onChange(item);
-        REQUIRE(lights.isOn() == true);
+        REQUIRE(lights.get() == true);
     }
 
     SECTION("Turn off lights") {
         ValueItem item(ValueType::TIME, hm2time(21, 0));
         lights.onChange(item);
-        REQUIRE(lights.isOn() == false);
+        REQUIRE(lights.get() == false);
     }
 }
 
 
 TEST_CASE("CarHeaer class test") {
     int leaveTime = hm2time(10, 0);
-    controller::CarHeater heater(actuator, leaveTime);
+    automation::CarHeater heater(actuator, "tmp_dev", leaveTime);
     auto data = GENERATE(
         std::make_pair(-21, 120),
         std::make_pair(-11,  90),
@@ -52,15 +52,15 @@ TEST_CASE("CarHeaer class test") {
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset 
              << ", Time: " << item2.getInt() 
-             << ", on: " << heater.isOn());
-        REQUIRE(heater.isOn() == false);
+             << ", on: " << heater.get());
+        REQUIRE(heater.get() == false);
 
         ValueItem item3(ValueType::TIME, timeAdd(leaveTime, -(offset - 2)));
         heater.onChange(item3);
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset
              << ", Time: " << item3.getInt()
-             << ", on: " << heater.isOn());
-        REQUIRE(heater.isOn() == true);
+             << ", on: " << heater.get());
+        REQUIRE(heater.get() == true);
     }
 }

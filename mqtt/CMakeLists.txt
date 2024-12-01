@@ -9,7 +9,7 @@ project(yaha)
 # Specify the directories where the .fbs files are located
 set(FBS_SRC_DIR ${CMAKE_SOURCE_DIR}/etc)
 set(FBS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set(FLATC ${VCPKG_ROOT}/tools/flatbuffers/flatc)
+set(FLATC ${VCPKG_TOOLS}/flatbuffers/flatc)
 
 set(FBS_FILES
     ${FBS_SRC_DIR}/fbsdata.fbs
