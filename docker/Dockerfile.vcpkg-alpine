@@ -1,0 +1,27 @@
+FROM alpine:latest
+
+# Install necessary packages
+RUN apk update && apk add --no-cache \
+    cmake \
+    curl \
+    git \
+    build-base ninja zip unzip \
+    pkgconf \
+    linux-headers perl bash
+
+# Add vcpkg
+ENV VCPKG_FORCE_SYSTEM_BINARIES=1
+RUN git clone --depth 1 https://github.com/microsoft/vcpkg.git /tmp/vcpkg && \
+    /tmp/vcpkg/bootstrap-vcpkg.sh \
+    && /tmp/vcpkg/vcpkg install flatbuffers:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install nlohmann-json:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install sqlite3:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install mosquitto:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install cpp-httplib:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install tinyxml2:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install catch2:x64-linux-release \
+    && mv /tmp/vcpkg/installed /opt/vcpkg \
+    && rm -rf /tmp/vcpkg \
+    && apk del linux-headers perl
+
+VOLUME /vcpkg

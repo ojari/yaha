@@ -1,0 +1,46 @@
+
+services:
+  vcpkg:
+    build:
+      context: .
+      dockerfile: Dockerfile.vcpkg
+    volumes:
+      - vcpkg_data:/vcpkg
+
+  vcpkg_rpi:
+    build:
+      context: .
+      dockerfile: Dockerfile.vcpkg-rpi
+    volumes:
+      - vcpkg_rpi_data:/vcpkg
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - vcpkg_data:/vcpkg
+      - source_code:/workspace
+    working_dir: /workspace
+
+  dev_rpi:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev-rpi
+    volumes:
+      - vcpkg_rpi_data:/vcpkg
+      - source_code:/workspace
+    working_dir: /workspace
+
+  run:
+    build:
+      context: .
+      dockerfile: Dockerfile.run
+    volumes:
+      - source_code:/workspace
+    working_dir: /workspace
+
+volumes:
+  vcpkg_data:
+  vcpkg_rpi_data:
+  source_code:

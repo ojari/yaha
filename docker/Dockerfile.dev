@@ -1,0 +1,22 @@
+FROM debian:12-slim
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    g++ \
+    gdb \
+    libc6-dev \
+    cmake \
+    make \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV VCPKG_ROOT=/vcpkg
+
+VOLUME /vcpkg
+VOLUME /workspace
+
+# Start the shell
+# CMD ["bash", "--login", "-i"]
+CMD ["/bin/bash"]

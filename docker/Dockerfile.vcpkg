@@ -1,0 +1,33 @@
+FROM debian:12-slim
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    g++ \
+    libc6-dev \
+    cmake \
+    make \
+    ninja-build \
+    zip unzip perl pkg-config linux-libc-dev \
+    curl \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+VOLUME /vcpkg
+
+# Add vcpkg
+ENV VCPKG_FORCE_SYSTEM_BINARIES=1
+RUN git clone --depth 1 https://github.com/microsoft/vcpkg.git /tmp/vcpkg && \
+    /tmp/vcpkg/bootstrap-vcpkg.sh \
+    && /tmp/vcpkg/vcpkg install flatbuffers:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install nlohmann-json:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install sqlite3:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install mosquitto:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install cpp-httplib:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install tinyxml2:x64-linux-release \
+    && /tmp/vcpkg/vcpkg install catch2:x64-linux-release \
+    && cp -R /tmp/vcpkg/installed /vcpkg \
+    && cp -R /tmp/vcpkg/installed /opt/vcpkg \
+    && rm -rf /tmp/vcpkg
+

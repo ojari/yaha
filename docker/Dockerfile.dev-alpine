@@ -1,0 +1,20 @@
+FROM alpine:latest
+
+# Install necessary packages
+RUN apk update && apk add --no-cache \
+    g++ \
+    gdb \
+    cmake \
+    make \
+    git \
+    bash \
+    ssh
+
+ENV VCPKG_ROOT=/vcpkg
+
+VOLUME /vcpkg
+VOLUME /workspace
+
+# Start the shell
+# CMD ["bash", "--login", "-i"]
+CMD ["/bin/bash"]
