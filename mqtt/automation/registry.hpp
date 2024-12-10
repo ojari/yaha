@@ -27,7 +27,7 @@ public:
     void add(
         ITaskManager& tasks,
         const std::string_view name,
-        const std::string& type,
+        AutomationType type,
         std::shared_ptr<IActuator> actuator,
         const int& arg1, const int& arg2)
     {
@@ -44,7 +44,7 @@ public:
         auto ctrl = create(
             tasks,
             output.name,
-            output.type,
+            toAutomationType(output.type),
             actuator,
             output.time1,
             output.time2);
@@ -62,10 +62,12 @@ private:
         std::shared_ptr<IActuator> actuator,
         Args&&... args) const;*/
 
+    AutomationType toAutomationType(const std::string& typeStr);
+
     std::shared_ptr<Automation> create(
         ITaskManager& tasks,
         const std::string_view name,
-        const std::string& type,
+        AutomationType type,
         std::shared_ptr<IActuator> actuator,
         const int& arg1, const int& arg2) const;
 

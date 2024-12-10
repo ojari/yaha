@@ -18,7 +18,10 @@ public:
     }
 
 private:
-    std::shared_ptr<Device> createDevice(const std::string& name, const std::string& type) const;
+    std::shared_ptr<Device> createDevice(
+        const std::string& name,
+        const std::string& type,
+        const std::string& eventStr) const;
     std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "../task.hpp"
-#include "../value.hpp"
+#include "../event.hpp"
 
 namespace task {
 
@@ -13,7 +13,7 @@ public:
         notify(price);
     }
 private:
-    ValueItem price {ValueType::ELECTRICITY_PRICE, 10};
+    EventData price {EventId::ELECTRICITY_PRICE, 10};
 
 };
 

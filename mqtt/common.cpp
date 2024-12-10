@@ -1,5 +1,42 @@
 #include <iostream>
 #include <iomanip> // Add this line
+#include "common.hpp"
+
+struct EventIdString {
+    EventId type;
+    const char* str;
+};
+
+EventIdString eventNames[] = {
+    { EventId::TEMPERATURE,          "Temperature" },
+    { EventId::ELECTRICITY_PRICE,    "Electricity Price" },
+    { EventId::TIME,                 "Time" },
+    { EventId::WEEKDAY,              "Weekday" },
+    { EventId::SUNRISE,              "Sunrise" },
+    { EventId::SUNSET,               "Sunset" },
+    { EventId::BUTTON_LIVING_ROOM,   "Button Living Room" },
+    { EventId::BUTTON_LIBRARY,       "Button Library" },
+    { EventId::UNKNOWN,              "Unknown" }
+};
+
+std::string event2str(EventId type) {
+    for (auto& eventName : eventNames) {
+        if (eventName.type == type) {
+            return eventName.str;
+        }
+    }
+    return "Unknown";
+}
+
+EventId str2event(const std::string& str) {
+    for (auto& eventName : eventNames) {
+        if (eventName.str == str) {
+            return eventName.type;
+        }
+    }
+    return EventId::UNKNOWN;
+}
+
 
 void showError(const char* message) {
     std::cerr << "ERROR: " << message << std::endl;

@@ -18,13 +18,13 @@ std::shared_ptr<IActuator> actuator{new TestActuator()};
 TEST_CASE("Lights class test") {
     automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
     SECTION("Turn on lights") {
-        ValueItem item(ValueType::TIME, hm2time(12, 0));
+        EventData item(EventId::TIME, hm2time(12, 0));
         lights.onChange(item);
         REQUIRE(lights.get() == true);
     }
 
     SECTION("Turn off lights") {
-        ValueItem item(ValueType::TIME, hm2time(21, 0));
+        EventData item(EventId::TIME, hm2time(21, 0));
         lights.onChange(item);
         REQUIRE(lights.get() == false);
     }
@@ -45,9 +45,9 @@ TEST_CASE("CarHeaer class test") {
         float temperature = data.first;
         int offset = data.second;
 
-        ValueItem item(ValueType::TEMPERATURE, temperature);
+        EventData item(EventId::TEMPERATURE, temperature);
         heater.onChange(item);
-        ValueItem item2(ValueType::TIME, timeAdd(leaveTime, -(offset+2)));
+        EventData item2(EventId::TIME, timeAdd(leaveTime, -(offset+2)));
         heater.onChange(item2);
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset 
@@ -55,7 +55,7 @@ TEST_CASE("CarHeaer class test") {
              << ", on: " << heater.get());
         REQUIRE(heater.get() == false);
 
-        ValueItem item3(ValueType::TIME, timeAdd(leaveTime, -(offset - 2)));
+        EventData item3(EventId::TIME, timeAdd(leaveTime, -(offset - 2)));
         heater.onChange(item3);
         INFO("Temperature: " << temperature 
              << ", Offset: " << offset

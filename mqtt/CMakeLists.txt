@@ -44,6 +44,7 @@ add_executable(${PROJECT_NAME}
   automation/car_heater.cpp
   automation/room_heater.cpp
   automation/storage_heater.cpp
+  automation/switch_light.cpp
   automation/water_heater.cpp
   task/time.cpp
   data/sourcesqlite.cpp

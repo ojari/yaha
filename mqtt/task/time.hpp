@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../task.hpp"
-#include "../value.hpp"
+#include "../event.hpp"
 
 namespace task {
 
@@ -13,10 +13,10 @@ public:
         incrementTime(1);
         int hours = hm2time(hour, minute);
         if (hours == sunrise) {
-            notify(ValueItem(ValueType::SUNRISE, 1));
+            notify(EventData(EventId::SUNRISE, 1));
         }
         else if (hours == sunset) {
-            notify(ValueItem(ValueType::SUNSET, 1));
+            notify(EventData(EventId::SUNSET, 1));
         }
         time.set(hours);
         notify(time);
@@ -24,7 +24,7 @@ public:
 private:
     void incrementTime(int minutes);
 
-    ValueItem time {ValueType::TIME, 0};
+    EventData time {EventId::TIME, 0};
     int hour {0};
     int minute {0};
     int weekday {0};

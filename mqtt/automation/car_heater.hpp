@@ -11,7 +11,7 @@ struct CarHeater : public Automation  {
     {
         initial_value(false);
     }
-    void onChange(const IValueItem& value) override;
+    void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
@@ -25,7 +25,7 @@ struct CarHeater : public Automation  {
         return ptr;
     }
 private:
-    int calculateDuration(const IValueItem& value) const;
+    int calculateDuration(const float temperature) const;
     int leaveTime;
     int offset = 60;
 };

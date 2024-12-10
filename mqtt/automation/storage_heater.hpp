@@ -12,7 +12,7 @@ public:
         initial_value(false);
     }
 
-    void onChange(const IValueItem& value) override;
+    void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
         ITaskManager& tasks, 
@@ -25,8 +25,8 @@ public:
     }
 
 private:
-    int calculateStartTime(const IValueItem& value);
-    int calculateEndTime(const IValueItem& value);
+    int calculateStartTime(const IEventData& value);
+    int calculateEndTime(const IEventData& value);
 };
 
 }

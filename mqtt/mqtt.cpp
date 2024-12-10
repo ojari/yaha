@@ -10,6 +10,10 @@ using json = nlohmann::json;
 void MessageRouter::route(std::string& deviceName, std::string& payload) {
     std::shared_ptr<device::Device> device = deviceRegistry->getDevice(deviceName);
     if (device) {
+        if (verbose) {
+            std::cout << "Device: " << deviceName << " Payload: " << payload << std::endl;
+        }
+
         json jsonPayload = json::parse(payload);
         device->on_message(deviceName, jsonPayload);
 

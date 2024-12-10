@@ -16,6 +16,7 @@ public:
 private:
     device::Registry* deviceRegistry;
     DataInsertHistory &history;
+    bool verbose = false;
 };
 
 

@@ -10,11 +10,11 @@
 #include <iomanip>
 
 struct DebugOutput : public IObserver {
-    void onChange(const IValueItem& value) override {
-        if (value.getType() == ValueType::TIME) {
+    void onChange(const IEventData& value) override {
+        if (value.id() == EventId::TIME) {
             time = value.getInt();
         }
-        else if (value.getType() == ValueType::TEMPERATURE) {
+        else if (value.id() == EventId::TEMPERATURE) {
             // do not show temperature changes
         }
         else {
@@ -86,8 +86,11 @@ int main() {
     taskManager.subscribe(ETask::TIME, debugOutput);
     taskManager.subscribe(ETask::TIME, *actuator);
 
-    automations.add(taskManager, "Demo1", "Lights", actuator, 1000, 1300);
-    automations.add(taskManager, "Demo2", "Lights", actuator, 1200, 1500);
+    automations.add(taskManager, "Demo1", automation::LIGHTS, actuator, 1000, 1300);
+    automations.add(taskManager, "Demo2", automation::LIGHTS, actuator, 1200, 1500);
+
+    automations.add(taskManager, "ButtonKirjasto2", automation::SWITCH, actuator, 1000, 1300);
+
     //automations.add(taskManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
     //automations.add(taskManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
     while (true) {

@@ -6,11 +6,11 @@
 struct IObserver {
     virtual ~IObserver() = default;
 
-    virtual void onChange(const IValueItem& value) = 0;
+    virtual void onChange(const IEventData& value) = 0;
 };
 
 struct Observable {
-    void notify(const IValueItem& value) const {
+    void notify(const IEventData& value) const {
         for (auto observer : observers)
             observer->onChange(value);
     }

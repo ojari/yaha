@@ -1,6 +1,6 @@
 #pragma once
 #include "../task.hpp"
-#include "../value.hpp"
+#include "../event.hpp"
 
 namespace task {
 
@@ -27,7 +27,7 @@ private:
             notify(temperature);
         }
     }
-    ValueItem temperature {ValueType::TEMPERATURE, 20.0f};
+    EventData temperature {EventId::TEMPERATURE, 20.0f};
     int counter {0};
 };
 

@@ -19,7 +19,7 @@ public:
     {}
     void set(std::string_view device, bool value) override;
 
-    void onChange(const IValueItem& value) override;
+    void onChange(const IEventData& event) override;
     
 private:
     const IOutput* output;

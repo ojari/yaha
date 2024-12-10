@@ -2,8 +2,8 @@
 
 namespace automation {
 
-void WaterHeater::onChange(const IValueItem& value) {
-    if (value.getType() == ValueType::TIME) {
+void WaterHeater::onChange(const IEventData& event) {
+    if (event.id() == EventId::TIME) {
         // implement the logic here
     }
 }

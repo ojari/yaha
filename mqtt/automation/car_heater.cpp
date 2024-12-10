@@ -2,9 +2,9 @@
 
 namespace automation {
 
-void CarHeater::onChange(const IValueItem& value) {
-    if (value.getType() == ValueType::TIME) {
-        int time = value.getInt();
+void CarHeater::onChange(const IEventData& event) {
+    if (event.id() == EventId::TIME) {
+        int time = event.getInt();
         int startTime = timeAdd(leaveTime, -offset);
         if ((time >= startTime) && time < leaveTime) {
             set(true);
@@ -12,8 +12,8 @@ void CarHeater::onChange(const IValueItem& value) {
             set(false);
         }
     }
-    else if (value.getType() == ValueType::TEMPERATURE) {
-        offset = calculateDuration(value);
+    else if (event.id() == EventId::TEMPERATURE) {
+        offset = calculateDuration(event.getFloat());
     }
 }
 
@@ -21,8 +21,7 @@ void CarHeater::onChange(const IValueItem& value) {
 // The duration is calculated in minutes
 // The temperature is in degrees Celsius
 //
-int CarHeater::calculateDuration(const IValueItem& value) const {
-    float temperature = value.getFloat();
+int CarHeater::calculateDuration(float temperature) const {
     if (temperature < -20.0f) {
         return 120;
     } else if (temperature < -10.0f) {

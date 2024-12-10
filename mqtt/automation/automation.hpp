@@ -8,6 +8,15 @@
 
 namespace automation {
 
+enum AutomationType {
+    LIGHTS,
+    SWITCH,
+    CAR_HEATER,
+    STORAGE_HEATER,
+    WATER_HEATER,
+    ROOM_HEATER
+};
+
 struct Automation : public IObserver {
     Automation(std::shared_ptr<IActuator> actuator, std::string_view name) :
         actuator(actuator),
