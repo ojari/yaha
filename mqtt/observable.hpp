@@ -3,12 +3,6 @@
 #include <vector>
 #include "common.hpp"
 
-struct IObserver {
-    virtual ~IObserver() = default;
-
-    virtual void onChange(const IEventData& value) = 0;
-};
-
 struct Observable {
     void notify(const IEventData& value) const {
         for (auto observer : observers)

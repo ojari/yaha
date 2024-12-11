@@ -25,6 +25,10 @@ public:
     explicit Mqtt(DataInsertHistory &history);
     void execute() override;
     void send(const std::string& topic, const std::string& message) override;
+
+    IEventManager* getEventManager() {
+        return &deviceRegistry;
+    }
 private:
     struct mosquitto *mosq;
     device::Registry deviceRegistry;

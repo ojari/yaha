@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../task.hpp"
-#include "../event.hpp"
+#include "../observable.hpp"
+#include "../event_data.hpp"
 
 namespace task {
 

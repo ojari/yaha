@@ -1,14 +1,12 @@
 #pragma once
 #include "device.hpp"
-#include "../event.hpp"
 
 namespace device {
 
 class SwitchDevice : public Device, public IDeviceBoolOut {
 public:
     explicit SwitchDevice(const std::string& name, EventId eid) :
-        deviceName(name),
-        eventData(eid, 0)
+        Device(name, eid)
     {}
 
     void on_message(std::string& _deviceName, nlohmann::json& payload) override {
@@ -27,7 +25,10 @@ public:
             }
             state = payload["action"].get<std::string>() == "on";
         }
-        std::cout << "Switch " << deviceName << " :: " << state << std::endl;
+        // std::cout << "Switch " << deviceName << " :: " << state << std::endl;
+
+        eventData.set((int)state);
+        notify(eventData);
     }
 
     void getHistory(DataHistory &history) override {
@@ -44,8 +45,6 @@ public:
         output.send(topic, payload);
     }
 private:
-    std::string deviceName;
-    EventData eventData;
     bool state = false;
 };
 

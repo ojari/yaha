@@ -13,16 +13,17 @@ struct SwitchLight : public Automation  {
         initial_value(0);
     }
 
+    void registerEvents(IEventManager& evman) override {
+        evman.subscribe(EventId::TIME, *this);
+    }
+
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
-        ITaskManager& tasks,
         std::string_view name,
         std::shared_ptr<IActuator> actuator)
     {
-        auto ptr = std::make_shared<SwitchLight>(actuator, name);
-        tasks.subscribe(ETask::TIME, *ptr);
-        return ptr;
+        return std::make_shared<SwitchLight>(actuator, name);
     }
 private:
 };

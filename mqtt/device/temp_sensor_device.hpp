@@ -6,6 +6,10 @@ namespace device {
 
 class TempSensorDevice : public Device {
 public:
+    explicit TempSensorDevice(const std::string& name, EventId eid) :
+        Device(name, eid)
+    {}
+
     void on_message(std::string& deviceName, nlohmann::json& payload) override {
         temperature = payload["temperature"];
         humidity = payload["humidity"];

@@ -25,29 +25,30 @@ public:
     }
     */
     void add(
-        ITaskManager& tasks,
+        IEventManager& evman,
         const std::string_view name,
         AutomationType type,
         std::shared_ptr<IActuator> actuator,
-        const int& arg1, const int& arg2)
+        const std::vector<int>& args)
     {
-        auto ctrl = create(tasks, name, type, actuator, arg1, arg2);
+        auto ctrl = create(name, type, actuator, args);
+        ctrl->registerEvents(evman);
         controllers.push_back(ctrl);
     }
 
 
     void add(
-        ITaskManager& tasks,
+        IEventManager& evman,
         std::shared_ptr<IActuator> actuator,
         const ConfigController& output)
     {
+        std::vector<int> args = {output.time1, output.time2};
         auto ctrl = create(
-            tasks,
             output.name,
             toAutomationType(output.type),
             actuator,
-            output.time1,
-            output.time2);
+            args);
+        ctrl->registerEvents(evman);
         controllers.push_back(ctrl);
     }
 
@@ -65,11 +66,10 @@ private:
     AutomationType toAutomationType(const std::string& typeStr);
 
     std::shared_ptr<Automation> create(
-        ITaskManager& tasks,
         const std::string_view name,
         AutomationType type,
         std::shared_ptr<IActuator> actuator,
-        const int& arg1, const int& arg2) const;
+        const std::vector<int>& args) const;
 
 };
 

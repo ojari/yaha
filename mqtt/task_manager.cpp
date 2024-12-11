@@ -6,18 +6,20 @@ void TaskManager::execute() {
     price.execute();
 }
 
-void TaskManager::subscribe(ETask taskId, IObserver& observer) {
-    switch (taskId) {
-        case ETask::TEMPERATURE:
+bool TaskManager::subscribe(EventId eventId, IObserver& observer) {
+    switch (eventId) {
+        case EventId::TEMPERATURE:
             temperature.subscribe(observer);
             break;
-        case ETask::TIME:
+        case EventId::TIME:
             time.subscribe(observer);
             break;
-        case ETask::PRICE:
+        case EventId::ELECTRICITY_PRICE:
             price.subscribe(observer);
             break;
         default:
+            return false;
             break;
     }
+    return true;
 }

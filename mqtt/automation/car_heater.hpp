@@ -11,18 +11,20 @@ struct CarHeater : public Automation  {
     {
         initial_value(false);
     }
+
+    void registerEvents(IEventManager& evman) override {
+        evman.subscribe(EventId::TIME, *this);
+        evman.subscribe(EventId::TEMPERATURE, *this);
+    }
+
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
-        ITaskManager& tasks, 
         std::string_view name,
         std::shared_ptr<IActuator> actuator,
         const int& leaveTime)
     {
-        auto ptr = std::make_shared<CarHeater>(actuator, name, leaveTime);
-        tasks.subscribe(ETask::TIME, *ptr);
-        tasks.subscribe(ETask::TEMPERATURE, *ptr);
-        return ptr;
+        return std::make_shared<CarHeater>(actuator, name, leaveTime);
     }
 private:
     int calculateDuration(const float temperature) const;

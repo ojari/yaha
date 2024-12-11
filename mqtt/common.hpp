@@ -42,3 +42,37 @@ public:
     virtual void set(int aValue) = 0;
     virtual void set(float aValue) = 0;
 };
+
+struct IObserver {
+    virtual ~IObserver() = default;
+
+    virtual void onChange(const IEventData& value) = 0;
+};
+
+struct IEventManager {
+    virtual ~IEventManager() = default;
+
+    virtual bool subscribe(EventId eventId, IObserver& observer) = 0;
+};
+
+
+struct DualEventManager : IEventManager {
+    DualEventManager(IEventManager* manager1, IEventManager* manager2) :
+        manager1(manager1),
+        manager2(manager2)
+    {}
+    virtual ~DualEventManager() = default;
+
+    bool subscribe(EventId eventId, IObserver& observer) {
+        if (manager1->subscribe(eventId, observer) == false) {
+            if (manager2->subscribe(eventId, observer) == false) {
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+private:
+    IEventManager* manager1;
+    IEventManager* manager2;
+};

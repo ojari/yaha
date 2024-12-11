@@ -2,10 +2,11 @@
 #include <memory>
 #include <string>
 #include "device.hpp"
+#include "../common.hpp"
 
 namespace device {
 
-class Registry {
+class Registry : public IEventManager {
 public:
 
     void load(const std::string& filename);
@@ -16,6 +17,8 @@ public:
         }
         return nullptr;
     }
+    
+    bool subscribe(EventId eventId, IObserver& observer) override;
 
 private:
     std::shared_ptr<Device> createDevice(

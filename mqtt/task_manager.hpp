@@ -1,16 +1,15 @@
 #pragma once
-#include "task.hpp"
-#include <vector>
+#include "common.hpp"
 #include "task/temperature.hpp"
 #include "task/time.hpp"
 #include "task/calc_price.hpp"
 
-struct TaskManager : public ITaskManager {
+struct TaskManager : public IEventManager {
     TaskManager() = default;
 
-    void execute() override;
+    void execute();
 
-    void subscribe(ETask taskId, IObserver& observer) override;
+    bool subscribe(EventId eventId, IObserver& observer) override;
 
 private:
     task::TaskTemperature temperature;

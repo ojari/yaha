@@ -81,23 +81,28 @@ int main() {
     TaskManager taskManager;
     automation::Registry automations;
     DebugOutput debugOutput;
+    DualEventManager evManager(&taskManager, mqtt->getEventManager());
 
-    taskManager.subscribe(ETask::TEMPERATURE, debugOutput);
-    taskManager.subscribe(ETask::TIME, debugOutput);
-    taskManager.subscribe(ETask::TIME, *actuator);
+    evManager.subscribe(EventId::TEMPERATURE, debugOutput);
+    evManager.subscribe(EventId::TIME, debugOutput);
+    evManager.subscribe(EventId::BUTTON_LIBRARY, debugOutput);
+    evManager.subscribe(EventId::BUTTON_LIVING_ROOM, debugOutput);
+    evManager.subscribe(EventId::TIME, *actuator);
 
-    automations.add(taskManager, "Demo1", automation::LIGHTS, actuator, 1000, 1300);
-    automations.add(taskManager, "Demo2", automation::LIGHTS, actuator, 1200, 1500);
+    std::vector<int> timeRange1 = {1000, 1300};
+    std::vector<int> timeRange2 = {1200, 1500};
+    automations.add(evManager, "Demo1", automation::LIGHTS, actuator, timeRange1);
+    automations.add(evManager, "Demo2", automation::LIGHTS, actuator, timeRange2);
 
-    automations.add(taskManager, "ButtonKirjasto2", automation::SWITCH, actuator, 1000, 1300);
+    automations.add(evManager, "ButtonKirjasto2", automation::SWITCH, actuator, timeRange1);
 
-    //automations.add(taskManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
-    //automations.add(taskManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
+    //automations.add(evManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
+    //automations.add(evManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
     while (true) {
         mqtt->execute();
-        taskManager.execute();
+        //taskManager.execute();
 
-        // std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 
     return 0;

@@ -30,30 +30,38 @@ AutomationType Registry::toAutomationType(const std::string& typeStr)
 }
 
 std::shared_ptr<Automation> Registry::create(
-    ITaskManager& tasks,
     const std::string_view name,
     AutomationType type,
     std::shared_ptr<IActuator> actuator,
-    const int& arg1,
-    const int& arg2) const
+    const std::vector<int>& args) const
 {
-    if (type == AutomationType::CAR_HEATER) {
-        return CarHeater::create(tasks, name, actuator, arg1);
-    }
-    else if (type == AutomationType::LIGHTS) {
-        return Lights::create(tasks, name, actuator, arg1, arg2);
-    }
-    else if (type == AutomationType::SWITCH) {
-        return StorageHeater::create(tasks, name, actuator);
-    }
-    else if (type == AutomationType::STORAGE_HEATER) {
-        return SwitchLight::create(tasks, name, actuator);
-    }
-    else if (type == AutomationType::WATER_HEATER) {
-        return WaterHeater::create(tasks, name, actuator);
-    }
-    else if (type == AutomationType::ROOM_HEATER) {
-        return RoomHeater::create(tasks, name, actuator);
+    using CreateFunc = std::shared_ptr<Automation>(*)(const std::string_view, std::shared_ptr<IActuator>, const std::vector<int>&);
+
+    static const std::pair<AutomationType, CreateFunc> createMap[] = {
+        {AutomationType::CAR_HEATER, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>& args) {
+            return CarHeater::create(name, actuator, args[0]);
+        }},
+        {AutomationType::LIGHTS, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>& args) {
+            return Lights::create(name, actuator, args[0], args[1]);
+        }},
+        {AutomationType::SWITCH, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>&) {
+            return SwitchLight::create(name, actuator);
+        }},
+        {AutomationType::STORAGE_HEATER, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>&) {
+            return StorageHeater::create(name, actuator);
+        }},
+        {AutomationType::WATER_HEATER, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>&) {
+            return WaterHeater::create(name, actuator);
+        }},
+        {AutomationType::ROOM_HEATER, [](const std::string_view name, std::shared_ptr<IActuator> actuator, const std::vector<int>&) {
+            return RoomHeater::create(name, actuator);
+        }}
+    };
+
+    for (const auto& pair : createMap) {
+        if (pair.first == type) {
+            return pair.second(name, actuator, args);
+        }
     }
 
     // Handle unknown type

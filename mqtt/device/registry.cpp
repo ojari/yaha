@@ -36,6 +36,15 @@ void Registry::load(const std::string& filename) {
     }
 }
 
+bool Registry::subscribe(EventId eventId, IObserver& observer) {
+    for (const auto& [name, device] : devices_) {
+        if (device->hasEvent(eventId)) {
+            device->subscribe(observer);
+            return true;
+        }
+    }
+    return false;
+}
 
 std::shared_ptr<Device> Registry::createDevice(
     const std::string& name, 
@@ -44,11 +53,14 @@ std::shared_ptr<Device> Registry::createDevice(
 {
     static const std::map<std::string, std::function<std::shared_ptr<Device>(const std::string&, EventId event)>> deviceMap = {
         {"Light", [](const std::string& name, EventId event) { 
-            return std::make_shared<LightDevice>(name); }},
+            return std::make_shared<LightDevice>(name, event); }
+        },
         {"Switch", [](const std::string& name,EventId event) {
-            return std::make_shared<SwitchDevice>(name, event); }},
+            return std::make_shared<SwitchDevice>(name, event); }
+        },
         {"TempSensor", [](const std::string& name, EventId event) {
-            return std::make_shared<TempSensorDevice>(); }}
+            return std::make_shared<TempSensorDevice>(name, event); }
+        }
     };
 
     auto it = deviceMap.find(type);

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <variant>
 #include "../actuator.hpp"
-#include "../observer.hpp"
+#include "../common.hpp"
 
 namespace automation {
 
@@ -22,6 +22,8 @@ struct Automation : public IObserver {
         actuator(actuator),
         name(name)
     {}
+
+    virtual void registerEvents(IEventManager& evman) = 0;
 
     bool get() const {
         return std::get<bool>(state);
