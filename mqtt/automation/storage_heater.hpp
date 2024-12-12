@@ -6,7 +6,7 @@ namespace automation {
 
 class StorageHeater : public Automation {
 public:
-    explicit StorageHeater(std::shared_ptr<IActuator> actuator, std::string_view name) :
+    explicit StorageHeater(std::shared_ptr<IActuator> actuator, const std::string& name) :
         Automation(actuator, name)
     {
         initial_value(false);
@@ -19,7 +19,7 @@ public:
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
-        std::string_view name,
+        const std::string& name,
         std::shared_ptr<IActuator> actuator)
     {
         return std::make_shared<StorageHeater>(actuator, name);

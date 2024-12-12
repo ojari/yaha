@@ -28,7 +28,15 @@ protected:
         return str == "ON";
     }
 
+    template <typename T>
+    void notifyValue(T value) {
+        eventData.set(value);
+        notify(eventData);
+    }
+
     std::string deviceName;
+
+private:
     EventData eventData;
 };
 

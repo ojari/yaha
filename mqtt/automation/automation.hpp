@@ -18,7 +18,7 @@ enum AutomationType {
 };
 
 struct Automation : public IObserver {
-    Automation(std::shared_ptr<IActuator> actuator, std::string_view name) :
+    Automation(std::shared_ptr<IActuator> actuator, const std::string& name) :
         actuator(actuator),
         name(name)
     {}
@@ -52,7 +52,7 @@ private:
     std::shared_ptr<IActuator> actuator;
     std::variant<int, bool> state;
     bool verbose = false;
-    std::string_view name;
+    std::string name;
 };
 
 };

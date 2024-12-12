@@ -12,6 +12,12 @@ namespace automation {
 
 class Registry {
 public:
+    Registry(std::shared_ptr<IActuator> actuator) :
+        actuator { actuator }
+    {}
+
+    void load(const std::string& filename, IEventManager& evman);
+
     /*template <typename... Args>
     void add(
         ITaskManager& tasks,
@@ -26,12 +32,11 @@ public:
     */
     void add(
         IEventManager& evman,
-        const std::string_view name,
+        const std::string& name,
         AutomationType type,
-        std::shared_ptr<IActuator> actuator,
         const std::vector<int>& args)
     {
-        auto ctrl = create(name, type, actuator, args);
+        auto ctrl = create(name, type, args);
         ctrl->registerEvents(evman);
         controllers.push_back(ctrl);
     }
@@ -39,14 +44,12 @@ public:
 
     void add(
         IEventManager& evman,
-        std::shared_ptr<IActuator> actuator,
         const ConfigController& output)
     {
         std::vector<int> args = {output.time1, output.time2};
         auto ctrl = create(
             output.name,
             toAutomationType(output.type),
-            actuator,
             args);
         ctrl->registerEvents(evman);
         controllers.push_back(ctrl);
@@ -54,6 +57,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<Automation>> controllers;
+    std::shared_ptr<IActuator> actuator;
 
     /*template <typename... Args>
     std::shared_ptr<Automation> create(
@@ -66,9 +70,8 @@ private:
     AutomationType toAutomationType(const std::string& typeStr);
 
     std::shared_ptr<Automation> create(
-        const std::string_view name,
+        const std::string& name,
         AutomationType type,
-        std::shared_ptr<IActuator> actuator,
         const std::vector<int>& args) const;
 
 };

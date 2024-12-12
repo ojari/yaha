@@ -5,7 +5,7 @@
 namespace automation {
 
 struct CarHeater : public Automation  {
-    CarHeater(std::shared_ptr<IActuator> actuator, std::string_view name, const int& leaveTime) :
+    CarHeater(std::shared_ptr<IActuator> actuator, const std::string& name, const int& leaveTime) :
         Automation(actuator, name),
         leaveTime(leaveTime)
     {
@@ -20,7 +20,7 @@ struct CarHeater : public Automation  {
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
-        std::string_view name,
+        const std::string& name,
         std::shared_ptr<IActuator> actuator,
         const int& leaveTime)
     {

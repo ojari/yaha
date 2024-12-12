@@ -14,6 +14,8 @@ public:
         temperature = payload["temperature"];
         humidity = payload["humidity"];
         std::cout << "Temperature " << deviceName << " :: " << temperature << "C :: " << humidity << "%" << std::endl;
+
+        notifyValue(temperature);
     }
     void getHistory(DataHistory &history) override {
         history.type = DataType::TEMPERATURE;

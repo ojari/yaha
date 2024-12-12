@@ -7,7 +7,7 @@
 namespace automation {
 
 struct Lights : public Automation {
-    Lights(std::shared_ptr<IActuator> actuator, std::string_view name, const int& onTime, const int& offTime) :
+    Lights(std::shared_ptr<IActuator> actuator, const std::string& name, const int& onTime, const int& offTime) :
         Automation(actuator, name),
         onTime(onTime),
         offTime(offTime)
@@ -22,7 +22,7 @@ struct Lights : public Automation {
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
-        std::string_view name,
+        const std::string& name,
         std::shared_ptr<IActuator> actuator,
         const int& onTime,
         const int& offTime)

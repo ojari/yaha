@@ -16,6 +16,7 @@ struct IOutput {
 
 enum class EventId {
   TEMPERATURE,
+  TEMPERATURE_ROOM,
   ELECTRICITY_PRICE,
   TIME,
   WEEKDAY,
@@ -23,6 +24,8 @@ enum class EventId {
   SUNSET,
   BUTTON_LIVING_ROOM,
   BUTTON_LIBRARY,
+  SWITCH_AUTO_TALLI,
+  SWITCH_AUTO_ULKO,
   UNKNOWN
 };
 

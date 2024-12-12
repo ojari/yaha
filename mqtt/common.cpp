@@ -9,6 +9,7 @@ struct EventIdString {
 
 EventIdString eventNames[] = {
     { EventId::TEMPERATURE,          "Temperature" },
+    { EventId::TEMPERATURE_ROOM,     "Temperature Room" },
     { EventId::ELECTRICITY_PRICE,    "Electricity Price" },
     { EventId::TIME,                 "Time" },
     { EventId::WEEKDAY,              "Weekday" },
@@ -16,6 +17,8 @@ EventIdString eventNames[] = {
     { EventId::SUNSET,               "Sunset" },
     { EventId::BUTTON_LIVING_ROOM,   "Button Living Room" },
     { EventId::BUTTON_LIBRARY,       "Button Library" },
+    { EventId::SWITCH_AUTO_TALLI,    "Switch Auto Talli" },
+    { EventId::SWITCH_AUTO_ULKO,     "Switch Auto Ulko" },
     { EventId::UNKNOWN,              "Unknown" }
 };
 

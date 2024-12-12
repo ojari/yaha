@@ -27,8 +27,7 @@ public:
         }
         // std::cout << "Switch " << deviceName << " :: " << state << std::endl;
 
-        eventData.set((int)state);
-        notify(eventData);
+        notifyValue((int)state);
     }
 
     void getHistory(DataHistory &history) override {

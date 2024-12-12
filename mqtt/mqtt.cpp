@@ -59,7 +59,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
 }
 
 void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
-    std::cout << "MQTT: " << level << " " << str << std::endl;
+    // std::cout << "MQTT: " << level << " " << str << std::endl;
 }
 
 //------------------------------------------------------------------
