@@ -2,11 +2,10 @@
 #include "light_device.hpp"
 #include "switch_device.hpp"
 #include "temp_sensor_device.hpp"
-// #include "common.hpp"
 #include <fstream>
 #include <string>
 #include <nlohmann/json.hpp>
-#include <iostream> // std::cout
+#include <spdlog/spdlog.h>
 #include <unistd.h> // getcwd
 
 namespace device {
@@ -15,7 +14,7 @@ void Registry::load(const std::string& filename) {
 
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-        std::cout << "Current working directory: " << cwd << std::endl;
+        spdlog::info("Current working directory: {}", cwd);
     }
     std::ifstream ifile(filename);
     if (ifile.is_open()) {
@@ -32,7 +31,7 @@ void Registry::load(const std::string& filename) {
 
         ifile.close();
     } else {
-        showError("Error opening devices.json");
+        spdlog::error("Error opening {}", filename);
     }
 }
 
@@ -68,6 +67,7 @@ std::shared_ptr<Device> Registry::createDevice(
         EventId event = str2event(eventStr);
         return std::move((it->second)(name, event));
     } else {
+        spdlog::error("Unknown device type: {}", type);
         return nullptr;
     }
 }

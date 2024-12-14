@@ -1,5 +1,5 @@
 #include "actuator.hpp"
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 void Actuator::onChange(const IEventData& event) {
     if (event.id() == EventId::TIME) {
@@ -8,7 +8,7 @@ void Actuator::onChange(const IEventData& event) {
 }
 
 void Actuator::set(std::string_view device, bool value) {
-    std::cout << time2str(time) << " setting " << device << " to " << (value ? "on" : "off") << std::endl;
+    spdlog::info("{}: setting {} to {}",time2str(time), device, (value ? "on" : "off"));
 
     // output->send(device, (value ? "on" : "off"));
 }

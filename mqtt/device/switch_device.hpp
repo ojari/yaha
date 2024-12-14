@@ -1,5 +1,6 @@
 #pragma once
 #include "device.hpp"
+#include <spdlog/spdlog.h>
 
 namespace device {
 
@@ -25,7 +26,7 @@ public:
             }
             state = payload["action"].get<std::string>() == "on";
         }
-        // std::cout << "Switch " << deviceName << " :: " << state << std::endl;
+        spdlog::info("Switch {} :: {}", deviceName, state);
 
         notifyValue((int)state);
     }

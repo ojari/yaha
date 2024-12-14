@@ -3,11 +3,15 @@
 #include "task_manager.hpp"
 #include "actuator.hpp"
 #include "automation/registry.hpp"
-#include <iostream>
 #include <map>
 #include <chrono>
 #include <thread>
 #include <iomanip>
+#include <spdlog/spdlog.h>
+//#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/syslog_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 
 struct DebugOutput : public IObserver {
     void onChange(const IEventData& value) override {
@@ -18,13 +22,11 @@ struct DebugOutput : public IObserver {
             // do not show temperature changes
         }
         else {
-            std::cout << time2str(time) << " " << value.name() << " changed to ";
             if (value.isInt()) {
-                std::cout << value.getInt();
+                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getInt());
             } else {
-                std::cout << value.getFloat();
+                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getFloat());
             }
-            std::cout << std::endl;
         }
     }
 
@@ -75,6 +77,23 @@ struct DummyHistory : public DataInsertHistory {
  * @brief The main function of the program.
  */
 int main() {
+    // initialize logging
+    //
+    //auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
+    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("switch_device", LOG_PID, LOG_USER, true);
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+
+    spdlog::sinks_init_list sink_list = {syslog_sink, console_sink};
+    auto logger = std::make_shared<spdlog::logger>("yaha", sink_list.begin(), sink_list.end());
+    logger->set_pattern("%H:%M:%S %L %^%v%$");
+    spdlog::set_default_logger(logger);
+
+    // spdlog::info("this is info message");
+    // spdlog::warn("this is warning message");
+    // spdlog::error("this is error message");
+
+    // initialize system
+    //
     DummyHistory history;
     auto mqtt = std::make_unique<Mqtt>();
     auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));

@@ -1,6 +1,6 @@
 #pragma once
 #include "device.hpp"
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace device {
 
@@ -13,7 +13,8 @@ public:
     void on_message(std::string& deviceName, nlohmann::json& payload) override {
         temperature = payload["temperature"];
         humidity = payload["humidity"];
-        std::cout << "Temperature " << deviceName << " :: " << temperature << "C :: " << humidity << "%" << std::endl;
+
+        spdlog::info("Temperature {} :: {}C :: {}%", deviceName, temperature, humidity);
 
         notifyValue(temperature);
     }

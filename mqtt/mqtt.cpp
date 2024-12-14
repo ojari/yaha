@@ -1,7 +1,7 @@
 #include <mosquitto.h>
-#include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 #include "mqtt.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
@@ -11,28 +11,28 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
     std::shared_ptr<device::Device> device = deviceRegistry->getDevice(deviceName);
     if (device) {
         if (verbose) {
-            std::cout << "Device: " << deviceName << " Payload: " << payload << std::endl;
+            spdlog::info("Device: {} Payload: {}", deviceName, payload);
         }
 
         json jsonPayload = json::parse(payload);
         device->on_message(deviceName, jsonPayload);
     } else {
-        std::cout << "ERROR Missing topic: " << deviceName << " Payload: " << payload << std::endl; 
+        spdlog::error("Missing topic: {} Payload: {}", deviceName, payload);
     }
 }
 
 
 void on_connect(struct mosquitto *mosq, void *obj, int result) {
     if (!result) {
-        std::cout << "Connected" << std::endl;
+        spdlog::info("Connected");
         mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
     } else {
-        std::cerr << "Connect failed: " << result << std::endl;
+        spdlog::error("Connect failed: {}", result);
     }
 }
 
 void on_disconnect(struct mosquitto *mosq, void *obj, int rc) {
-    std::cout << "MQTT Disconnected " << rc << std::endl;  
+    spdlog::warn("Disconnected: {}", rc);
 }
 
 void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message) {
@@ -41,7 +41,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
     int topic_count;
     int rc;
 
-    // std::cout << "Topic: " << message->topic << " Message: " << (char*)message->payload << std::endl;
+    //spdlog::info("Received message on topic: {} with payload: {}", message->topic, (char*)message->payload);
 
     rc = mosquitto_sub_topic_tokenise(message->topic, &topics, &topic_count);
     if ((rc == MOSQ_ERR_SUCCESS) && (topic_count > 1)) {
@@ -54,7 +54,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
 }
 
 void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
-    // std::cout << "MQTT: " << level << " " << str << std::endl;
+    spdlog::info("MQTT: {} {}", level, str);
 }
 
 //------------------------------------------------------------------
@@ -67,14 +67,14 @@ Mqtt::Mqtt() :
     deviceRegistry.load("devices.json");
 
     if (hostname == nullptr) {
-        showError("Missing RPI_HOST environmental variable");
+        spdlog::error("Missing RPI_HOST environmental variable");
         return;
     }
 
     mosquitto_lib_init();
     mosq = mosquitto_new("yaha", true, static_cast<void*>(&messageRouter));
     if (!mosq) {
-        showError("Out of memory");
+        spdlog::error("Out of memory");
         return;
     }
 
@@ -85,7 +85,7 @@ Mqtt::Mqtt() :
 
     rc = mosquitto_connect(mosq, hostname, 1883, 60);
     if (rc) {
-        showError(mosquitto_strerror(rc));
+        spdlog::error("Unable to connect: {}", mosquitto_strerror(rc));
         return;
     }
 }
@@ -95,7 +95,7 @@ void Mqtt::execute() {
 
     rc = mosquitto_loop(mosq, 5, 1);
     if (rc) {
-        showError(mosquitto_strerror(rc));
+        spdlog::error("Loop error: {}", mosquitto_strerror(rc));
         mosquitto_reconnect(mosq);
     }
 }
@@ -103,6 +103,6 @@ void Mqtt::execute() {
 void Mqtt::send(const std::string& topic, const std::string& payload) {
     int rc = mosquitto_publish(mosq, NULL, topic.c_str(), payload.size(), payload.c_str(), 0, false);
     if (rc) {
-        showError(mosquitto_strerror(rc));
+        spdlog::error("Publish error: {}", mosquitto_strerror(rc));
     }
 }

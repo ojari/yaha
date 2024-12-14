@@ -1,6 +1,7 @@
 #include <memory>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 #include "../task.hpp"
 #include "registry.hpp"
 #include "lights.hpp"
@@ -37,7 +38,7 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
 
         ifile.close();
     } else {
-        showError("Error opening automation.json");
+        spdlog::error("Error opening {}", filename);
     }
 }
 
@@ -95,6 +96,7 @@ std::shared_ptr<Automation> Registry::create(
     }
 
     // Handle unknown type
+    spdlog::error("Unknown AutomationType: {}", (int)type);
     return nullptr;
 }
 

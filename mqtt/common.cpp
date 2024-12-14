@@ -1,4 +1,4 @@
-#include <iostream>
+#include <sstream>
 #include <iomanip> // Add this line
 #include "common.hpp"
 
@@ -38,15 +38,6 @@ EventId str2event(const std::string& str) {
         }
     }
     return EventId::UNKNOWN;
-}
-
-
-void showError(const char* message) {
-    std::cerr << "ERROR: " << message << std::endl;
-}
-
-void showError(const char* message, const char* arg) {
-    std::cerr << "ERROR: " << message << " " << arg << std::endl;
 }
 
 int hm2time(int hour, int minute) {

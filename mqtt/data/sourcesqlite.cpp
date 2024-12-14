@@ -1,6 +1,6 @@
 #include "sourcesqlite.hpp"
 #include <memory>
-#include "../common.hpp"
+#include <spdlog/spdlog.h>
 
 /*std::unique_ptr<Database> createDatabase(const std::string& filename) {
     sqlite3* db;
@@ -21,7 +21,7 @@ sqlite3* createDatabase(const std::string& filename) {
     }
     if (result != SQLITE_OK) {
         const char* errorString = sqlite3_errmsg(db);
-        showError("sqlite open database", errorString);
+        spdlog::error("sqlite open database: {}", errorString);
         sqlite3_close(db);
 
         return nullptr; // or throw an exception with the error message

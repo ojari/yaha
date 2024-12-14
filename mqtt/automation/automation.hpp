@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <iostream>
 #include <variant>
 #include "../actuator.hpp"
 #include "../common.hpp"

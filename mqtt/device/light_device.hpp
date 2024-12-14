@@ -1,6 +1,6 @@
 #pragma once
 #include "device.hpp"
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace device {
 
@@ -14,7 +14,7 @@ public:
     void on_message(std::string& devName, nlohmann::json& payload) override {
         brightness = payload["brightness"];
         state = str2bool(payload["state"]);
-        std::cout << "Light  " << devName << " :: " << state << " :: " << brightness << std::endl;
+        spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
     }
 
     void send(IOutput& output, bool value, int newBrightness) override {
