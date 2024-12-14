@@ -6,23 +6,21 @@
 
 class MessageRouter {
 public:
-    MessageRouter(device::Registry *deviceReg, DataInsertHistory &history) : 
-        deviceRegistry(deviceReg),
-        history(history)
+    MessageRouter(device::Registry *deviceReg) : 
+        deviceRegistry(deviceReg)
     {}
 
     void route(std::string& deviceName, std::string& payload);
 
 private:
     device::Registry* deviceRegistry;
-    DataInsertHistory &history;
     bool verbose = false;
 };
 
 
 class Mqtt : public ITask, public IOutput {
 public:
-    explicit Mqtt(DataInsertHistory &history);
+    explicit Mqtt();
     void execute() override;
     void send(const std::string& topic, const std::string& message) override;
 

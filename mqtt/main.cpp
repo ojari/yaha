@@ -76,7 +76,7 @@ struct DummyHistory : public DataInsertHistory {
  */
 int main() {
     DummyHistory history;
-    auto mqtt = std::make_unique<Mqtt>(history);
+    auto mqtt = std::make_unique<Mqtt>();
     auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));
     TaskManager taskManager;
     automation::Registry automations(actuator);

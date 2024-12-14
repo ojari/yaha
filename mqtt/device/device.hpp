@@ -18,7 +18,6 @@ public:
     virtual ~Device() = default;
 
     virtual void on_message(std::string& deviceName, nlohmann::json& payload) = 0;
-    virtual void getHistory(DataHistory &history) = 0;
 
     bool hasEvent(EventId eventId) const {
         return eventData.id() == eventId;

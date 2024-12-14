@@ -30,11 +30,6 @@ public:
         notifyValue((int)state);
     }
 
-    void getHistory(DataHistory &history) override {
-        history.type = DataType::SWITCH;
-        history.val1 = static_cast<int>(state);
-    }
-
     void send(IOutput& output, bool value) override {
         std::string topic = "zigbee2mqtt/" + deviceName + "/set";
         std::string payload;

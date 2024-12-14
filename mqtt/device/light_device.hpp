@@ -16,10 +16,7 @@ public:
         state = str2bool(payload["state"]);
         std::cout << "Light  " << devName << " :: " << state << " :: " << brightness << std::endl;
     }
-    void getHistory(DataHistory &history) override {
-        history.type = DataType::LIGHT;
-        history.val1 = static_cast<int>(state);
-    }
+
     void send(IOutput& output, bool value, int newBrightness) override {
         std::string topic = "zigbee2mqtt/" + deviceName + "/set";
         std::string payload;
