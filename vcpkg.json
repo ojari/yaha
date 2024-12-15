@@ -3,13 +3,10 @@
 
     "dependencies": [
         "catch2",
-        "fmt", 
         "spdlog",
-        "flatbuffers",
-        "mosquitto",
         "nlohmann-json",
-        "openssl",
-        "sqlite3"
+        "sqlite3",
+        "paho-mqtt"
     ]
     
 }

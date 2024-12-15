@@ -12,8 +12,8 @@ set(FBS_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(FLATC ${VCPKG_TOOLS}/flatbuffers/flatc)
 
 set(FBS_FILES
-    ${FBS_SRC_DIR}/fbsdata.fbs
-    ${FBS_SRC_DIR}/elprice.fbs
+   # ${FBS_SRC_DIR}/fbsdata.fbs
+   # ${FBS_SRC_DIR}/elprice.fbs
 )
 
 # Add custom command to compile .fbs files
@@ -65,7 +65,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
 )
 target_link_libraries(${PROJECT_NAME}
-    ${MOSQUITTO_LIB}
+    ${MQTT_LIB}
     ${EXTRA_LIBRARIES}
     sqlite3
  #   redis++

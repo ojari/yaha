@@ -1,5 +1,4 @@
 #pragma once
-#include <MQTTClient.h>
 #include "common.hpp"
 #include "task.hpp"
 #include "device/registry.hpp"
@@ -29,7 +28,7 @@ public:
         return &deviceRegistry;
     }
 private:
-    MQTTClient client;
+    struct mosquitto *mosq;
     device::Registry deviceRegistry;
     MessageRouter messageRouter;
 };

@@ -1,4 +1,4 @@
-#include <MQTTClient.h>
+#include <mosquitto.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -22,30 +22,7 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 }
 
 
-void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
-{
-    spdlog::info("Message with token value {} delivery confirmed", dt);
-    //deliveredtoken = dt;
-}
-
-int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
-{
-    int i;
-    char* payloadptr;
-    spdlog::info("Message arrived");
-    spdlog::info("     topic: {}", topicName);
-    spdlog::info("   message: {}", (char*)(message->payload));
-
-    MQTTClient_freeMessage(&message);
-    MQTTClient_free(topicName);
-    return 1;
-}
-void mqtt_connlost(void *context, char *cause)
-{
-    spdlog::error("Connection lost cause: {}", cause);
-}
-
-/*void on_connect(struct mosquitto *mosq, void *obj, int result) {
+void on_connect(struct mosquitto *mosq, void *obj, int result) {
     if (!result) {
         spdlog::info("Connected");
         mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
@@ -79,7 +56,6 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
 void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
     spdlog::info("MQTT: {} {}", level, str);
 }
-*/
 
 //------------------------------------------------------------------
 Mqtt::Mqtt() : 
@@ -95,26 +71,21 @@ Mqtt::Mqtt() :
         return;
     }
 
-    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
-    MQTTClient_create(&client, hostname, "yaha", MQTTCLIENT_PERSISTENCE_NONE, NULL);
-    conn_opts.keepAliveInterval = 60;
-    conn_opts.cleansession = 1;
-
-    rc = MQTTClient_setCallbacks(client, NULL, mqtt_connlost, mqtt_msgarrvd, mqtt_delivered);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        spdlog::error("Unable to set callbacks: {}", rc);
+    mosquitto_lib_init();
+    mosq = mosquitto_new("yaha", true, static_cast<void*>(&messageRouter));
+    if (!mosq) {
+        spdlog::error("Out of memory");
         return;
     }
 
-    rc = MQTTClient_connect(client, &conn_opts);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        spdlog::error("Unable to connect: {}", rc);
-        return;
-    }
+    mosquitto_connect_callback_set(mosq, on_connect);
+    mosquitto_message_callback_set(mosq, on_message);
+    mosquitto_disconnect_callback_set(mosq, on_disconnect);
+    mosquitto_log_callback_set(mosq, on_logging);
 
-    rc = MQTTClient_subscribe(client, "zigbee2mqtt/#", 0);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        spdlog::error("Unable to subscribe: {}", rc);
+    rc = mosquitto_connect(mosq, hostname, 1883, 60);
+    if (rc) {
+        spdlog::error("Unable to connect: {}", mosquitto_strerror(rc));
         return;
     }
 }
@@ -122,18 +93,16 @@ Mqtt::Mqtt() :
 void Mqtt::execute() {
     int rc = 0;
 
-/*    rc = mosquitto_loop(mosq, 5, 1);
+    rc = mosquitto_loop(mosq, 5, 1);
     if (rc) {
         spdlog::error("Loop error: {}", mosquitto_strerror(rc));
         mosquitto_reconnect(mosq);
     }
-*/
 }
 
 void Mqtt::send(const std::string& topic, const std::string& payload) {
-/*    int rc = mosquitto_publish(mosq, NULL, topic.c_str(), payload.size(), payload.c_str(), 0, false);
+    int rc = mosquitto_publish(mosq, NULL, topic.c_str(), payload.size(), payload.c_str(), 0, false);
     if (rc) {
         spdlog::error("Publish error: {}", mosquitto_strerror(rc));
     }
-    */
 }
