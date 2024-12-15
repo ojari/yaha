@@ -5,7 +5,9 @@
         "catch2",
         "spdlog",
         "nlohmann-json",
+        "tinyxml2",
         "sqlite3",
+        "cpp-httplib",
         "paho-mqtt"
     ]
     

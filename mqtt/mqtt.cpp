@@ -2,6 +2,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#include <algorithm>
 #include "mqtt.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
@@ -30,12 +31,26 @@ void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
 
 int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
-    int i;
-    char* payloadptr;
-    spdlog::info("Message arrived");
-    spdlog::info("     topic: {}", topicName);
-    spdlog::info("   message: {}", (char*)(message->payload));
+    std::string payload {static_cast<char*>(message->payload), static_cast<size_t>(message->payloadlen)};
+    std::string topic {topicName};
+    int slashCount = std::count(topic.begin(), topic.end(), '/');
 
+    if (slashCount != 1) {
+        return 1;
+    }
+    // spdlog::info("Message arrived");
+    // spdlog::info("     topic: {}", topicName);
+    // spdlog::info("   message: {}", payload.c_str());
+
+    size_t firstSlash = topic.find('/');
+    if (firstSlash != std::string::npos) {
+        auto* router = static_cast<MessageRouter*>(context);
+        
+        std::string device_name = topic.substr(firstSlash + 1);
+        router->route(device_name, payload);
+    } else {
+        spdlog::error("Invalid topic format: {}", topic);
+    }
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
@@ -52,32 +67,6 @@ void mqtt_connlost(void *context, char *cause)
     } else {
         spdlog::error("Connect failed: {}", result);
     }
-}
-
-void on_disconnect(struct mosquitto *mosq, void *obj, int rc) {
-    spdlog::warn("Disconnected: {}", rc);
-}
-
-void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message) {
-    auto* router = static_cast<MessageRouter*>(obj);
-    char **topics;
-    int topic_count;
-    int rc;
-
-    //spdlog::info("Received message on topic: {} with payload: {}", message->topic, (char*)message->payload);
-
-    rc = mosquitto_sub_topic_tokenise(message->topic, &topics, &topic_count);
-    if ((rc == MOSQ_ERR_SUCCESS) && (topic_count > 1)) {
-        std::string topic = topics[1];
-        std::string payload = (char*)message->payload;
-
-        router->route(topic, payload);
-    }
-    mosquitto_sub_topic_tokens_free(&topics, topic_count);
-}
-
-void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
-    spdlog::info("MQTT: {} {}", level, str);
 }
 */
 
@@ -100,7 +89,12 @@ Mqtt::Mqtt() :
     conn_opts.keepAliveInterval = 60;
     conn_opts.cleansession = 1;
 
-    rc = MQTTClient_setCallbacks(client, NULL, mqtt_connlost, mqtt_msgarrvd, mqtt_delivered);
+    rc = MQTTClient_setCallbacks(
+        client,
+        static_cast<void*>(&messageRouter),
+        mqtt_connlost,
+        mqtt_msgarrvd,
+        mqtt_delivered);
     if (rc != MQTTCLIENT_SUCCESS) {
         spdlog::error("Unable to set callbacks: {}", rc);
         return;

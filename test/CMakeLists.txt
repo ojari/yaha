@@ -41,7 +41,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}
     Catch2
-    ${MOSQUITTO_LIB}
+    ${MQTT_LIB}
     sqlite3
     ${EXTRA_LIBRARIES}
 )
