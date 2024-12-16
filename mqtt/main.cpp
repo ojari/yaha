@@ -4,6 +4,7 @@
 #include "actuator.hpp"
 #include "debug_output.hpp"
 #include "automation/registry.hpp"
+#include "application.hpp"
 #include <map>
 #include <chrono>
 #include <thread>
@@ -80,12 +81,19 @@ int main() {
 
     evManager.subscribe(EventId::TIME, *actuator);
 
-    while (true) {
+    Application app;
+    TimerSlow timer1(app);
+    TimerFast timer2(app);
+
+    app.run();
+
+  /*  while (true) {
         mqtt->execute();
         taskManager.execute();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
+*/
 
     return 0;
 }

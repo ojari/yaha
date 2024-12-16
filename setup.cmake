@@ -14,7 +14,7 @@ else()
     set(MQTT_LIB mosquitto)
   else()
     set(CURL_LIB curl)
-    set(EXTRA_LIBRARIES ssl crypto pthread dl fmt)  # z
+    set(EXTRA_LIBRARIES ssl crypto pthread dl fmt uv)  # z
     #set(MQTT_LIB mosquitto_static)
     set(MQTT_LIB paho-mqtt3c)
   endif()
