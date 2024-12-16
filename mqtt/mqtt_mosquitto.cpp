@@ -2,7 +2,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
-#include "mqtt.hpp"
+#include "mqtt_mosquitto.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
 

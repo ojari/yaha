@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "task_manager.hpp"
 #include "actuator.hpp"
+#include "debug_output.hpp"
 #include "automation/registry.hpp"
 #include <map>
 #include <chrono>
@@ -11,28 +12,6 @@
 //#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/syslog_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-
-
-struct DebugOutput : public IObserver {
-    void onChange(const IEventData& value) override {
-        if (value.id() == EventId::TIME) {
-            time = value.getInt();
-        }
-        else if (value.id() == EventId::TEMPERATURE) {
-            // do not show temperature changes
-        }
-        else {
-            if (value.isInt()) {
-                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getInt());
-            } else {
-                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getFloat());
-            }
-        }
-    }
-
-private:
-    int time {-1};
-};
 
 
 class IntTime {
@@ -66,12 +45,6 @@ private:
     int minute;
 };
 
-struct DummyHistory : public DataInsertHistory {
-    void insert(const DataHistory& data) override {
-        // dummy implementation: do nothing
-    }
-};
-
 
 /**
  * @brief The main function of the program.
@@ -94,7 +67,6 @@ int main() {
 
     // initialize system
     //
-    DummyHistory history;
     auto mqtt = std::make_unique<Mqtt>();
     auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));
     TaskManager taskManager;
@@ -104,22 +76,10 @@ int main() {
 
     automations.load("automation.json", evManager);
 
-    evManager.subscribe(EventId::TEMPERATURE, debugOutput);
-    evManager.subscribe(EventId::TEMPERATURE_ROOM, debugOutput);
-    evManager.subscribe(EventId::TIME, debugOutput);
-    evManager.subscribe(EventId::BUTTON_LIBRARY, debugOutput);
-    evManager.subscribe(EventId::BUTTON_LIVING_ROOM, debugOutput);
+    debugOutput.registerEvents(evManager);
+
     evManager.subscribe(EventId::TIME, *actuator);
 
-    std::vector<int> timeRange1 = {1000, 1300};
-    std::vector<int> timeRange2 = {1200, 1500};
-    //automations.add(evManager, "Demo1", automation::LIGHTS, timeRange1);
-    //automations.add(evManager, "Demo2", automation::LIGHTS, timeRange2);
-
-    automations.add(evManager, "ButtonKirjasto2", automation::SWITCH, timeRange1);
-
-    //automations.add(evManager, actuator,  ConfigController { "Demo1", "Lights", "", 1000, 1300 });
-    //automations.add(evManager, actuator,  ConfigController { "Demo2", "Lights", "", 1200, 1500 });
     while (true) {
         mqtt->execute();
         taskManager.execute();
