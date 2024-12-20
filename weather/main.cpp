@@ -3,12 +3,23 @@
 #include <iomanip>
 #include <ctime>
 #include <vector>
-#include <httplib.h>
+// #include <httplib.h>
+#include <curl/curl.h>
+#include <spdlog/spdlog.h>
 #include "../common/ICommand.hpp"
 
 using namespace std;
 
 extern void parse(const char* cache_file);
+
+
+//------------------------------------------------------------------------------
+// Helper function to write data received by curl to a string
+size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -29,24 +40,51 @@ public:
     }
 
     void execute() override {
-        cout << "command download: " << cache_file << endl;
+        spdlog::info("command download (curl): {}", cache_file);
 
+        CURL* curl;
+        CURLcode res;
+        std::string readBuffer;
+
+        curl = curl_easy_init();
+        if (curl) {
+            std::string full_url = url + path;
+            curl_easy_setopt(curl, CURLOPT_URL, full_url.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+            res = curl_easy_perform(curl);
+            if (res != CURLE_OK) {
+                spdlog::error("curl_easy_perform() failed: {}", curl_easy_strerror(res));
+            }
+            else {
+                std::ofstream outfile(cache_file);
+                outfile << readBuffer << std::endl;
+                outfile.close();
+            }
+            curl_easy_cleanup(curl);
+        }
+    }
+
+    /* void httplib_execute() {
         httplib::Client cli(url, 80);
 
         if (auto res = cli.Get(path.c_str())) {
             if (res->status == httplib::StatusCode::OK_200) {
-                // std::cout << res->body << std::endl;
+                std::cout << res->body << std::endl;
 
                 std::ofstream outfile(cache_file);
                 outfile << res->body << std::endl;
                 outfile.close();
-            }
+			}
+			else {
+				std::cout << "HTTP error: " << res->status << std::endl;
+			}
+
         } else {
             auto err = res.error();
             std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
         }
-        // download(url.c_str(), cache_file.c_str());
-    }
+    }*/
 
 private:
     string url;

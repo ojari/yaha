@@ -36,6 +36,7 @@ coro/build
 doc/C4*.puml
 etc/
 vcpkg_installed/
+vs/.vs/
 
 # .vscode/settings.json
 build
