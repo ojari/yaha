@@ -6,7 +6,9 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#ifndef WIN32
 #include <unistd.h> // getcwd
+#endif
 
 namespace device {
 

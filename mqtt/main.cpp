@@ -11,7 +11,9 @@
 #include <iomanip>
 #include <spdlog/spdlog.h>
 //#include <spdlog/sinks/basic_file_sink.h>
+#ifndef WIN32
 #include <spdlog/sinks/syslog_sink.h>
+#endif
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 
@@ -54,10 +56,15 @@ int main() {
     // initialize logging
     //
     //auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
-    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("switch_device", LOG_PID, LOG_USER, true);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+#ifndef WIN32
+    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("switch_device", LOG_PID, LOG_USER, true);
+    spdlog::sinks_init_list sink_list = { syslog_sink, console_sink };
+#else
+    spdlog::sinks_init_list sink_list = { console_sink };
+#endif
 
-    spdlog::sinks_init_list sink_list = {syslog_sink, console_sink};
+    
     auto logger = std::make_shared<spdlog::logger>("yaha", sink_list.begin(), sink_list.end());
     logger->set_pattern("%H:%M:%S %L %^%v%$");
     spdlog::set_default_logger(logger);

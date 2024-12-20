@@ -9,7 +9,8 @@
         "sqlite3",
         "cpp-httplib",
         "paho-mqtt",
-        "libuv"
+        "libuv",
+        "curl"
     ]
     
 }
