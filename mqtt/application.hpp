@@ -1,6 +1,7 @@
 #pragma once
 #include <uv.h>
 #include <spdlog/spdlog.h>
+#include "hardware_info.hpp"
 
 
 struct Application {
@@ -24,6 +25,7 @@ private:
     uv_loop_t loop;
 };
 
+//-----------------------------------------------------------------------------
 struct TimerBase {
     TimerBase(Application& app, int interval) {
         uv_timer_init(app.getLoop(), &timer);
@@ -44,6 +46,7 @@ protected:
     uv_timer_t timer;
 };
 
+//-----------------------------------------------------------------------------
 struct TimerSlow : public TimerBase {
     TimerSlow(Application& app) :
         TimerBase(app, 1000)
@@ -54,14 +57,27 @@ struct TimerSlow : public TimerBase {
     void onTimer() override {
         counter++;
         if (counter % 10 == 0) {
-            spdlog::info("TimerSlow b: {}", counter);
+            loadAvgReader.Read();
+            memUsageReader.Read();
+            procMemReader.Read();
+
+            spdlog::info("Load: 1m: {}, proc mem: {}, Memory total: {}, used: {}", 
+                loadAvgReader.getLoad(), 
+                procMemReader.getVmRSS(),
+                memUsageReader.getTotalMem()/1024,
+                memUsageReader.getUsedMem()/1024);
         }
     }
 
 private:
+    LoadAverageReader loadAvgReader;
+    MemoryUsageReader memUsageReader;
+    ProcessMemoryReader procMemReader;
+
     int counter = 0;
 };
 
+//-----------------------------------------------------------------------------
 struct TimerFast : public TimerBase {
     TimerFast(Application& app) :
         TimerBase(app, 500)
@@ -72,7 +88,7 @@ struct TimerFast : public TimerBase {
     void onTimer() override {
         counter++;
         if (counter % 4 == 0) {
-            spdlog::info("TimerFast b: {}", counter);
+            //spdlog::info("TimerFast b: {}", counter);
         }
     }
 

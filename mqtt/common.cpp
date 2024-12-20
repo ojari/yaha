@@ -19,6 +19,10 @@ EventIdString eventNames[] = {
     { EventId::BUTTON_LIBRARY,       "Button Library" },
     { EventId::SWITCH_AUTO_TALLI,    "Switch Auto Talli" },
     { EventId::SWITCH_AUTO_ULKO,     "Switch Auto Ulko" },
+    { EventId::PROC_MEM,             "Process Mem" },
+    { EventId::USED_MEM,             "Used Mem" },
+    { EventId::LOAD_AVG,             "Load Avg" },
+    { EventId::CPU_TEMP,             "Cpu Temp" },
     { EventId::UNKNOWN,              "Unknown" }
 };
 

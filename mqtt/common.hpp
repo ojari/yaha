@@ -20,10 +20,18 @@ enum class EventId {
   WEEKDAY,
   SUNRISE,
   SUNSET,
+
   BUTTON_LIVING_ROOM,
   BUTTON_LIBRARY,
   SWITCH_AUTO_TALLI,
   SWITCH_AUTO_ULKO,
+ 
+  PROC_MEM, // hardware_info
+  USED_MEM,
+  LOAD_AVG,
+  CPU_TEMP,
+
+
   UNKNOWN
 };
 
