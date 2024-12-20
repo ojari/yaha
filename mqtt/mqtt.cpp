@@ -22,6 +22,23 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
     }
 }
 
+void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
+    if (topic == "zigbee2mqtt/bridge/devices") {
+        // spdlog::info("Bridge log: {}", payload);
+        std::ofstream file("payload.json");
+        if (file.is_open()) {
+            file << payload;
+            file.close();
+            spdlog::info("Payload saved to payload.json");
+        } else {
+            spdlog::error("Unable to open file payload.json for writing");
+        }
+    } else {
+        // spdlog::error("Unknown bridge topic: {}", topic);
+    }
+}
+
+
 
 void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
 {
@@ -35,7 +52,17 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     std::string topic {topicName};
     int slashCount = std::count(topic.begin(), topic.end(), '/');
 
+    if (topic.find("/bridge") != std::string::npos) {
+        auto* router = static_cast<MessageRouter*>(context);
+        router->bridge_msg(topic, payload);
+        MQTTClient_freeMessage(&message);
+        MQTTClient_free(topicName);
+        return 1;
+    }
+
     if (slashCount != 1) {
+        MQTTClient_freeMessage(&message);
+        MQTTClient_free(topicName);
         return 1;
     }
     // spdlog::info("Message arrived");
@@ -55,6 +82,7 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     MQTTClient_free(topicName);
     return 1;
 }
+
 void mqtt_connlost(void *context, char *cause)
 {
     spdlog::error("Connection lost cause: {}", cause);

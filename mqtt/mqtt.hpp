@@ -13,6 +13,8 @@ public:
 
     void route(std::string& deviceName, std::string& payload);
 
+    void bridge_msg(std::string& topic, std::string& payload);
+
 private:
     device::Registry* deviceRegistry;
     bool verbose = false;
