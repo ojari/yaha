@@ -16,7 +16,14 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
         }
 
         json jsonPayload = json::parse(payload);
-        device->on_message(deviceName, jsonPayload);
+        try {
+            device->on_message(deviceName, jsonPayload);
+        } catch (const nlohmann::json::parse_error& e) {
+            spdlog::error("Json parse error: {}", e.what());
+        } catch (const nlohmann::json::type_error& e) {
+            spdlog::error("Json type error: {}", e.what());
+            spdlog::error("Device: {} Payload: {}", deviceName, payload);
+        }
     } else {
         spdlog::error("Missing topic: {} Payload: {}", deviceName, payload);
     }

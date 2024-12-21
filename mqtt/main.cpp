@@ -58,7 +58,7 @@ int main() {
     //auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 #ifndef WIN32
-    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("switch_device", LOG_PID, LOG_USER, true);
+    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("yaha", LOG_PID, LOG_USER, true);
     spdlog::sinks_init_list sink_list = { syslog_sink, console_sink };
 #else
     spdlog::sinks_init_list sink_list = { console_sink };

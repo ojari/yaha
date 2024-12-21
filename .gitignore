@@ -37,6 +37,8 @@ doc/C4*.puml
 etc/
 vcpkg_installed/
 vs/.vs/
+_build_arm/
+_build/
 
 # .vscode/settings.json
 build
