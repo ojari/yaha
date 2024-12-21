@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "observable.hpp"
 #include <fstream>
 #include <spdlog/spdlog.h>
 
@@ -10,7 +11,7 @@ class LoadAverageReader {
 public:
     LoadAverageReader(const std::string& loadavgFilePath = "/proc/loadavg")
         : loadavgFilePath_(loadavgFilePath),
-        load1_(EventId::LOAD_AVG, 0.0f) {}
+        load(EventId::LOAD_AVG, 0.0f) {}
 
     bool Read() {
         std::ifstream loadavgFile(loadavgFilePath_);
@@ -25,16 +26,16 @@ public:
         loadavgFile >> load1 >> load5 >> load15;
         loadavgFile.close();
 
-        load1_.set(load1);
+        load.set(load5);
         return true;
     }
 
     float getLoad() const { 
-        return load1_.getFloat();
+        return load.getFloat();
     }
 
 private:
-    EventData load1_;
+    EventData load;
     std::string loadavgFilePath_;
 };
 
@@ -90,7 +91,7 @@ private:
 //-----------------------------------------------------------------------------
 #include <unistd.h>
 
-class ProcessMemoryReader {
+class ProcessMemoryReader : public Observable {
 public:
     ProcessMemoryReader()
         : statusFilePath_("/proc/" + std::to_string(getpid()) + "/status") {}
@@ -105,20 +106,25 @@ public:
         std::string line;
         while (std::getline(statusFile, line)) {
             if (line.find("VmRSS:") == 0) {
-                sscanf(line.c_str(), "VmRSS: %lu kB", &vmRSS);
-            } else if (line.find("VmSwap:") == 0) {
-                sscanf(line.c_str(), "VmSwap: %lu kB", &vmSwap);
+                long value = 0;
+                sscanf(line.c_str(), "VmRSS: %lu kB", &value);
+                update(value);
             }
         }
         statusFile.close();
         return true;
     }
 
-    unsigned long getVmRSS() const { return vmRSS; }
-    unsigned long getVmSwap() const { return vmSwap; }
+    unsigned int getVmRSS() const { return vmRss.getInt(); }
 
 private:
-    unsigned long vmRSS;
-    unsigned long vmSwap;
+    void update(float value) {
+        if (vmRss.getInt() != value) {
+            vmRss.set(value);
+            notify(vmRss);
+        }
+    }
+
+    EventData vmRss {EventId::PROC_MEM, 0};
     std::string statusFilePath_;
 };

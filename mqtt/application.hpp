@@ -49,14 +49,14 @@ protected:
 //-----------------------------------------------------------------------------
 struct TimerSlow : public TimerBase {
     TimerSlow(Application& app) :
-        TimerBase(app, 1000)
+        TimerBase(app, 5*60000)
     {
         timer.data = this;
     }
 
     void onTimer() override {
-        counter++;
-        if (counter % 10 == 0) {
+        //counter++;
+        //if (counter % 10 == 0) {
             loadAvgReader.Read();
             memUsageReader.Read();
             procMemReader.Read();
@@ -66,7 +66,7 @@ struct TimerSlow : public TimerBase {
                 procMemReader.getVmRSS(),
                 memUsageReader.getTotalMem()/1024,
                 memUsageReader.getUsedMem()/1024);
-        }
+        //}
     }
 
 private:
@@ -80,7 +80,7 @@ private:
 //-----------------------------------------------------------------------------
 struct TimerFast : public TimerBase {
     TimerFast(Application& app) :
-        TimerBase(app, 500)
+        TimerBase(app, 1000)
     {
         timer.data = this;
     }
