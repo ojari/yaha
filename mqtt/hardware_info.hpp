@@ -115,7 +115,9 @@ public:
         return true;
     }
 
-    unsigned int getVmRSS() const { return vmRss.getInt(); }
+    unsigned int getVmRSS() const {
+        return vmRss.getInt(-1);
+    }
 
 private:
     void update(float value) {

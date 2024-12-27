@@ -29,7 +29,10 @@ public:
         return type;
     }
 
-    int getInt() const override {
+    int getInt(int default_val = -1) const override {
+        if (!isInteger) {
+            return default_val;
+        }
         return std::get<int>(value);
     }
 

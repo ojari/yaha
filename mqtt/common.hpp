@@ -31,7 +31,6 @@ enum class EventId {
   LOAD_AVG,
   CPU_TEMP,
 
-
   UNKNOWN
 };
 
@@ -44,7 +43,7 @@ public:
 
     virtual  std::string name() const = 0;
     virtual EventId id() const = 0;
-    virtual int getInt() const = 0;
+    virtual int getInt(int default_val = -1) const = 0;
     virtual float getFloat() const = 0;
     virtual bool isInt() const = 0;
     virtual void setv(IEventData &item) = 0;
