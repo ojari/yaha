@@ -71,4 +71,8 @@ target_link_libraries(${PROJECT_NAME}
  #   redis++
 )
 
+if(DEFINED DEBUG_TIME)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_TIME)
+endif()
+
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)

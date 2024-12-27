@@ -47,6 +47,8 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// 5 minutes timer
+//
 struct TimerSlow : public TimerBase {
     TimerSlow(Application& app) :
         TimerBase(app, 5*60000)
@@ -61,11 +63,11 @@ struct TimerSlow : public TimerBase {
             memUsageReader.Read();
             procMemReader.Read();
 
-            spdlog::info("Load: 1m: {}, proc mem: {}, Memory total: {}, used: {}", 
+            spdlog::info("Load: {}, proc mem: {}, Memory: {} / {}", 
                 loadAvgReader.getLoad(), 
                 procMemReader.getVmRSS(),
-                memUsageReader.getTotalMem()/1024,
-                memUsageReader.getUsedMem()/1024);
+                memUsageReader.getUsedMem()/1024,
+                memUsageReader.getTotalMem()/1024);
         //}
     }
 
@@ -78,20 +80,27 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+// One minute timer
+//
+#ifdef DEBUG_TIME
+const int TIMER_INTERVAL = 20;
+#else
+const int TIMER_INTERVAL = 60000;
+#endif
+
 struct TimerFast : public TimerBase {
-    TimerFast(Application& app) :
-        TimerBase(app, 1000)
+    TimerFast(Application& app, TaskManager& taskManager) :
+        TimerBase(app, TIMER_INTERVAL),
+        taskManager(taskManager)
     {
         timer.data = this;
     }
 
     void onTimer() override {
-        counter++;
-        if (counter % 4 == 0) {
-            //spdlog::info("TimerFast b: {}", counter);
-        }
+        taskManager.execute();
     }
 
 private:
-    int counter = 0;
+    TaskManager &taskManager;
 };
+

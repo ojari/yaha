@@ -90,7 +90,7 @@ int main() {
 
     Application app;
     TimerSlow timer1(app);
-    TimerFast timer2(app);
+    TimerFast timer2(app, taskManager);
 
     app.run();
 

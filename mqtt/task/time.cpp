@@ -3,7 +3,7 @@
 
 namespace task {
 
-void TaskTime::incrementTime(int minutes) {
+void TaskDebugTime::incrementTime(int minutes) {
     minute += minutes;
     if (minute >= 60) {
         hour += minute / 60;

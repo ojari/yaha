@@ -13,6 +13,10 @@ struct TaskManager : public IEventManager {
 
 private:
     task::TaskTemperature temperature;
+#ifdef DEBUG_TIME
+    task::TaskDebugTime time;
+#else
     task::TaskTime time;
+#endif
     task::TaskCalcPrice price;
 };
