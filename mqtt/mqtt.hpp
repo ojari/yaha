@@ -25,7 +25,7 @@ class Mqtt : public ITask, public IOutput {
 public:
     explicit Mqtt();
     void execute() override;
-    void send(const std::string& topic, const std::string& message) override;
+    void send(std::string_view topic, const std::string& message) override;
 
     IEventManager* getEventManager() {
         return &deviceRegistry;

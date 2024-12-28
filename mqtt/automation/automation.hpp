@@ -24,6 +24,12 @@ struct Automation : public IObserver {
 
     virtual void registerEvents(IEventManager& evman) = 0;
 
+    virtual std::string toString() {
+        std::string str_value = get() ? "ON" : "OFF";
+        std::string result = "{\"state\": \"" + str_value + "\"}";
+        return result;
+    }
+
     bool get() const {
         return std::get<bool>(state);
     }

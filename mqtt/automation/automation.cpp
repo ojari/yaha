@@ -13,21 +13,21 @@ void Automation::initial_value(bool value) {
 
 void Automation::set(int value) {
     if (value != std::get<int>(state)) {
-        actuator->set(name, value);
+        state = value;
+        actuator->set(name, toString());
         if (verbose) {
             spdlog::info("{} changed to {}", name, value);
         }
-        state = value;
     }
 }
 
 void Automation::set(bool value) {
     if (value != std::get<bool>(state)) {
-        actuator->set(name, value);
+        state = value;
+        actuator->set(name, toString());
         if (verbose) {
             spdlog::info("{} changed to {}", name, value);
         }
-        state = value;
     }
 }
 

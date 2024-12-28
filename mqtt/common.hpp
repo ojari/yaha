@@ -9,7 +9,7 @@ extern int timeAdd(int time, int minutes);
 struct IOutput {
     virtual ~IOutput() = default;
 
-    virtual void send(const std::string& topic, const std::string& message) = 0;
+    virtual void send(std::string_view topic, const std::string& message) = 0;
 };
 
 enum class EventId {

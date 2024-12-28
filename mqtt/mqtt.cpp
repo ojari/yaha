@@ -159,10 +159,18 @@ void Mqtt::execute() {
 */
 }
 
-void Mqtt::send(const std::string& topic, const std::string& payload) {
-/*    int rc = mosquitto_publish(mosq, NULL, topic.c_str(), payload.size(), payload.c_str(), 0, false);
-    if (rc) {
-        spdlog::error("Publish error: {}", mosquitto_strerror(rc));
+void Mqtt::send(std::string_view topic, const std::string& payload) {
+    int rc = 0;
+    MQTTClient_message pubmsg = MQTTClient_message_initializer;
+    // MQTTClient_deliveryToken token;
+
+    pubmsg.payload = const_cast<char*>(payload.c_str());
+    pubmsg.payloadlen = payload.size();
+    pubmsg.qos = 1;
+    pubmsg.retained = 0;
+
+    rc = MQTTClient_publishMessage(client, topic.data(), &pubmsg, NULL);
+    if (rc != MQTTCLIENT_SUCCESS) {
+        spdlog::error("Unable to publish: {}", rc);
     }
-    */
 }

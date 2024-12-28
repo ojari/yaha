@@ -6,20 +6,20 @@ class IActuator {
 public:
     virtual ~IActuator() = default;
 
-    virtual void set(std::string_view device, bool value) = 0;
+    virtual void set(std::string_view device, const std::string& value) = 0;
 };
 
 
 class Actuator : public IActuator, public IObserver {
 public:
-    explicit Actuator(const IOutput* output) : 
+    explicit Actuator(IOutput* output) : 
         output(output) 
     {}
-    void set(std::string_view device, bool value) override;
+    void set(std::string_view device, const std::string& value) override;
 
     void onChange(const IEventData& event) override;
     
 private:
-    const IOutput* output;
+    IOutput* output;
     int time {0};
 };

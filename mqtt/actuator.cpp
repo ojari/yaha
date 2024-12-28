@@ -7,8 +7,8 @@ void Actuator::onChange(const IEventData& event) {
     }   
 }
 
-void Actuator::set(std::string_view device, bool value) {
-    spdlog::info("{}: setting {} to {}",time2str(time), device, (value ? "on" : "off"));
+void Actuator::set(std::string_view device, const std::string& value) {
+    spdlog::info("{}: setting {} to {}",time2str(time), device, value);
 
-    // output->send(device, (value ? "on" : "off"));
+    output->send(device, value);
 }

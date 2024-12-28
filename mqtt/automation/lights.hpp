@@ -19,6 +19,8 @@ struct Lights : public Automation {
         evman.subscribe(EventId::TIME, *this);
     }
 
+    std::string toString() override;
+
     void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
