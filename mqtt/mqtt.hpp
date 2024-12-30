@@ -23,7 +23,7 @@ private:
 
 class Mqtt : public ITask, public IOutput {
 public:
-    explicit Mqtt();
+    explicit Mqtt(const std::string& filename);
     void execute() override;
     void send(std::string_view topic, const std::string& message) override;
 

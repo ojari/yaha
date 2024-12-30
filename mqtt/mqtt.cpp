@@ -30,6 +30,7 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 }
 
 void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
+#if 0
     if (topic == "zigbee2mqtt/bridge/devices") {
         // spdlog::info("Bridge log: {}", payload);
         std::ofstream file("payload.json");
@@ -43,8 +44,8 @@ void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
     } else {
         // spdlog::error("Unknown bridge topic: {}", topic);
     }
+#endif
 }
-
 
 
 void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
@@ -95,24 +96,14 @@ void mqtt_connlost(void *context, char *cause)
     spdlog::error("Connection lost cause: {}", cause);
 }
 
-/*void on_connect(struct mosquitto *mosq, void *obj, int result) {
-    if (!result) {
-        spdlog::info("Connected");
-        mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
-    } else {
-        spdlog::error("Connect failed: {}", result);
-    }
-}
-*/
-
 //------------------------------------------------------------------
-Mqtt::Mqtt() : 
+Mqtt::Mqtt(const std::string& filename) : 
     messageRouter(&deviceRegistry)
 {
     int rc = 0;
     const char* hostname = getenv("RPI_HOST");
 
-    deviceRegistry.load("devices.json");
+    deviceRegistry.load(filename);
 
     if (hostname == nullptr) {
         spdlog::error("Missing RPI_HOST environmental variable");

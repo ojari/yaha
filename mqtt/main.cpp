@@ -52,7 +52,7 @@ private:
 /**
  * @brief The main function of the program.
  */
-int main() {
+int main(int argc, char* argv[]) {
     // initialize logging
     //
     //auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
@@ -63,26 +63,32 @@ int main() {
 #else
     spdlog::sinks_init_list sink_list = { console_sink };
 #endif
-
     
     auto logger = std::make_shared<spdlog::logger>("yaha", sink_list.begin(), sink_list.end());
     logger->set_pattern("%H:%M:%S %L %^%v%$");
     spdlog::set_default_logger(logger);
 
-    // spdlog::info("this is info message");
-    // spdlog::warn("this is warning message");
-    // spdlog::error("this is error message");
+    // read filenames from command line
+    std::string devicesFile = "devices.json";
+    std::string automationFile = "automation.json";
+
+    if (argc > 1) {
+        devicesFile = argv[1];
+    }
+    if (argc > 2) {
+        automationFile = argv[2];
+    }
 
     // initialize system
     //
-    auto mqtt = std::make_unique<Mqtt>();
+    auto mqtt = std::make_unique<Mqtt>(devicesFile);
     auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));
     TaskManager taskManager;
     automation::Registry automations(actuator);
     DebugOutput debugOutput;
     DualEventManager evManager(&taskManager, mqtt->getEventManager());
 
-    automations.load("automation.json", evManager);
+    automations.load(automationFile, evManager);
 
     debugOutput.registerEvents(evManager);
 
@@ -93,14 +99,6 @@ int main() {
     TimerFast timer2(app, taskManager);
 
     app.run();
-
-  /*  while (true) {
-        mqtt->execute();
-        taskManager.execute();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    }
-*/
 
     return 0;
 }
