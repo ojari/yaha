@@ -26,7 +26,10 @@ struct DebugOutput : public IObserver {
         evManager.subscribe(EventId::TIME, *this);
         evManager.subscribe(EventId::BUTTON_LIBRARY, *this);
         evManager.subscribe(EventId::BUTTON_LIVING_ROOM, *this);
-       
+        evManager.subscribe(EventId::SWITCH_AUTO_TALLI, *this);
+        evManager.subscribe(EventId::SWITCH_AUTO_ULKO, *this);
+        evManager.subscribe(EventId::SWITCH_VARASTO, *this);
+        evManager.subscribe(EventId::SWITCH_PC_POWER, *this);
     }
 
 private:
