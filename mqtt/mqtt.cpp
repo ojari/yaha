@@ -50,7 +50,7 @@ void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
 
 void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
 {
-    spdlog::info("Message with token value {} delivery confirmed", dt);
+    // spdlog::info("Message with token value {} delivery confirmed", dt);
     //deliveredtoken = dt;
 }
 

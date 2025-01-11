@@ -7,7 +7,7 @@
         "nlohmann-json",
         "tinyxml2",
         "sqlite3",
-        "cpp-httplib",
+        { "name": "cpp-httplib", "features": ["openssl"] },
         "paho-mqtt",
         "libuv",
         "curl"

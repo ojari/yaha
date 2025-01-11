@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(yaha)
-add_subdirectory(mqtt)
 
-project(weather)
-add_subdirectory(weather)
+# Use CMAKE_BUILD_TYPE
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+endif()
+
+add_subdirectory(mqtt)
+#add_subdirectory(asus)
+#add_subdirectory(weather)
+#add_subdirectory(spot)
 
 enable_testing()
-project(test)
 add_subdirectory(test)

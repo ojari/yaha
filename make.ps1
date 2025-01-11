@@ -89,6 +89,10 @@ switch ($Do) {
   "Export" {
     $target = $env:TARGET_HOST
     write-host "Export to $target"
+    Set-Location "etc"
+    ./make_cfg.ps1
+    Set-Location ".."
+  
     scp _build_arm/mqtt/Debug/yaha pi@${target}:
     scp etc/gen_devices.json pi@${target}:devices.json
     scp etc/gen_automation.json pi@${target}:automation.json

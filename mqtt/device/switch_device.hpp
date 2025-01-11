@@ -15,6 +15,9 @@ public:
             state = payload["state"].get<std::string>() == "ON";
         }
         else {
+            if (payload["action"].is_null()) {
+                return;
+            }
             const std::string& state_str = payload["action"].get<std::string>();
             if (state_str == "on") {
                 state = true;

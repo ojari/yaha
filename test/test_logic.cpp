@@ -6,7 +6,7 @@
 
 class TestActuator : public IActuator {
 public:
-    void set(std::string_view device, bool value) override {
+    void set(std::string_view device, const std::string& value) override {
         //this->device = device;
         //this->value = value;
     }

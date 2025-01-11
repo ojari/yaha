@@ -57,26 +57,21 @@ struct TimerSlow : public TimerBase {
     }
 
     void onTimer() override {
-        //counter++;
-        //if (counter % 10 == 0) {
-            loadAvgReader.Read();
-            memUsageReader.Read();
-            procMemReader.Read();
+        loadAvgReader.Read();
+        memUsageReader.Read();
+        procMemReader.Read();
 
-            spdlog::info("Load: {}, proc mem: {}, Memory: {} / {}", 
-                loadAvgReader.getLoad(), 
-                procMemReader.getVmRSS(),
-                memUsageReader.getUsedMem()/1024,
-                memUsageReader.getTotalMem()/1024);
-        //}
+        /*spdlog::info("Load: {}, proc mem: {}, Memory: {} / {}", 
+            loadAvgReader.getLoad(), 
+            procMemReader.getVmRSS(),
+            memUsageReader.getUsedMem()/1024,
+            memUsageReader.getTotalMem()/1024); */
     }
 
 private:
     LoadAverageReader loadAvgReader;
     MemoryUsageReader memUsageReader;
     ProcessMemoryReader procMemReader;
-
-    int counter = 0;
 };
 
 //-----------------------------------------------------------------------------
