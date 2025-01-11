@@ -22,6 +22,9 @@ struct Automation : public IObserver {
         name(name)
     {}
 
+    virtual void setArg(const std::string& name, const std::string& value) {
+    }
+    
     virtual void registerEvents(IEventManager& evman) = 0;
 
     virtual std::string toString() {
@@ -31,6 +34,10 @@ struct Automation : public IObserver {
     }
 
     bool get() const {
+        if (std::holds_alternative<int>(state)) {
+            return std::get<int>(state) != 0;
+        }
+
         return std::get<bool>(state);
     }
 

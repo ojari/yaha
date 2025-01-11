@@ -15,6 +15,7 @@ void Lights::onChange(const IEventData& event) {
 
 std::string Lights::toString() {
     std::string str_value = get() ? "ON" : "OFF";
+    //std::string result = "{\"state\": \"" + str_value + "\", \"brightness\": 200}";
     std::string result = "{\"state\": \"" + str_value + "\"}";
     return result;
 }

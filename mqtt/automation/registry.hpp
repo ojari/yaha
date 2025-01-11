@@ -33,24 +33,9 @@ public:
     void add(
         IEventManager& evman,
         const std::string& name,
-        AutomationType type,
-        const std::vector<int>& args)
+        AutomationType type)
     {
-        auto ctrl = create(name, type, args);
-        ctrl->registerEvents(evman);
-        controllers.push_back(ctrl);
-    }
-
-
-    void add(
-        IEventManager& evman,
-        const ConfigController& output)
-    {
-        std::vector<int> args = {output.time1, output.time2};
-        auto ctrl = create(
-            output.name,
-            toAutomationType(output.type),
-            args);
+        auto ctrl = create(name, type);
         ctrl->registerEvents(evman);
         controllers.push_back(ctrl);
     }
@@ -71,8 +56,7 @@ private:
 
     std::shared_ptr<Automation> create(
         const std::string& name,
-        AutomationType type,
-        const std::vector<int>& args) const;
+        AutomationType type) const;
 
 };
 

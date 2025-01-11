@@ -13,8 +13,10 @@ struct SwitchLight : public Automation  {
         initial_value(0);
     }
 
+    void setArg(const std::string& name, const std::string& value) override;
+	
     void registerEvents(IEventManager& evman) override {
-        evman.subscribe(EventId::TIME, *this);
+        evman.subscribe(buttonEvent, *this);
     }
 
     void onChange(const IEventData& event) override;
@@ -25,7 +27,11 @@ struct SwitchLight : public Automation  {
     {
         return std::make_shared<SwitchLight>(actuator, name);
     }
+
 private:
+    EventId buttonEvent;
+    int mode;
+    bool current = false;
 };
 
 }
