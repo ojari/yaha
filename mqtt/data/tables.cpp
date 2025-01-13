@@ -77,19 +77,13 @@ void dataFromHeader(const DataHeader& header, DataElPrice& data) {
 //-----------------------------------------------------------------------------
 void dataToHeader(DataHeader& header, const DataHistory& data) {
     header.setValue("epoch", data.epoch);
-    header.setValue("device", data.device);
-    header.setValue("type", static_cast<int>(data.type));
-    header.setValue("val1", data.val1);
-    header.setValue("val2", data.val2);
-    header.setValue("val3", data.val3);
+    header.setValue("event", static_cast<int>(data.event));
+    header.setValue("val",  data.val);
 }
 void dataFromHeader(const DataHeader& header, DataHistory& data) {
     data.epoch = header.getValue<int>("epoch");
-    data.device = header.getValue<std::string>("device");
-    data.type = static_cast<DataType>(header.getValue<int>("type"));
-    data.val1 = header.getValue<int>("val1");
-    data.val2 = header.getValue<int>("val2");
-    data.val3 = header.getValue<int>("val3");
+    data.event = static_cast<EventId>(header.getValue<int>("event"));
+    data.val = header.getValue<int>("val");
 }
 
 //-----------------------------------------------------------------------------

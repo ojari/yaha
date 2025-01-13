@@ -125,11 +125,8 @@ class TableHistory : public DataHeader {
 public:
     TableHistory() : DataHeader("History") {
         add(DataValue("epoch", 0L));
-        add(DataValue("device", ""));
-        add(DataValue("type", 0));
-        add(DataValue("val1", 0));
-        add(DataValue("val2", 0));
-        add(DataValue("val3", 0));
+        add(DataValue("event", 0));
+        add(DataValue("val", 0));
     }
 };
 extern void dataToHeader(DataHeader& header, const DataHistory& data);

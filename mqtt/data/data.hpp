@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../common.hpp"
 
 struct BaseData {
     long epoch;
@@ -57,34 +58,19 @@ struct DataElPrice : public BaseData {
     {}
 };
 
-enum class DataType {
-    LIGHT = 0,
-    SWITCH = 1,
-    TEMPERATURE = 2
-};
-
 struct DataHistory : public BaseData {
-    std::string device;
-    DataType type;
-    int val1;
-    int val2;
-    int val3;
+    EventId event;
+    int val;
 
     DataHistory() :
         BaseData{0},
-        device{"unknown"},
-        type{DataType::LIGHT},
-        val1{0},
-        val2{0},
-        val3{0}
+        event{EventId::UNKNOWN},
+        val{0}
     {}
-    DataHistory(long time, const std::string& dev, DataType type, int v1, int v2, int v3) :
+    DataHistory(long time, const EventId& ev, int v1) :
         BaseData{time},
-        device{dev},
-        type{type},
-        val1{v1},
-        val2{v2},
-        val3{v3}
+        event{ev},
+        val{v1}
     {}
 };
 
