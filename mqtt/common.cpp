@@ -21,6 +21,8 @@ EventIdString eventNames[] = {
     { EventId::SWITCH_AUTO_ULKO,     "Switch Auto Ulko" },
     { EventId::SWITCH_VARASTO,       "Switch Varasto" },
     { EventId::SWITCH_PC_POWER,      "Switch PC Power" },
+    { EventId::LAMP_LIVING_ROOM,     "Lamp Living Room" },
+    { EventId::LAMP_LIBRARY,         "Lamp Library" },
     { EventId::PROC_MEM,             "Process Mem" },
     { EventId::USED_MEM,             "Used Mem" },
     { EventId::LOAD_AVG,             "Load Avg" },

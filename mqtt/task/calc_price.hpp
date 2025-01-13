@@ -9,8 +9,12 @@ public:
     explicit TaskCalcPrice() = default;
 
     void execute() override {
-        price.set(5);
-        notify(price);
+        const int newPrice = 5;
+
+        if (price.getInt() != newPrice) {
+            price.set(newPrice);
+            notify(price);
+        }
     }
 private:
     EventData price {EventId::ELECTRICITY_PRICE, 10};

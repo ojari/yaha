@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   common.cpp
   actuator.cpp
+  history.cpp
   task_manager.cpp
   automation/registry.cpp
   automation/automation.cpp

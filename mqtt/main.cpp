@@ -1,8 +1,11 @@
 #include "mqtt.hpp"
 #include "common.hpp"
+#include "data/sourcesqlite.hpp"
+#include "data/tables.hpp"
 #include "task_manager.hpp"
 #include "actuator.hpp"
 #include "debug_output.hpp"
+#include "history.hpp"
 #include "automation/registry.hpp"
 #include "application.hpp"
 #include <map>
@@ -74,10 +77,27 @@ int main(int argc, char* argv[]) {
 
     if (argc > 1) {
         devicesFile = argv[1];
+
+        if (devicesFile == "create") {
+            sqlite3* db = createDatabase("data_yaha.db");
+            SourceSqlite source(db);
+            TableHistory tableHistory;
+
+            source.createTable(tableHistory);
+            return 0;
+        }
     }
     if (argc > 2) {
         automationFile = argv[2];
     }
+
+    // database initialization
+    //
+    sqlite3* db = createDatabase("data_yaha.db");
+    SourceSqlite source(db);
+    TableHistory tableHistory;
+
+    source.createSql(tableHistory);
 
     // initialize system
     //
@@ -86,11 +106,13 @@ int main(int argc, char* argv[]) {
     TaskManager taskManager;
     automation::Registry automations(actuator);
     DebugOutput debugOutput;
+    History history(source);
     DualEventManager evManager(&taskManager, mqtt->getEventManager());
 
     automations.load(automationFile, evManager);
 
     debugOutput.registerEvents(evManager);
+    history.registerEvents(evManager);
 
     evManager.subscribe(EventId::TIME, *actuator);
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <sqlite3.h>
+#include <spdlog/spdlog.h>
 #include <functional>
 #include "tables.hpp"
 
@@ -11,7 +12,10 @@ public:
 class SqlInsert {
 public:
     SqlInsert(sqlite3* db, const char* sql) {
-        sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        int err = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to prepare statement: {}", sqlite3_errmsg(db));
+        }
     }
 
     ~SqlInsert() {
@@ -20,22 +24,34 @@ public:
     }
 
     void add(long value) {
-        sqlite3_bind_int64(stmt, index, value);
+        int err = sqlite3_bind_int64(stmt, index, value);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to bind value: {}", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        }
         index++;
     }
 
     void add(int value) {
-        sqlite3_bind_int(stmt, index, value);
+        int err = sqlite3_bind_int(stmt, index, value);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to bind value: {}", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        }
         index++;
     }
 
     void add(float value) {
-        sqlite3_bind_double(stmt, index, value);
+        int err = sqlite3_bind_double(stmt, index, value);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to bind value: {}", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        }
         index++;
     }
 
     void add(const std::string& value) {
-        sqlite3_bind_text(stmt, index, value.c_str(), -1, SQLITE_TRANSIENT);
+        int err = sqlite3_bind_text(stmt, index, value.c_str(), -1, SQLITE_TRANSIENT);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to bind value: {}", sqlite3_errmsg(sqlite3_db_handle(stmt)));
+        }
         index++;
     }
 private:
@@ -148,7 +164,7 @@ public:
     }
 
     std::string insertSql(IDataHeader& header) const {
-        std::string output = "INSERT INFO ";
+        std::string output = "INSERT INTO ";
         output.append(header.getTableName());
         output.append("(");
 
@@ -185,10 +201,21 @@ public:
     SqlIterator begin(DataHeader& header) {
         std::string sql = selectSql(header);
         sqlite3_stmt* stmt;
-        sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+        int err = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to prepare statement: {}", sqlite3_errmsg(db));
+        }
         return SqlIterator(stmt, header);
     }
 
+    void createTable(IDataHeader& header) {
+        std::string sqlStr = createSql(header);
+        int err = sqlite3_exec(db, sqlStr.c_str(), nullptr, nullptr, nullptr);
+        if (err != SQLITE_OK) {
+            spdlog::error("Failed to create table: {}", sqlite3_errmsg(db));
+            // throw SqlException("Failed to create table");
+        }
+    }
 
     void insert(IDataHeader& header) {
         std::string sqlStr = insertSql(header);

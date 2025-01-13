@@ -27,6 +27,9 @@ enum class EventId {
   SWITCH_AUTO_ULKO,
   SWITCH_VARASTO,
   SWITCH_PC_POWER,
+
+  LAMP_LIVING_ROOM,
+  LAMP_LIBRARY,
  
   PROC_MEM, // hardware_info
   USED_MEM,
