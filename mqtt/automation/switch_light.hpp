@@ -16,7 +16,9 @@ struct SwitchLight : public Automation  {
     void setArg(const std::string& name, const std::string& value) override;
 	
     void registerEvents(IEventManager& evman) override {
-        evman.subscribe(buttonEvent, *this);
+        if (buttonEvent != EventId::UNKNOWN) {
+            evman.subscribe(buttonEvent, *this);
+        }
     }
 
     void onChange(const IEventData& event) override;

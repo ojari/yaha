@@ -24,13 +24,25 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
             std::string name = automationData["name"].get<std::string>();
             const std::string type = automationData["type"].get<std::string>();
 
+            if (!type.empty() && type[0] == '#') {
+                continue;
+            }
+
             auto ctrl = create(name, toAutomationType(type));
 
             for (auto it = automationData.begin(); it != automationData.end(); ++it) {
                 if (it.key() != "name" && 
                     it.key() != "type") 
                 {
-                    ctrl->setArg(it.key(), it.value().dump());
+                    if (it.value().is_string()) {
+                        ctrl->setArg(it.key(), it.value().get<std::string>());
+                    }
+                    else if (it.value().is_number()) {
+                        ctrl->setArg(it.key(), std::to_string(it.value().get<int>()));
+                    }
+                    else {
+                        spdlog::warn("Expected string type for key: {}, but got different type", it.key());
+                    }
                 }
             }
 
