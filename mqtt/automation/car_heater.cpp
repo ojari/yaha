@@ -8,7 +8,8 @@ void CarHeater::onChange(const IEventData& event) {
         int startTime = timeAdd(leaveTime, -offset);
         if ((time >= startTime) && time < leaveTime) {
             set(true);
-        } else {
+        }
+        else {
             set(false);
         }
     }
@@ -24,13 +25,17 @@ void CarHeater::onChange(const IEventData& event) {
 int CarHeater::calculateDuration(float temperature) const {
     if (temperature < -20.0f) {
         return 120;
-    } else if (temperature < -10.0f) {
+    }
+    else if (temperature < -10.0f) {
         return 90;
-    } else if (temperature < -5.0f) {
+    }
+    else if (temperature < -5.0f) {
         return 60;
-    } else if (temperature < 5.0f) {
+    }
+    else if (temperature < 5.0f) {
         return 30;
-    } else {
+    }
+    else {
         return 0;
     }
 }

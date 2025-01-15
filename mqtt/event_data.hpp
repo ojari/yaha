@@ -70,11 +70,20 @@ public:
     }
 
     void set(int aValue) override {
-        this->value = aValue;
+        if (std::holds_alternative<int>(value)) {
+            value = aValue;
+        } else {
+            value = static_cast<float>(aValue);
+        }
         isInteger = true;
     }
 
     void set(float aValue) override {
+        if (std::holds_alternative<float>(value)) {
+            value = aValue;
+        } else {
+            value = static_cast<int>(aValue);
+        }
         this->value = aValue;
         isInteger = false;
     }

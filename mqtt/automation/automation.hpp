@@ -7,6 +7,8 @@
 
 namespace automation {
 
+const int NAN_VALUE = -1;
+
 enum AutomationType {
     LIGHTS,
     SWITCH,
@@ -42,6 +44,9 @@ struct Automation : public IObserver {
     }
 
     int getInt() const {
+        if (std::holds_alternative<bool>(state)) {
+            return std::get<bool>(state);
+        }
         return std::get<int>(state);
     }
 

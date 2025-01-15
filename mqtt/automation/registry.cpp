@@ -51,7 +51,8 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
         }
 
         ifile.close();
-    } else {
+    }
+    else {
         spdlog::error("Error opening {}", filename);
     }
 }

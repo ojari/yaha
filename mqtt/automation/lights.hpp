@@ -21,17 +21,7 @@ struct Lights : public Automation {
         initial_value(false);
     }
 
-    void setArg(const std::string& name, const std::string& value) override {
-        if (name == "on") {
-            onTime = std::stoi(value);
-        }
-        else if (name == "off") {
-            offTime = std::stoi(value);
-        }
-        else {
-            throw std::runtime_error("Unknown argument: " + name);
-        }
-    }
+    void setArg(const std::string& name, const std::string& value) override;
 
     void registerEvents(IEventManager& evman) override {
         evman.subscribe(EventId::TIME, *this);
@@ -50,6 +40,7 @@ struct Lights : public Automation {
 private:
     int onTime = -1;
     int offTime = -1;
+    int brightness = NAN_VALUE;
 };
 
 }

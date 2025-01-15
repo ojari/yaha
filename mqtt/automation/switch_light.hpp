@@ -14,11 +14,12 @@ struct SwitchLight : public Automation  {
     }
 
     void setArg(const std::string& name, const std::string& value) override;
-	
+
+    std::string toString() override;
+
     void registerEvents(IEventManager& evman) override {
-        if (buttonEvent != EventId::UNKNOWN) {
-            evman.subscribe(buttonEvent, *this);
-        }
+        evman.subscribe(buttonEvent, *this);
+        evman.subscribe(lampEvent, *this);
     }
 
     void onChange(const IEventData& event) override;
@@ -31,8 +32,12 @@ struct SwitchLight : public Automation  {
     }
 
 private:
-    EventId buttonEvent;
-    int mode;
+    void toggleLight();
+    
+    EventId buttonEvent = EventId::UNKNOWN;
+    EventId lampEvent = EventId::UNKNOWN;
+    int mode = 0;
+    int brightness = NAN_VALUE;
     bool current = false;
 };
 
