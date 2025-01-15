@@ -2,6 +2,7 @@
 #include <uv.h>
 #include <spdlog/spdlog.h>
 #include "hardware_info.hpp"
+#include "config.hpp"
 
 
 struct Application {
@@ -51,7 +52,7 @@ protected:
 //
 struct TimerSlow : public TimerBase {
     TimerSlow(Application& app) :
-        TimerBase(app, 5*60000)
+        TimerBase(app, SLOW_TIMER_INTERVAL)
     {
         timer.data = this;
     }
@@ -77,15 +78,9 @@ private:
 //-----------------------------------------------------------------------------
 // One minute timer
 //
-#ifdef DEBUG_TIME
-const int TIMER_INTERVAL = 20;
-#else
-const int TIMER_INTERVAL = 60000;
-#endif
-
 struct TimerFast : public TimerBase {
     TimerFast(Application& app, TaskManager& taskManager) :
-        TimerBase(app, TIMER_INTERVAL),
+        TimerBase(app, FAST_TIMER_INTERVAL),
         taskManager(taskManager)
     {
         timer.data = this;
