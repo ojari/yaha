@@ -12,14 +12,20 @@ void History::onChange(const IEventData& value) {
 }
 
 void History::registerEvents(IEventManager &evman) {
-    evman.subscribe(EventId::TEMPERATURE, *this);
-    evman.subscribe(EventId::TEMPERATURE_ROOM, *this);
-    evman.subscribe(EventId::ELECTRICITY_PRICE, *this);
-    evman.subscribe(EventId::BUTTON_LIVING_ROOM, *this);
-    evman.subscribe(EventId::BUTTON_LIBRARY, *this);
-    evman.subscribe(EventId::LAMP_LIBRARY, *this);
-    evman.subscribe(EventId::LAMP_LIVING_ROOM, *this);
-    evman.subscribe(EventId::SWITCH_AUTO_TALLI, *this);
-    evman.subscribe(EventId::SWITCH_AUTO_ULKO, *this);
+    const std::array<EventId, 9> events = {
+        EventId::TEMPERATURE,
+        EventId::TEMPERATURE_ROOM,
+        EventId::ELECTRICITY_PRICE,
+        EventId::BUTTON_LIVING_ROOM,
+        EventId::BUTTON_LIBRARY,
+        EventId::LAMP_LIBRARY,
+        EventId::LAMP_LIVING_ROOM,
+        EventId::SWITCH_AUTO_TALLI,
+        EventId::SWITCH_AUTO_ULKO
+    };
+
+    for (const auto& event : events) {
+        evman.subscribe(event, *this);
+    }
 }
 

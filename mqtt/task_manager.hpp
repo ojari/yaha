@@ -7,6 +7,10 @@
 struct TaskManager : public IEventManager {
     TaskManager() = default;
 
+    void initialize() {
+        time.initialize();
+    }
+
     void execute();
 
     bool subscribe(EventId eventId, IObserver& observer) override;

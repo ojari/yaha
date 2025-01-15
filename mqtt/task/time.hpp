@@ -11,6 +11,10 @@ class TaskTime : public Observable, public ITask {
 public:
     explicit TaskTime() = default;
 
+    void initialize() override {
+        execute();
+    }
+
     void execute() override {
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
@@ -32,7 +36,7 @@ protected:
         notify(time);
     }
     int hour {0};
-    int minute {0};
+    int minute {1};
     int weekday {0};
 
 private:
@@ -43,6 +47,11 @@ private:
 class TaskDebugTime : public TaskTime {
 public:
     explicit TaskDebugTime() = default;
+
+    void initialize() override {
+        sendNotification(hour, minute);
+
+    }
 
     void execute() override {
         incrementTime(1);

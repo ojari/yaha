@@ -77,6 +77,9 @@ struct DualEventManager : IEventManager {
     virtual ~DualEventManager() = default;
 
     bool subscribe(EventId eventId, IObserver& observer) {
+        if (eventId == EventId::UNKNOWN) {
+            return true;
+        }
         if (manager1->subscribe(eventId, observer) == false) {
             if (manager2->subscribe(eventId, observer) == false) {
                 return false;

@@ -109,6 +109,8 @@ int main(int argc, char* argv[]) {
     History history(source);
     DualEventManager evManager(&taskManager, mqtt->getEventManager());
 
+    taskManager.initialize();
+
     automations.load(automationFile, evManager);
 
     debugOutput.registerEvents(evManager);
