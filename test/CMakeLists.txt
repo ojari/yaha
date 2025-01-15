@@ -17,15 +17,16 @@ add_executable(${PROJECT_NAME}
   # test_collect.cpp
   test_time.cpp
   test_datas.cpp
-  test_sourcesqlite.cpp
+  #test_sourcesqlite.cpp
   #test_sourcestring.cpp
 
   ../mqtt/common.cpp
   ../mqtt/task/time.cpp
   ../mqtt/automation/lights.cpp
+  ../mqtt/automation/switch_light.cpp
   ../mqtt/automation/car_heater.cpp
   ../mqtt/automation/automation.cpp
-  ../mqtt/data/sourcesqlite.cpp
+  #../mqtt/data/sourcesqlite.cpp
   ../mqtt/data/sourcestring.cpp
   ../mqtt/data/tables.cpp
 )
