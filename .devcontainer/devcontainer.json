@@ -1,0 +1,18 @@
+{
+    "name": "ARM Debian Development",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:debian",
+    "runArgs": ["--platform", "linux/arm64"],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools"
+            ]
+         
+        }
+    },
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y build-essential gcc-arm-linux-gnueabi"
+  }
