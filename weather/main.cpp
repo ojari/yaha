@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <fstream>
 #include <ctime>
 #include <vector>
 // #include <httplib.h>
@@ -10,8 +11,9 @@
 
 using namespace std;
 
-extern void parse(const char* cache_file);
 
+extern void parse(const char* cache_file);
+extern void createWeather(const std::string& filename);
 
 //------------------------------------------------------------------------------
 // Helper function to write data received by curl to a string
@@ -20,7 +22,18 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     return size * nmemb;
 }
 
+//------------------------------------------------------------------------------
+class CreateDatabaseCommand : public ICommand {
+public:
+    CreateDatabaseCommand() :
+        ICommand("-c", "Create database.")
+    {}
 
+    void execute() override {
+        spdlog::info("command create database");
+        createWeather("data_yaha.db");
+    }
+};
 
 //------------------------------------------------------------------------------
 class DownloadCommand : public ICommand {
@@ -108,12 +121,14 @@ private:
     string cache_file;
 };
 
+
 //------------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
     string cache_file = "tmp_weather.xml";
 
     vector<shared_ptr<ICommand>> commands {
+        make_shared<CreateDatabaseCommand>(),
         make_shared<DownloadCommand>(cache_file),
         make_shared<ParseCommand>(cache_file)
     };
@@ -124,6 +139,13 @@ int main(int argc, char** argv)
             if (command->flag() == arg) {
                 command->execute();
             }
+        }
+    }
+    else {
+        cout << "Usage: weather <command>" << endl;
+        cout << "Commands:" << endl;
+        for (auto command : commands) {
+            cout << "  " << command->flag() << " - " << command->description() << endl;
         }
     }
     return 0;

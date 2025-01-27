@@ -20,14 +20,18 @@ struct DataTemperature : public BaseData {
 };
 
 struct DataWeather : public BaseData {
-    float temperature;
-    float humidity;
-    float pressure;
-    float windSpeed;
-    float windDirection;
-    float rain;
+    float temperature = 0.0;
+    float humidity = 0.0;
+    float pressure = 0.0;
+    float windSpeed = 0.0;
+    float windDirection = 0.0;
+    float rain = 0.0;
     float uv = 0.0;
     float solarRadiation = 0.0;
+
+    DataWeather(long time) :
+        BaseData(time)
+    {}
 
     DataWeather(long time, float temp, float hum, float press, float windSpd, float windDir, float r) :
         BaseData(time),
@@ -38,6 +42,30 @@ struct DataWeather : public BaseData {
         windDirection(windDir),
         rain(r)
     {}
+
+    void setTemperature(float value) {
+        temperature = value;
+    }
+
+    void setHumidity(float value) {
+        humidity = value;
+    }
+
+    void setPressure(float value) {
+        pressure = value;
+    }
+
+    void setWindSpeed(float value) {
+        windSpeed = value;
+    }
+
+    void setWindDirection(float value) {
+        windDirection = value;
+    }
+
+    void setRain(float value) {
+        rain = value;
+    }
 
     void setSolarRadiation(float value) {
         solarRadiation = value;

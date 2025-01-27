@@ -96,8 +96,8 @@ extern void dataFromHeader(const DataHeader& header, DataTemperature& data);
 
 class TableWeather : public DataHeader {
 public:
-    TableWeather() : DataHeader("Weather") {
-        add(DataValue("epoch", 0L));
+    TableWeather(long epoch = 0) : DataHeader("Weather") {
+        add(DataValue("epoch", epoch));
         add(DataValue("temperature", 0.0f));
         add(DataValue("humidity", 0.0f));
         add(DataValue("pressure", 0.0f));

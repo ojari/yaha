@@ -4,18 +4,13 @@
 #include <vector>
 #include <string>
 #include "../common/utils.hpp"
+#include "data/data.hpp"
+#include "data/tables.hpp"
+#include "data/sourcesqlite.hpp"
 
 using namespace tinyxml2;
 using namespace std;
 
-struct WeatherData {
-    long epoch;
-    double temperature;
-    double humidity;
-    double pressure;
-    double geopHeight;
-    double dewPoint;
-};
 
 //------------------------------------------------------------------------------
 void print_elements(XMLElement *element)
@@ -42,7 +37,7 @@ XMLElement *set_location(XMLElement *root, vector<string>& path)
 }
 
 //------------------------------------------------------------------------------
-void parseEpoch(string buffer, vector<WeatherData>& data)
+void parseEpoch(string buffer, vector<DataWeather>& data)
 {
     istringstream sstream(buffer);
     string line;
@@ -55,12 +50,13 @@ void parseEpoch(string buffer, vector<WeatherData>& data)
             
             linestream >> latitude >> longitude >> epoch;
 
-            data.push_back(WeatherData {epoch, 0, 0, 0, 0, 0});
+            data.push_back(DataWeather {epoch});
         }
     }
 }
 
-void parseWeather(string buffer, vector<WeatherData>& data)
+//------------------------------------------------------------------------------
+void parseWeather(string buffer, vector<DataWeather>& data)
 {
     istringstream sstream(buffer);
     string line;
@@ -69,17 +65,35 @@ void parseWeather(string buffer, vector<WeatherData>& data)
     while (getline(sstream, line)) {
         if (line.length() > 20) {
             istringstream linestream(line);
-            linestream >> data[counter].pressure 
-                       >> data[counter].geopHeight
-                       >> data[counter].temperature
-                       >> data[counter].dewPoint
-                       >> data[counter].humidity;
+            float pressure, temperature, humidity, windDirection, windSpeed, rain, solarRadiation;
+            float geopHeight,dewPoint, windUms, windVms, totalCloudCover, lowCloudCover, mediumCloudCover, highCloudCover;
+            linestream >> pressure
+                       >> geopHeight
+                       >> temperature
+                       >> dewPoint
+                       >> humidity
+                       >> windDirection
+                       >> windSpeed
+                       >> windUms
+                       >> windVms
+                       >> rain
+                       >> totalCloudCover >> lowCloudCover >> mediumCloudCover >> highCloudCover >> solarRadiation;
+            
+            data[counter].setTemperature(temperature);
+            data[counter].setHumidity(humidity);
+            data[counter].setPressure(pressure);
+            data[counter].setWindSpeed(windSpeed);
+            data[counter].setWindDirection(windDirection);
+            data[counter].setRain(rain);
+            data[counter].setSolarRadiation(solarRadiation);
+
             counter++;
         }
     }
 }
 
-void printWeatherData(vector<WeatherData>& data)
+//------------------------------------------------------------------------------
+void printWeatherData(vector<DataWeather>& data)
 {
     for (auto& item : data) {
         print_epoch(item.epoch);
@@ -87,8 +101,26 @@ void printWeatherData(vector<WeatherData>& data)
              << item.temperature << " "
              << item.humidity << " "
              << item.pressure << " "
-             << item.geopHeight << " "
-             << item.dewPoint << endl;
+             << item.windSpeed << " "
+             << item.windDirection << " "
+             << item.rain << " "
+             << item.solarRadiation << endl;
+    }
+}
+
+//------------------------------------------------------------------------------
+void toDatabase(vector<DataWeather>& data)
+{
+    sqlite3* db = createDatabase("data_yaha.db");
+    SourceSqlite source(db);
+    TableWeather table;
+
+    for (auto& item : data) {
+        cout << "Inserting to database: " << item.epoch << endl;
+    
+        dataToHeader(table, item);
+
+        source.insert(table);
     }
 }
 
@@ -116,7 +148,7 @@ void parse(const char* cache_file)
         "gml:doubleOrNilReasonTupleList"
     };
 
-    vector<WeatherData> data;
+    vector<DataWeather> data;
 
     if (doc.LoadFile(cache_file) != XML_SUCCESS) {
         cout << "Can't read weather xml file!" << endl;
@@ -134,6 +166,8 @@ void parse(const char* cache_file)
 
         parseWeather(node->GetText(), data);
     }
-    printWeatherData(data);    
+    printWeatherData(data);
+
+    toDatabase(data);
 }
 

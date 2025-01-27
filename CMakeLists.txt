@@ -9,7 +9,7 @@ endif()
 
 add_subdirectory(mqtt)
 #add_subdirectory(asus)
-#add_subdirectory(weather)
+add_subdirectory(weather)
 #add_subdirectory(spot)
 
 enable_testing()
