@@ -53,6 +53,7 @@ void SwitchLight::onChange(const IEventData& event) {
         }
     }
     else if (event.id() == lampEvent) {
+        initial_value(event.getInt());
     }
 }
 

@@ -162,6 +162,12 @@ void Mqtt::send(std::string_view topic, const std::string& payload) {
 
     rc = MQTTClient_publishMessage(client, topic.data(), &pubmsg, NULL);
     if (rc != MQTTCLIENT_SUCCESS) {
-        spdlog::error("Unable to publish: {}", rc);
+        errorCounter++;
+        if (errorCounter <= 3) {
+            spdlog::error("Unable to publish: {}", rc);
+        }
+    }
+    else {
+        errorCounter = 0;
     }
 }

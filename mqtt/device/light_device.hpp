@@ -15,6 +15,13 @@ public:
         brightness = payload["brightness"];
         state = str2bool(payload["state"]);
         spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
+
+        if (state==false) {
+            notifyValue(0);
+        }
+        else {
+            notifyValue(brightness);
+        }
     }
 
     void send(IOutput& output, bool value, int newBrightness) override {

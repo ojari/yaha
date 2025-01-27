@@ -34,4 +34,5 @@ private:
     MQTTClient client;
     device::Registry deviceRegistry;
     MessageRouter messageRouter;
+    int errorCounter = 0;
 };

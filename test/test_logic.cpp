@@ -34,7 +34,6 @@ TEST_CASE("Lights class test") {
     }
 }
 
-
 TEST_CASE("Switch mode 0") {
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
@@ -61,6 +60,7 @@ TEST_CASE("Switch mode 1") {
         EventData item(EventId::BUTTON_LIVING_ROOM, 1);
         sw.onChange(item);
         REQUIRE(sw.get() == true);
+        REQUIRE(sw.getInt() == 64);
 
         sw.onChange(item);
         REQUIRE(sw.get() == false);
@@ -79,6 +79,7 @@ TEST_CASE("Switch mode 2") {
         sw.onChange(item);
 
         REQUIRE(sw.get() == true);
+        REQUIRE(sw.getInt() == 40);
     }
 
     SECTION("Turn off switch") {
@@ -88,7 +89,32 @@ TEST_CASE("Switch mode 2") {
     }
 }
 
-TEST_CASE("CarHeaer class test") {
+TEST_CASE("Switch remembers last light value")
+{
+    automation::SwitchLight sw(actuator, "test_dev");
+    sw.setArg("event", "Button Living Room");
+    sw.setArg("eventLamp", "Lamp Living Room");
+    sw.setArg("mode", "2");
+    sw.setArg("brightness", "64");
+
+    SECTION("Handle lamp event") {
+        EventData ev1(EventId::BUTTON_LIVING_ROOM, 1);
+        sw.onChange(ev1);
+        REQUIRE(sw.get() == true);
+        REQUIRE(sw.getInt() == 64);
+
+        EventData ev2(EventId::LAMP_LIVING_ROOM, 12);
+        sw.onChange(ev2);
+        REQUIRE(sw.get() == true);
+        REQUIRE(sw.getInt() == 12);
+
+        ev2.set(0);
+        sw.onChange(ev2);
+        REQUIRE(sw.get() == false);
+    }
+}
+
+TEST_CASE("CarHeater class test") {
     int leaveTime = hm2time(10, 0);
     automation::CarHeater heater(actuator, "tmp_dev", leaveTime);
     auto data = GENERATE(
