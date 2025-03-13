@@ -1,5 +1,6 @@
 #include "registry.hpp"
 #include "light_device.hpp"
+#include "shelly_device.hpp"
 #include "switch_device.hpp"
 #include "temp_sensor_device.hpp"
 #include <fstream>
@@ -58,6 +59,9 @@ std::shared_ptr<Device> Registry::createDevice(
         },
         {"Switch", [](const std::string& name,EventId event) {
             return std::make_shared<SwitchDevice>(name, event); }
+        },
+        {"Shelly", [](const std::string& name, EventId event) {
+            return std::make_shared<ShellyDevice>(name, event); }
         },
         {"TempSensor", [](const std::string& name, EventId event) {
             return std::make_shared<TempSensorDevice>(name, event); }

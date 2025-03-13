@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("Build", "BuildArm", "Vcpkg", "VcpkgArm", "VcpkgWin", "Clean", "Wc", "Run", "Export", "VsExport")]
+    [ValidateSet("Build", "BuildArm", "Vcpkg", "VcpkgArm", "VcpkgWin", "Clean", "Wc", "Run", "Export", "ExportAll", "VsExport")]
     [string]$Do,
     [bool]$Arm = $false
 )
@@ -29,12 +29,20 @@ function doClean {
 function doBuild {
   param (
       [string]$toolchain,
-      [string]$bld_dir
+      [string]$bld_dir,
+      [string]$bld_type
   )
+  write-host cmake --fresh -S"." -B"$bld_dir" `
+        --toolchain "etc/$toolchain" `
+        -G "$GENERATOR" `
+        -DCMAKE_BUILD_TYPE="$bld_type" `
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
+        --log-level=NOTICE
+
   cmake --fresh -S"." -B"$bld_dir" `
         --toolchain "etc/$toolchain" `
-        -G $GENERATOR `
-        -DCMAKE_BUILD_TYPE="Debug" `
+        -G "$GENERATOR" `
+        -DCMAKE_BUILD_TYPE="$bld_type" `
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
         --log-level=NOTICE
   if ($LASTEXITCODE -ne 0) {
@@ -60,16 +68,28 @@ function doVsExport {
   }
 }
 
+function doExport {
+  $target = $env:TARGET_HOST
+  write-host "Export to $target"
+  Set-Location "etc"
+  ./make_cfg.ps1
+  Set-Location ".."
+
+  scp _build_arm/mqtt/Debug/yaha pi@${target}:
+  scp etc/gen_devices.json pi@${target}:devices.json
+  scp etc/gen_automation.json pi@${target}:automation.json
+}
+
 
 switch ($Do) {
   "Clean" {
     doClean $bld_dir
   }
   "Build" {
-    doBuild "toolchain-x64.cmake" "_build"
+    doBuild "toolchain-x64.cmake" "_build" "Debug"
   }
   "BuildArm" {
-    doBuild "toolchain-arm64.cmake" "_build_arm"
+    doBuild "toolchain-arm64.cmake" "_build_arm" "Release"
   }
   "Vcpkg" {
     &"$VCPKG" install --triplet x64-linux-release
@@ -87,15 +107,12 @@ switch ($Do) {
     ./_build/mqtt/Debug/yaha
   }
   "Export" {
-    $target = $env:TARGET_HOST
-    write-host "Export to $target"
-    Set-Location "etc"
-    ./make_cfg.ps1
-    Set-Location ".."
-  
-    scp _build_arm/mqtt/Debug/yaha pi@${target}:
-    scp etc/gen_devices.json pi@${target}:devices.json
-    scp etc/gen_automation.json pi@${target}:automation.json
+    doExport
+  }
+  "ExportAll" {
+    &"$VCPKG" install --triplet arm64-linux-release
+    doBuild "toolchain-arm64.cmake" "_build_arm" "Release"
+    doExport
   }
   "VsExport" {
     doVsExport "toolchain-win.cmake" "vs"

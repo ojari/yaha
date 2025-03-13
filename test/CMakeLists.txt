@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
   # test_collect.cpp
   test_time.cpp
   test_datas.cpp
+  test_shelly.cpp
   #test_sourcesqlite.cpp
   #test_sourcestring.cpp
 
@@ -42,8 +43,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_libraries(${PROJECT_NAME}
     Catch2
-    ${MQTT_LIB}
-    sqlite3
     ${EXTRA_LIBRARIES}
 )
 

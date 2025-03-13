@@ -22,8 +22,9 @@ struct DebugOutput : public IObserver {
 
     void registerEvents(IEventManager& evManager) {
         const std::array<EventId, 12> events = {
-            EventId::TEMPERATURE,
+            // EventId::TEMPERATURE,
             EventId::TEMPERATURE_ROOM,
+            EventId::WEEKDAY,
             EventId::PROC_MEM,
             EventId::TIME,
             EventId::BUTTON_LIBRARY,

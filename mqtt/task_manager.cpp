@@ -11,8 +11,7 @@ bool TaskManager::subscribe(EventId eventId, IObserver& observer) {
         case EventId::TEMPERATURE:
             temperature.subscribe(observer);
             break;
-        case EventId::SUNRISE:
-        case EventId::SUNSET:
+        case EventId::SUNDOWN:
         case EventId::TIME:
             time.subscribe(observer);
             break;

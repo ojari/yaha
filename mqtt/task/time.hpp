@@ -22,9 +22,15 @@ public:
 
         hour = local_tm.tm_hour;
         minute = local_tm.tm_min;
-        weekday = local_tm.tm_wday;
+        int new_weekday = local_tm.tm_wday;
 
         sendNotification(hour, minute);
+
+        if (new_weekday != weekday) {
+            weekday_event.set(new_weekday);
+            notify(weekday_event);
+            weekday = new_weekday;
+        }
     }
 
 protected:
@@ -37,10 +43,11 @@ protected:
     }
     int hour {0};
     int minute {1};
-    int weekday {0};
+    int weekday {-1};
 
 private:
     EventData time {EventId::TIME, 0};
+    EventData weekday_event {EventId::WEEKDAY, 0};
 };
 
 //-----------------------------------------------------------------------------
@@ -50,17 +57,16 @@ public:
 
     void initialize() override {
         sendNotification(hour, minute);
-
     }
 
     void execute() override {
         incrementTime(1);
         int hours = hm2time(hour, minute);
-        if (hours == sunrise) {
-            notify(EventData(EventId::SUNRISE, 1));
+        if (sunrise <= hours && hours <= sunset) {
+            notify(EventData(EventId::SUNDOWN, 0));
         }
-        else if (hours == sunset) {
-            notify(EventData(EventId::SUNSET, 1));
+        else {
+            notify(EventData(EventId::SUNDOWN, 1));
         }
 
         sendNotification(hour, minute);

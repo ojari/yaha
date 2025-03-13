@@ -18,6 +18,8 @@
 #include <spdlog/sinks/syslog_sink.h>
 #endif
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <fstream>
+#include <unistd.h>
 
 
 class IntTime {
@@ -52,6 +54,16 @@ private:
 };
 
 
+void writePidToFile(const std::string& filePath) {
+    std::ofstream pidFile(filePath);
+    if (pidFile.is_open()) {
+        pidFile << getpid();
+        pidFile.close();
+    } else {
+        spdlog::error("Unable to open file: {}", filePath);
+    }
+}
+
 /**
  * @brief The main function of the program.
  */
@@ -66,7 +78,8 @@ int main(int argc, char* argv[]) {
 #else
     spdlog::sinks_init_list sink_list = { console_sink };
 #endif
-    
+    writePidToFile("/tmp/yaha.pid");
+
     auto logger = std::make_shared<spdlog::logger>("yaha", sink_list.begin(), sink_list.end());
     logger->set_pattern("%H:%M:%S %L %^%v%$");
     spdlog::set_default_logger(logger);

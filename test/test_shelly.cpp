@@ -1,0 +1,32 @@
+#include "catch2/catch_all.hpp"
+#include "../mqtt/device/shelly_device.hpp"
+#include "../mqtt/common.hpp"
+#include <memory>
+
+class MockOutput : public IOutput {
+public:
+    void send(std::string_view topic, const std::string& payload) override {
+        lastTopic = topic;
+        lastPayload = payload;
+    }
+
+    std::string lastTopic;
+    std::string lastPayload;
+};
+
+TEST_CASE("ShellyDevice class test") {
+    device::ShellyDevice shelly("test_dev", EventId::BUTTON_LIVING_ROOM);
+    MockOutput output;
+    SECTION("Turn on switch") {
+        nlohmann::json payload;
+        payload["state"] = "ON";
+        std::string deviceName = "test_dev";
+        shelly.on_message(deviceName, payload);
+        // REQUIRE(shelly.get() == true);
+    }
+    SECTION("Send method") {
+        shelly.send(output, true);
+        REQUIRE(output.lastTopic == "test_dev/rpc");
+        REQUIRE(output.lastPayload == R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":true}})");
+    }
+}
