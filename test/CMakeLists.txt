@@ -32,7 +32,6 @@ add_executable(${PROJECT_NAME}
   ../mqtt/data/tables.cpp
 )
 
-
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${VCPKG_ROOT}/include
     ../mqtt
@@ -47,3 +46,6 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+
+target_link_options(${PROJECT_NAME} PRIVATE --coverage)
+target_compile_options(${PROJECT_NAME} PRIVATE --coverage)

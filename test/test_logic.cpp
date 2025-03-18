@@ -15,11 +15,9 @@ struct TestActuator : public IActuator {
     std::string lastValue;
 };
 
-TestActuator tactuator;
-std::shared_ptr<IActuator> actuator{&tactuator};
-
 
 TEST_CASE("Lights class test") {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
     SECTION("Turn on lights") {
         EventData item(EventId::TIME, hm2time(12, 0));
@@ -35,6 +33,7 @@ TEST_CASE("Lights class test") {
 }
 
 TEST_CASE("Switch mode 0") {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
     sw.setArg("mode", "0");
@@ -51,6 +50,7 @@ TEST_CASE("Switch mode 0") {
 }
 
 TEST_CASE("Switch mode 1") {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
     sw.setArg("mode", "1");
@@ -68,6 +68,7 @@ TEST_CASE("Switch mode 1") {
 }
 
 TEST_CASE("Switch mode 2") {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
     sw.setArg("mode", "2");
@@ -91,6 +92,7 @@ TEST_CASE("Switch mode 2") {
 
 TEST_CASE("Switch remembers last light value")
 {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
     sw.setArg("eventLamp", "Lamp Living Room");
@@ -115,6 +117,7 @@ TEST_CASE("Switch remembers last light value")
 }
 
 TEST_CASE("CarHeater class test") {
+    std::shared_ptr<IActuator> actuator = std::make_shared<TestActuator>();
     int leaveTime = hm2time(10, 0);
     automation::CarHeater heater(actuator, "tmp_dev", leaveTime);
     auto data = GENERATE(

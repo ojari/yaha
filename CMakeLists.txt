@@ -7,6 +7,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 
+include(CTest)
+
 add_subdirectory(mqtt)
 #add_subdirectory(asus)
 add_subdirectory(weather)

@@ -1,6 +1,10 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("Build", "BuildArm", "Vcpkg", "VcpkgArm", "VcpkgWin", "Clean", "Wc", "Run", "Export", "ExportAll", "VsExport")]
+    [ValidateSet(
+      "Build", "BuildArm", 
+      "Vcpkg", "VcpkgArm", "VcpkgWin", 
+      "Clean", "Wc", "Run", "Test",
+      "Export", "ExportAll", "VsExport")]
     [string]$Do,
     [bool]$Arm = $false
 )
@@ -105,6 +109,13 @@ switch ($Do) {
   }
   "Run" {
     ./_build/mqtt/Debug/yaha
+  }
+  "Test" {
+    doBuild "toolchain-x64.cmake" "_build" "Debug"
+    set-location "_build"
+    ctest -T test -C Debug
+    ctest -T coverage
+    set-location ".."
   }
   "Export" {
     doExport
