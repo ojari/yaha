@@ -21,7 +21,7 @@ if ($Arm) {
   $bld_dir = "_build"
 }
 
-function doClean {
+function Clear-Build {
   param (
       [string]$bld_dir
   )
@@ -30,7 +30,15 @@ function doClean {
   mkdir $bld_dir
 }
 
-function doBuild {
+function Invoke-Vcpkg {
+  param (
+      [string]$triplet
+  )
+  Write-Host "vcpkg install $triplet"
+  &"$VCPKG" install --triplet $triplet
+}
+
+function Invoke-Build {
   param (
       [string]$toolchain,
       [string]$bld_dir,
@@ -48,6 +56,7 @@ function doBuild {
         -G "$GENERATOR" `
         -DCMAKE_BUILD_TYPE="$bld_type" `
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
+        -DCOVERAGE=ON `
         --log-level=NOTICE
   if ($LASTEXITCODE -ne 0) {
       throw "cmake config exit code: $LASTEXITCODE"
@@ -59,8 +68,7 @@ function doBuild {
   }
 }
 
-
-function doVsExport {
+function Export-Vs {
   param (
       [string]$toolchain,
       [string]$bld_dir
@@ -72,7 +80,7 @@ function doVsExport {
   }
 }
 
-function doExport {
+function Export-ToDevice {
   $target = $env:TARGET_HOST
   write-host "Export to $target"
   Set-Location "etc"
@@ -87,23 +95,13 @@ function doExport {
 
 switch ($Do) {
   "Clean" {
-    doClean $bld_dir
+    Clear-Build $bld_dir
   }
-  "Build" {
-    doBuild "toolchain-x64.cmake" "_build" "Debug"
-  }
-  "BuildArm" {
-    doBuild "toolchain-arm64.cmake" "_build_arm" "Release"
-  }
-  "Vcpkg" {
-    &"$VCPKG" install --triplet x64-linux-release
-  }
-  "VcpkgArm" {
-    &"$VCPKG" install --triplet arm64-linux-release
-  }
-  "VcpkgWin" {
-    &"$VCPKG" install --triplet x64-windows
-  }
+  "Build" {     Invoke-Build "toolchain-x64.cmake" "_build" "Debug" }
+  "BuildArm" {  Invoke-Build "toolchain-arm64.cmake" "_build_arm" "Release" }
+  "Vcpkg" {     Invoke-Vcpkg x64-linux-release }
+  "VcpkgArm" {  Invoke-Vcpkg arm64-linux-release }
+  "VcpkgWin" {  Invoke-Vcpkg x64-windows }
   "Wc" {
     cloc --exclude-dir=expert --exclude-lang="CMake,Bourne Shell" mqtt weather spot
   }
@@ -111,7 +109,7 @@ switch ($Do) {
     ./_build/mqtt/Debug/yaha
   }
   "Test" {
-    doBuild "toolchain-x64.cmake" "_build" "Debug"
+    Invoke-Build "toolchain-x64.cmake" "_build" "Debug"
     set-location "_build"
     ctest -T test -C Debug
     ctest -T coverage
@@ -121,15 +119,15 @@ switch ($Do) {
     cpplint --recursive --exclude=vcpkg_installed --exclude=_build .
   }
   "Export" {
-    doExport
+    Export-ToDevice
   }
   "ExportAll" {
-    &"$VCPKG" install --triplet arm64-linux-release
-    doBuild "toolchain-arm64.cmake" "_build_arm" "Release"
-    doExport
+    Invoke-Vcpkg arm64-linux-release
+    Invoke-Build "toolchain-arm64.cmake" "_build_arm" "Release"
+    Export-ToDevice
   }
   "VsExport" {
-    doVsExport "toolchain-win.cmake" "vs"
+    Export-Vs "toolchain-win.cmake" "vs"
   }
   default {
     throw "Invalid option: $Do"

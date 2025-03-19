@@ -18,6 +18,8 @@ add_executable(${PROJECT_NAME}
   test_time.cpp
   test_datas.cpp
   test_shelly.cpp
+  test_light_device.cpp
+  test_switch_device.cpp
   #test_sourcesqlite.cpp
   #test_sourcestring.cpp
 
@@ -46,6 +48,3 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-
-target_link_options(${PROJECT_NAME} PRIVATE --coverage)
-target_compile_options(${PROJECT_NAME} PRIVATE --coverage)

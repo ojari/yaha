@@ -13,7 +13,11 @@ public:
 
     void on_message(std::string& devName, nlohmann::json& payload) override {
         brightness = payload["brightness"];
-        state = str2bool(payload["state"]);
+        if (payload["state"].is_boolean()) {
+            state = payload["state"];
+        } else {
+            state = str2bool(payload["state"]);
+        }
         spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
 
         if (state == false) {

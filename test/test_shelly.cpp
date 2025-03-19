@@ -24,9 +24,14 @@ TEST_CASE("ShellyDevice class test") {
         shelly.on_message(deviceName, payload);
         // REQUIRE(shelly.get() == true);
     }
-    SECTION("Send method") {
+    SECTION("Send ON method") {
         shelly.send(output, true);
         REQUIRE(output.lastTopic == "test_dev/rpc");
         REQUIRE(output.lastPayload == R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":true}})");
+    }
+    SECTION("Send OFF method") {
+        shelly.send(output, false);
+        REQUIRE(output.lastTopic == "test_dev/rpc");
+        REQUIRE(output.lastPayload == R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":false}})");
     }
 }
