@@ -1,13 +1,13 @@
 #pragma once
 
+#include <chrono>
 #include "common.hpp"
 #include "data/sourcesqlite.hpp"
 #include "data/tables.hpp"
-#include <chrono>
 
 class History : public IObserver {
 public:
-    History(SourceSqlite &history) :
+    explicit History(SourceSqlite &history) :
         history(history)
     {}
     virtual ~History() = default;

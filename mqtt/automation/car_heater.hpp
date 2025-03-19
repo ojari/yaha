@@ -21,8 +21,7 @@ struct CarHeater : public Automation  {
     void setArg(const std::string& name, const std::string& value) override {
         if (name == "leave") {
             leaveTime = std::stoi(value);
-        }
-        else {
+        } else {
             // throw std::runtime_error("Unknown argument: " + name);
         }
     }
@@ -40,10 +39,11 @@ struct CarHeater : public Automation  {
     {
         return std::make_shared<CarHeater>(actuator, name);
     }
+
 private:
     int calculateDuration(const float temperature) const;
     int leaveTime;
     int offset = 60;
 };
 
-}
+}  // namespace automation

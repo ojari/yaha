@@ -1,14 +1,13 @@
 #pragma once
 #include <vector>
-#include <stdexcept> // Add this line
-
+#include <stdexcept>
 #include "config.hpp"
 #include "data.hpp"
 #include "datasource.hpp"
 
 class DataHeader : public IDataHeader {
 public:
-    explicit DataHeader(const std::string& tableName) : 
+    explicit DataHeader(const std::string& tableName) :
         tableName(tableName)
     {}
 
@@ -96,7 +95,7 @@ extern void dataFromHeader(const DataHeader& header, DataTemperature& data);
 
 class TableWeather : public DataHeader {
 public:
-    TableWeather(long epoch = 0) : DataHeader("Weather") {
+    explicit TableWeather(long epoch = 0) : DataHeader("Weather") {
         add(DataValue("epoch", epoch));
         add(DataValue("temperature", 0.0f));
         add(DataValue("humidity", 0.0f));

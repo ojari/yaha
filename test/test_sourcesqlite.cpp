@@ -26,14 +26,14 @@ TEST_CASE("SourceSqlite Test", "[SourceSqlite]") {
 
         // Note: must create table in memory before inserting data
         //       must add data to table before reading
-    
-        //auto iter = source.begin(tableDevice);
 
-        //dataFromHeader(*iter, device);
+        // auto iter = source.begin(tableDevice);
+
+        // dataFromHeader(*iter, device);
 
         // Verify the values
-        //REQUIRE(device.name == "device1");
-        //REQUIRE(device.type == "type1");
+        // REQUIRE(device.name == "device1");
+        // REQUIRE(device.type == "type1");
 
         close_db(db);
     }
@@ -94,14 +94,14 @@ TEST_CASE("Insert and Read item from SQLite database") {
     source.insert(tableDevice);
 
     // Read the inserted item
-    
+
     auto iter = source.begin(tableDevice);
-    //IDataHeader& header = *(*iter);
-    //auto device = tableDevice.get(); 
+    // IDataHeader& header = *(*iter);
+    // auto device = tableDevice.get();
 
     // Verify the values
-    //REQUIRE(device.name == "device1");
-    //REQUIRE(device.type == "type1");
+    // REQUIRE(device.name == "device1");
+    // REQUIRE(device.type == "type1");
 
     close_db(db);
 }

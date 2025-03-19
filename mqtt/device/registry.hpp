@@ -8,7 +8,6 @@ namespace device {
 
 class Registry : public IEventManager {
 public:
-
     void load(const std::string& filename);
 
     std::shared_ptr<Device> getDevice(const std::string& name) {
@@ -17,7 +16,7 @@ public:
         }
         return nullptr;
     }
-    
+
     bool subscribe(EventId eventId, IObserver& observer) override;
 
 private:
@@ -28,4 +27,4 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
 
-}
+}  // namespace device

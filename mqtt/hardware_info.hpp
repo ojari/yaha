@@ -1,15 +1,15 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+#include <unistd.h>
+#include <fstream>
 #include "common.hpp"
 #include "observable.hpp"
-#include <fstream>
-#include <spdlog/spdlog.h>
-
 #include "event_data.hpp"
 
 class LoadAverageReader {
 public:
-    LoadAverageReader(const std::string& loadavgFilePath = "/proc/loadavg")
+    explicit LoadAverageReader(const std::string& loadavgFilePath = "/proc/loadavg")
         : loadavgFilePath_(loadavgFilePath),
         load(EventId::LOAD_AVG, 0.0f) {}
 
@@ -30,7 +30,7 @@ public:
         return true;
     }
 
-    float getLoad() const { 
+    float getLoad() const {
         return load.getFloat();
     }
 
@@ -42,7 +42,7 @@ private:
 //-----------------------------------------------------------------------------
 class MemoryUsageReader {
 public:
-    MemoryUsageReader(const std::string& meminfoFilePath = "/proc/meminfo")
+    explicit MemoryUsageReader(const std::string& meminfoFilePath = "/proc/meminfo")
         : meminfoFilePath(meminfoFilePath) {}
 
     bool Read() {
@@ -89,8 +89,6 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-#include <unistd.h>
-
 class ProcessMemoryReader : public Observable {
 public:
     ProcessMemoryReader()

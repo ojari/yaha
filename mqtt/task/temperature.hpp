@@ -7,20 +7,19 @@ namespace task {
 
 class TaskTemperature : public Observable, public ITask {
 public:
-    explicit TaskTemperature() = default;
+    TaskTemperature() = default;
 
     void execute() override {
         if (counter < 30) {
             update(19.0f);
-        }
-        else if (counter < 60) {
+        } else if (counter < 60) {
             update(21.0f);
-        }
-        else {
+        } else {
             counter = 0;
         }
         counter++;
     }
+
 private:
     void update(float temp) {
         if (temperature.getFloat() != temp) {
@@ -32,4 +31,4 @@ private:
     int counter {0};
 };
 
-}
+}  // namespace task

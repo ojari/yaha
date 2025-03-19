@@ -22,6 +22,7 @@ public:
     bool hasEvent(EventId eventId) const {
         return eventData.id() == eventId;
     }
+
 protected:
     bool str2bool(const std::string& str) const {
         return str == "ON";
@@ -47,4 +48,4 @@ struct IDeviceLightOut {
     virtual void send(IOutput& output, bool state, int brightness) = 0;
 };
 
-}
+}  // namespace device

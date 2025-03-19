@@ -1,8 +1,8 @@
 #include <MQTTClient.h>
-#include <fstream>
-#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <algorithm>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "mqtt.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
@@ -51,7 +51,7 @@ void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
 void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
 {
     // spdlog::info("Message with token value {} delivery confirmed", dt);
-    //deliveredtoken = dt;
+    // deliveredtoken = dt;
 }
 
 int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
@@ -80,7 +80,7 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     size_t firstSlash = topic.find('/');
     if (firstSlash != std::string::npos) {
         auto* router = static_cast<MessageRouter*>(context);
-        
+
         std::string device_name = topic.substr(firstSlash + 1);
         router->route(device_name, payload);
     } else {
@@ -97,7 +97,7 @@ void mqtt_connlost(void *context, char *cause)
 }
 
 //------------------------------------------------------------------
-Mqtt::Mqtt(const std::string& filename) : 
+Mqtt::Mqtt(const std::string& filename) :
     messageRouter(&deviceRegistry)
 {
     int rc = 0;
@@ -166,8 +166,7 @@ void Mqtt::send(std::string_view topic, const std::string& payload) {
         if (errorCounter <= 3) {
             spdlog::error("Unable to publish: {}", rc);
         }
-    }
-    else {
+    } else {
         errorCounter = 0;
     }
 }

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <map>
 #include <fstream>
-#include <sstream> // Include the necessary header file
+#include <sstream>  // Include the necessary header file
 #include <vector>
 #include <chrono>
 #include <thread>
@@ -169,9 +169,8 @@ void Rule::load(const json& obj) {
             action = thenArray[1].get<std::string>();
             if (thenArray.size() > 2) {
                 action_off = thenArray[2].get<std::string>();
-            } 
-        }
-        else {
+            }
+        } else {
             json conditionsArray = element.value();
             for (const auto& conditionObj : conditionsArray) {
                 if (element.key() == "time") {
@@ -182,7 +181,7 @@ void Rule::load(const json& obj) {
                     condition->load(conditionObj);
                     conditions.push_back(std::move(condition));
                 }
-            }            
+            }
         }
     }
 }

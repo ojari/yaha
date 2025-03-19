@@ -1,15 +1,12 @@
+#include <curl/curl.h>
+#include <spdlog/spdlog.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <fstream>
 #include <ctime>
 #include <vector>
-// #include <httplib.h>
-#include <curl/curl.h>
-#include <spdlog/spdlog.h>
 #include "../common/ICommand.hpp"
-
-using namespace std;
 
 
 extern void parse(const char* cache_file);
@@ -24,7 +21,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 
 //------------------------------------------------------------------------------
 class CreateDatabaseCommand : public ICommand {
-public:
+ public:
     CreateDatabaseCommand() :
         ICommand("-c", "Create database.")
     {}
@@ -38,7 +35,7 @@ public:
 //------------------------------------------------------------------------------
 class DownloadCommand : public ICommand {
 public:
-    DownloadCommand(string cache_file) :
+    explicit DownloadCommand(std::string cache_file) :
         ICommand("-d", "Download latest weather from network."),
         url("opendata.fmi.fi"),
         path("/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::multipointcoverage&place="),
@@ -46,7 +43,7 @@ public:
     {
         char *location = getenv("LOCATION");
         if (location == NULL) {
-            cerr << "ERROR: Missing LOCATION environmental variable!" << std::endl;
+            std::cerr << "ERROR: Missing LOCATION environmental variable!" << std::endl;
             return;
         }
         path.append(location);
@@ -68,8 +65,7 @@ public:
             res = curl_easy_perform(curl);
             if (res != CURLE_OK) {
                 spdlog::error("curl_easy_perform() failed: {}", curl_easy_strerror(res));
-            }
-            else {
+            } else {
                 std::ofstream outfile(cache_file);
                 outfile << readBuffer << std::endl;
                 outfile.close();
@@ -100,15 +96,15 @@ public:
     }*/
 
 private:
-    string url;
-    string path;
-    string cache_file;
+    std::string url;
+    std::string path;
+    std::string cache_file;
 };
 
 //------------------------------------------------------------------------------
 class ParseCommand : public ICommand {
 public:
-    ParseCommand(string cache_file) :
+    explicit ParseCommand(std::string cache_file) :
         ICommand("-p", "Parse weather information from cache file."),
         cache_file(cache_file)
     {}
@@ -118,34 +114,33 @@ public:
     }
 
 private:
-    string cache_file;
+    std::string cache_file;
 };
 
 
 //------------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
-    string cache_file = "tmp_weather.xml";
+    std::string cache_file = "tmp_weather.xml";
 
-    vector<shared_ptr<ICommand>> commands {
-        make_shared<CreateDatabaseCommand>(),
-        make_shared<DownloadCommand>(cache_file),
-        make_shared<ParseCommand>(cache_file)
+    std::vector<std::shared_ptr<ICommand>> commands {
+        std::make_shared<CreateDatabaseCommand>(),
+        std::make_shared<DownloadCommand>(cache_file),
+        std::make_shared<ParseCommand>(cache_file)
     };
 
     if (argc == 2) {
-        string arg = argv[1];
+        std::string arg = argv[1];
         for (auto command : commands) {
             if (command->flag() == arg) {
                 command->execute();
             }
         }
-    }
-    else {
-        cout << "Usage: weather <command>" << endl;
-        cout << "Commands:" << endl;
+    } else {
+        std::cout << "Usage: weather <command>" << std::endl;
+        std::cout << "Commands:" << std::endl;
         for (auto command : commands) {
-            cout << "  " << command->flag() << " - " << command->description() << endl;
+            std::cout << "  " << command->flag() << " - " << command->description() << std::endl;
         }
     }
     return 0;

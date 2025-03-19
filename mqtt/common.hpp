@@ -29,8 +29,8 @@ enum class EventId {
 
   LAMP_LIVING_ROOM,
   LAMP_LIBRARY,
- 
-  PROC_MEM, // hardware_info
+
+  PROC_MEM,  // hardware_info
   USED_MEM,
   LOAD_AVG,
   CPU_TEMP,

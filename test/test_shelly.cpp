@@ -1,7 +1,7 @@
+#include <memory>
 #include "catch2/catch_all.hpp"
 #include "../mqtt/device/shelly_device.hpp"
 #include "../mqtt/common.hpp"
-#include <memory>
 
 class MockOutput : public IOutput {
 public:

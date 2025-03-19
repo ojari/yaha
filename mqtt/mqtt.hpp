@@ -7,7 +7,7 @@
 
 class MessageRouter {
 public:
-    MessageRouter(device::Registry *deviceReg) : 
+    explicit MessageRouter(device::Registry *deviceReg) :
         deviceRegistry(deviceReg)
     {}
 

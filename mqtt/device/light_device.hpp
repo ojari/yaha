@@ -1,6 +1,6 @@
 #pragma once
-#include "device.hpp"
 #include <spdlog/spdlog.h>
+#include "device.hpp"
 
 namespace device {
 
@@ -16,10 +16,9 @@ public:
         state = str2bool(payload["state"]);
         spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
 
-        if (state==false) {
+        if (state == false) {
             notifyValue(0);
-        }
-        else {
+        } else {
             notifyValue(brightness);
         }
     }
@@ -40,4 +39,4 @@ private:
     bool state = false;
 };
 
-}
+}  // namespace device

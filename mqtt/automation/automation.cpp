@@ -33,4 +33,4 @@ void Automation::set(bool value) {
     }
 }
 
-}
+}  // namespace automation

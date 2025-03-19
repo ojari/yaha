@@ -12,7 +12,7 @@ namespace automation {
 
 class Registry {
 public:
-    Registry(std::shared_ptr<IActuator> actuator) :
+    explicit Registry(std::shared_ptr<IActuator> actuator) :
         actuator { actuator }
     {}
 
@@ -57,7 +57,6 @@ private:
     std::shared_ptr<Automation> create(
         const std::string& name,
         AutomationType type) const;
-
 };
 
-}
+}  // namespace automation

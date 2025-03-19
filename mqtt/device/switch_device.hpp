@@ -1,6 +1,6 @@
 #pragma once
-#include "device.hpp"
 #include <spdlog/spdlog.h>
+#include "device.hpp"
 
 namespace device {
 
@@ -13,8 +13,7 @@ public:
     void on_message(std::string& _deviceName, nlohmann::json& payload) override {
         if (payload.contains("state")) {
             state = payload["state"].get<std::string>() == "ON";
-        }
-        else {
+        } else {
             if (payload["action"].is_null()) {
                 return;
             }
@@ -23,15 +22,14 @@ public:
                 state = true;
             } else if (state_str == "off") {
                 state = false;
-            }
-            else {
+            } else {
                 return;
             }
             state = payload["action"].get<std::string>() == "on";
         }
         spdlog::info("Switch {} :: {}", deviceName, state);
 
-        notifyValue((int)state);
+        notifyValue(static_cast<int>(state));
     }
 
     void send(IOutput& output, bool value) override {
@@ -42,8 +40,9 @@ public:
         payload.append("\"}");
         output.send(topic, payload);
     }
+
 private:
     bool state = false;
 };
 
-}
+}  // namespace device

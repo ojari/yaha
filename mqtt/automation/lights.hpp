@@ -37,10 +37,11 @@ struct Lights : public Automation {
     {
         return std::make_shared<Lights>(actuator, name);
     }
+
 private:
     int onTime = -1;
     int offTime = -1;
     int brightness = NAN_VALUE;
 };
 
-}
+}  // namespace automation

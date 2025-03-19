@@ -1,8 +1,8 @@
-#define CATCH_CONFIG_RUNNER // Configure catch to use your main, and not its own.
-#include "catch2/catch_all.hpp"
+#define CATCH_CONFIG_RUNNER  // Configure catch to use your main, and not its own.
 #include <iostream>
 #include <exception>
 #include <filesystem>
+#include "catch2/catch_all.hpp"
 
 void remove_database() {
     std::cout << "Removing database\n";

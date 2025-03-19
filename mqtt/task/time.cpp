@@ -16,4 +16,4 @@ void TaskDebugTime::incrementTime(int minutes) {
     }
 }
 
-}
+}  // namespace task

@@ -1,3 +1,10 @@
+#include <unistd.h>
+#include <spdlog/spdlog.h>
+#include <map>
+#include <chrono>
+#include <thread>
+#include <iomanip>
+#include <fstream>
 #include "mqtt.hpp"
 #include "common.hpp"
 #include "data/sourcesqlite.hpp"
@@ -8,18 +15,11 @@
 #include "history.hpp"
 #include "automation/registry.hpp"
 #include "application.hpp"
-#include <map>
-#include <chrono>
-#include <thread>
-#include <iomanip>
-#include <spdlog/spdlog.h>
-//#include <spdlog/sinks/basic_file_sink.h>
+// #include <spdlog/sinks/basic_file_sink.h>
 #ifndef WIN32
 #include <spdlog/sinks/syslog_sink.h>
 #endif
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <fstream>
-#include <unistd.h>
 
 
 class IntTime {
@@ -48,6 +48,7 @@ public:
             }
         }
     }
+
 private:
     int hour;
     int minute;
@@ -70,7 +71,7 @@ void writePidToFile(const std::string& filePath) {
 int main(int argc, char* argv[]) {
     // initialize logging
     //
-    //auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
+    // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 #ifndef WIN32
     auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("yaha", LOG_PID, LOG_USER, true);

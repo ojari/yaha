@@ -1,13 +1,11 @@
+#include <string.h>
+#include <curl/curl.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <string.h>
 #include <string>
-#include <curl/curl.h>
-
-using namespace std;
-
+#include "download.hpp"
 
 // Callback function to write received data into a string
 size_t curl_write_cb(void *contents, size_t size, size_t nmemb, std::string* output)

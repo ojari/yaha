@@ -1,9 +1,9 @@
-#include "catch2/catch_all.hpp"
+#include <memory>
+#include <catch2/catch_all.hpp>
 #include "../mqtt/automation/lights.hpp"
 #include "../mqtt/automation/switch_light.hpp"
 #include "../mqtt/automation/car_heater.hpp"
 #include "../mqtt/common.hpp"
-#include <memory>
 
 struct TestActuator : public IActuator {
     void set(std::string_view device, const std::string& value) override {
@@ -123,10 +123,9 @@ TEST_CASE("CarHeater class test") {
     auto data = GENERATE(
         std::make_pair(-21, 120),
         std::make_pair(-11,  90),
-        std::make_pair( -6,  60),
-        std::make_pair(  0,  30),
-        std::make_pair(  4,  30)
-    );
+        std::make_pair(-6,  60),
+        std::make_pair(0,  30),
+        std::make_pair(4,  30));
     SECTION("Temperature test") {
         float temperature = data.first;
         int offset = data.second;
@@ -135,15 +134,15 @@ TEST_CASE("CarHeater class test") {
         heater.onChange(item);
         EventData item2(EventId::TIME, timeAdd(leaveTime, -(offset+2)));
         heater.onChange(item2);
-        INFO("Temperature: " << temperature 
-             << ", Offset: " << offset 
-             << ", Time: " << item2.getInt() 
+        INFO("Temperature: " << temperature
+             << ", Offset: " << offset
+             << ", Time: " << item2.getInt()
              << ", on: " << heater.get());
         REQUIRE(heater.get() == false);
 
         EventData item3(EventId::TIME, timeAdd(leaveTime, -(offset - 2)));
         heater.onChange(item3);
-        INFO("Temperature: " << temperature 
+        INFO("Temperature: " << temperature
              << ", Offset: " << offset
              << ", Time: " << item3.getInt()
              << ", on: " << heater.get());

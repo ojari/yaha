@@ -6,7 +6,7 @@ namespace task {
 
 class TaskCalcPrice : public Observable, public ITask {
 public:
-    explicit TaskCalcPrice() = default;
+    TaskCalcPrice() = default;
 
     void execute() override {
         const int newPrice = 5;
@@ -16,9 +16,9 @@ public:
             notify(price);
         }
     }
+
 private:
     EventData price {EventId::ELECTRICITY_PRICE, 10};
-
 };
 
-}
+}  // namespace task

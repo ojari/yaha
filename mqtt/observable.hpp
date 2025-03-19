@@ -14,8 +14,8 @@ struct Observable {
     }
 
     void unsubscribe(IObserver& observer) {
-        //@TODO: use std::remove_if
-        /*observers.erase(
+        // @TODO: use std::remove_if
+        /* observers.erase(
             remove(observers.begin(), observers.end(), &observer),
             observers.end()
         );*/

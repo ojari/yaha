@@ -1,7 +1,7 @@
+#include <spdlog/spdlog.h>
 #include <memory>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <spdlog/spdlog.h>
 #include "../task.hpp"
 #include "registry.hpp"
 #include "lights.hpp"
@@ -14,7 +14,6 @@
 namespace automation {
 
 void Registry::load(const std::string& filename, IEventManager& evman) {
-
     std::ifstream ifile(filename);
     if (ifile.is_open()) {
         nlohmann::json data;
@@ -31,16 +30,14 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
             auto ctrl = create(name, toAutomationType(type));
 
             for (auto it = automationData.begin(); it != automationData.end(); ++it) {
-                if (it.key() != "name" && 
-                    it.key() != "type") 
+                if (it.key() != "name" &&
+                    it.key() != "type")
                 {
                     if (it.value().is_string()) {
                         ctrl->setArg(it.key(), it.value().get<std::string>());
-                    }
-                    else if (it.value().is_number()) {
+                    } else if (it.value().is_number()) {
                         ctrl->setArg(it.key(), std::to_string(it.value().get<int>()));
-                    }
-                    else {
+                    } else {
                         spdlog::warn("Expected string type for key: {}, but got different type", it.key());
                     }
                 }
@@ -51,8 +48,7 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
         }
 
         ifile.close();
-    }
-    else {
+    } else {
         spdlog::error("Error opening {}", filename);
     }
 }
@@ -114,4 +110,4 @@ std::shared_ptr<Automation> Registry::create(
     return nullptr;
 }
 
-}
+}  // namespace automation

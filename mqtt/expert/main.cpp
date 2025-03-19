@@ -1,10 +1,10 @@
-#include "expert.hpp"
 #include <chrono>
 #include <thread>
+#include "expert.hpp"
 
 class MyExecutor : public ExecutorBase {
 public:
-    MyExecutor() : 
+    MyExecutor() :
         system()
     {
         system.addFact(ScalarStatement::Temperature, 20)
@@ -17,7 +17,7 @@ public:
             .addFact(Statement::TempLow);
 
         system.loadRules("rules.json");
-        //system.saveRules("rules_tmp.json");
+        // system.saveRules("rules_tmp.json");
     }
 
     void loop() {
@@ -38,6 +38,7 @@ public:
                   << std::setw(2) << std::setfill('0') << time.getMinute() << " "
                   << target << "::" << action << std::endl;
     }
+
 private:
     ExpertSystem system;
     IntTime time {0, 0};
@@ -59,10 +60,10 @@ void interact(ExpertSystem& system)
     std::cout << "Enter a value: ";
     std::cin >> value;
     std::cin.ignore();  // ignore the newline character
-    //system.addFact(static_cast<Statement>(fact), value);
+    // system.addFact(static_cast<Statement>(fact), value);
 
-    //system.infer();
-}   
+    // system.infer();
+}
 
 
 int main()

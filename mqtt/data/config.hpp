@@ -23,7 +23,11 @@ struct ConfigController {
 
     ConfigController() = default;
 
-    ConfigController(const std::string& name, const std::string& type, const std::string& actuator, int time1, int time2) :
+    ConfigController(const std::string& name,
+                     const std::string& type,
+                     const std::string& actuator,
+                     int time1,
+                     int time2) :
         name(name),
         type(type),
         actuator(actuator),

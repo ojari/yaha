@@ -54,6 +54,7 @@ public:
         }
         index++;
     }
+
 private:
     sqlite3_stmt* stmt;
     int index = 1;
@@ -130,7 +131,7 @@ private:
 // @todo: move sql statement creation to cpp file.
 class SourceSqlite {
 public:
-    explicit SourceSqlite(sqlite3* db) : 
+    explicit SourceSqlite(sqlite3* db) :
         db(db)
     {
     }
@@ -158,9 +159,9 @@ public:
             }
             output.append(",");
         }
-        output.pop_back(); // remove last comma
+        output.pop_back();  // remove last comma
         output.append(");");
-        return output; 
+        return output;
     }
 
     std::string insertSql(IDataHeader& header) const {
@@ -172,13 +173,13 @@ public:
             output.append(value.getName());
             output.append(",");
         }
-        output.pop_back(); // remove last comma
+        output.pop_back();  // remove last comma
 
         output.append(" ) VALUES (");
         for (auto const& value : header) {
             output.append("?,");
         }
-        output.pop_back(); // remove last comma
+        output.pop_back();  // remove last comma
         output.append(");");
         return output;
     }
@@ -190,7 +191,7 @@ public:
             output.append(value.getName());
             output.append(",");
         }
-        output.pop_back(); // remove last comma
+        output.pop_back();  // remove last comma
 
         output.append(" FROM ");
         output.append(header.getTableName());
@@ -243,6 +244,7 @@ public:
     bool isEnd() const {
         return true;
     }
+
 private:
     sqlite3* db;
 };

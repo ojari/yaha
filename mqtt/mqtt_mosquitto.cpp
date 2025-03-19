@@ -1,7 +1,7 @@
 #include <mosquitto.h>
+#include <spdlog/spdlog.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <spdlog/spdlog.h>
 #include "mqtt_mosquitto.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
@@ -41,7 +41,7 @@ void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_messag
     int topic_count;
     int rc;
 
-    //spdlog::info("Received message on topic: {} with payload: {}", message->topic, (char*)message->payload);
+    // spdlog::info("Received message on topic: {} with payload: {}", message->topic, (char*)message->payload);
 
     rc = mosquitto_sub_topic_tokenise(message->topic, &topics, &topic_count);
     if ((rc == MOSQ_ERR_SUCCESS) && (topic_count > 1)) {
@@ -58,7 +58,7 @@ void on_logging(struct mosquitto *mosq, void *obj, int level, const char *str) {
 }
 
 //------------------------------------------------------------------
-Mqtt::Mqtt() : 
+Mqtt::Mqtt() :
     messageRouter(&deviceRegistry)
 {
     int rc = 0;

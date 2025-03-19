@@ -51,7 +51,7 @@ protected:
 // 5 minutes timer
 //
 struct TimerSlow : public TimerBase {
-    TimerSlow(Application& app) :
+    explicit TimerSlow(Application& app) :
         TimerBase(app, SLOW_TIMER_INTERVAL)
     {
         timer.data = this;

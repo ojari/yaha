@@ -26,7 +26,7 @@ struct Automation : public IObserver {
 
     virtual void setArg(const std::string& name, const std::string& value) {
     }
-    
+
     virtual void registerEvents(IEventManager& evman) = 0;
 
     virtual std::string toString() {
@@ -72,4 +72,4 @@ private:
     std::string name;
 };
 
-};
+}  // namespace automation

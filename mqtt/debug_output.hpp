@@ -1,17 +1,15 @@
 #pragma once
-#include "common.hpp"
 #include <spdlog/spdlog.h>
+#include "common.hpp"
 
 
 struct DebugOutput : public IObserver {
     void onChange(const IEventData& value) override {
         if (value.id() == EventId::TIME) {
             time = value.getInt();
-        }
-        else if (value.id() == EventId::TEMPERATURE) {
+        } else if (value.id() == EventId::TEMPERATURE) {
             // do not show temperature changes
-        }
-        else {
+        } else {
             if (value.isInt()) {
                 spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getInt());
             } else {

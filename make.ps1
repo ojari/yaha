@@ -3,7 +3,7 @@ param(
     [ValidateSet(
       "Build", "BuildArm", 
       "Vcpkg", "VcpkgArm", "VcpkgWin", 
-      "Clean", "Wc", "Run", "Test",
+      "Clean", "Wc", "Run", "Test", "Lint",
       "Export", "ExportAll", "VsExport")]
     [string]$Do,
     [bool]$Arm = $false
@@ -116,6 +116,9 @@ switch ($Do) {
     ctest -T test -C Debug
     ctest -T coverage
     set-location ".."
+  }
+  "Lint" {
+    cpplint --recursive --exclude=vcpkg_installed --exclude=_build .
   }
   "Export" {
     doExport

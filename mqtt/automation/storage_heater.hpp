@@ -30,4 +30,4 @@ private:
     int calculateEndTime(const IEventData& value);
 };
 
-}
+}  // namespace automation

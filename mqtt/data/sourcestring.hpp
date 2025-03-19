@@ -1,6 +1,6 @@
 #pragma once
-#include "datasource.hpp"
 #include <sstream>
+#include "datasource.hpp"
 
 class StringException : public std::runtime_error {
 public:
@@ -10,7 +10,7 @@ public:
 template <typename T>
 class SourceString {
 public:
-    explicit SourceString(const std::string& data) : 
+    explicit SourceString(const std::string& data) :
         sstream(data)
     {
     }
@@ -86,7 +86,7 @@ private:
     // The first non-whitespace character is returned.
     char readNonSpace() const {
         char c;
-        while (sstream.get(c) && std::isspace(c));
+        while (sstream.get(c) && std::isspace(c)) {}
         return c;
     }
 

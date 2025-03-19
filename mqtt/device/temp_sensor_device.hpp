@@ -1,6 +1,6 @@
 #pragma once
-#include "device.hpp"
 #include <spdlog/spdlog.h>
+#include "device.hpp"
 
 namespace device {
 
@@ -27,4 +27,4 @@ private:
     float humidity;
 };
 
-}
+}  // namespace device

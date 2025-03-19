@@ -14,7 +14,7 @@ struct DataTemperature : public BaseData {
 
     DataTemperature(long time, float temp, float hum) :
         BaseData(time),
-        temperature(temp), 
+        temperature(temp),
         humidity(hum)
     {}
 };
@@ -29,7 +29,7 @@ struct DataWeather : public BaseData {
     float uv = 0.0;
     float solarRadiation = 0.0;
 
-    DataWeather(long time) :
+    explicit DataWeather(long time) :
         BaseData(time)
     {}
 

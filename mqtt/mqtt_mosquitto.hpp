@@ -6,7 +6,7 @@
 
 class MessageRouter {
 public:
-    MessageRouter(device::Registry *deviceReg) : 
+    explicit MessageRouter(device::Registry *deviceReg) :
         deviceRegistry(deviceReg)
     {}
 
@@ -20,7 +20,7 @@ private:
 
 class Mqtt : public ITask, public IOutput {
 public:
-    explicit Mqtt();
+    Mqtt();
     void execute() override;
     void send(const std::string& topic, const std::string& message) override;
 

@@ -6,7 +6,7 @@
 
 namespace automation {
 
-struct SwitchLight : public Automation  {    
+struct SwitchLight : public Automation  {
     SwitchLight(std::shared_ptr<IActuator> actuator, const std::string& name) :
         Automation(actuator, name)
     {
@@ -33,7 +33,7 @@ struct SwitchLight : public Automation  {
 
 private:
     void toggleLight();
-    
+
     EventId buttonEvent = EventId::UNKNOWN;
     EventId lampEvent = EventId::UNKNOWN;
     int mode = 0;
@@ -41,4 +41,4 @@ private:
     bool current = false;
 };
 
-}
+}  // namespace automation

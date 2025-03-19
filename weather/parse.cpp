@@ -26,7 +26,7 @@ XMLElement *set_location(XMLElement *root, vector<string>& path)
 {
     XMLElement *node = root;
 
-    for(auto tagName : path) {
+    for (auto tagName : path) {
         node = node->FirstChildElement(tagName.c_str());
         if (node == NULL) {
             cout << "Can't find " << tagName << " from weather data!" << endl;
@@ -47,7 +47,7 @@ void parseEpoch(string buffer, vector<DataWeather>& data)
             istringstream linestream(line);
             double latitude, longitude;
             long epoch;
-            
+
             linestream >> latitude >> longitude >> epoch;
 
             data.push_back(DataWeather {epoch});
@@ -66,7 +66,8 @@ void parseWeather(string buffer, vector<DataWeather>& data)
         if (line.length() > 20) {
             istringstream linestream(line);
             float pressure, temperature, humidity, windDirection, windSpeed, rain, solarRadiation;
-            float geopHeight,dewPoint, windUms, windVms, totalCloudCover, lowCloudCover, mediumCloudCover, highCloudCover;
+            float geopHeight, dewPoint, windUms, windVms;
+            float totalCloudCover, lowCloudCover, mediumCloudCover, highCloudCover;
             linestream >> pressure
                        >> geopHeight
                        >> temperature
@@ -77,8 +78,9 @@ void parseWeather(string buffer, vector<DataWeather>& data)
                        >> windUms
                        >> windVms
                        >> rain
-                       >> totalCloudCover >> lowCloudCover >> mediumCloudCover >> highCloudCover >> solarRadiation;
-            
+                       >> totalCloudCover
+                       >> lowCloudCover >> mediumCloudCover >> highCloudCover >> solarRadiation;
+
             data[counter].setTemperature(temperature);
             data[counter].setHumidity(humidity);
             data[counter].setPressure(pressure);
@@ -117,7 +119,7 @@ void toDatabase(vector<DataWeather>& data)
 
     for (auto& item : data) {
         cout << "Inserting to database: " << item.epoch << endl;
-    
+
         dataToHeader(table, item);
 
         source.insert(table);

@@ -25,14 +25,11 @@ public:
     DataValueType getType() const {
         if (std::holds_alternative<int>(value)) {
             return DataValueType::INT;
-        }
-        else if (std::holds_alternative<long>(value)) {
+        } else if (std::holds_alternative<long>(value)) {
             return DataValueType::LONG;
-        }
-        else if (std::holds_alternative<float>(value)) {
+        } else if (std::holds_alternative<float>(value)) {
             return DataValueType::DOUBLE;
-        }
-        else if (std::holds_alternative<std::string>(value)) {
+        } else if (std::holds_alternative<std::string>(value)) {
             return DataValueType::STRING;
         }
         throw std::runtime_error("Invalid data type");
@@ -47,6 +44,7 @@ public:
     void setValue(T& newValue) {
         this->value.emplace<T>(newValue);
     }
+
 private:
     std::string name;
     std::variant<int, long, float, std::string> value;

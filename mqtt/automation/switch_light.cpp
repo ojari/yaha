@@ -5,17 +5,13 @@ namespace automation {
 void SwitchLight::setArg(const std::string& name, const std::string& value) {
     if (name == "mode") {
         mode = std::stoi(value);
-    }
-    else if (name == "event") {
+    } else if (name == "event") {
         buttonEvent = str2event(value);
-    }
-    else if (name == "eventLamp") {
+    } else if (name == "eventLamp") {
         lampEvent = str2event(value);
-    }
-    else if (name == "brightness") {
+    } else if (name == "brightness") {
         brightness = std::stoi(value);
-    }
-    else {
+    } else {
         throw std::runtime_error("Unknown argument: " + name);
     }
 }
@@ -23,8 +19,7 @@ void SwitchLight::setArg(const std::string& name, const std::string& value) {
 void SwitchLight::toggleLight() {
     if (getInt() == 0) {
         set(brightness);
-    }
-    else {
+    } else {
         set(0);
     }
 }
@@ -32,27 +27,25 @@ void SwitchLight::toggleLight() {
 void SwitchLight::onChange(const IEventData& event) {
     if (event.id() == buttonEvent) {
         switch (mode) {
-            case 0: // off button toggles the light
+            case 0:  // off button toggles the light
                 if (event.getInt() == 0) {
                     toggleLight();
                 }
                 break;
-            case 1: // on button toggles the light
+            case 1:  // on button toggles the light
                 if (event.getInt() == 1) {
                     toggleLight();
                 }
                 break;
-            case 2: // both buttons works
+            case 2:  // both buttons works
                 if (event.getInt()) {
                     set(brightness);
-                }
-                else {
+                } else {
                     set(0);
                 }
                 break;
         }
-    }
-    else if (event.id() == lampEvent) {
+    } else if (event.id() == lampEvent) {
         initial_value(event.getInt());
     }
 }
@@ -68,4 +61,4 @@ std::string SwitchLight::toString() {
 }
 
 
-}
+}  // namespace automation

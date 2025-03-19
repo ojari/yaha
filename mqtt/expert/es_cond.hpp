@@ -14,7 +14,7 @@ struct Condition {
 struct BoolCondition : public Condition {
     BoolCondition() = default;
 
-    BoolCondition(Statement statement) :
+    explicit BoolCondition(Statement statement) :
         statement(statement)
     {}
     bool isTrue(Facts& facts) const {

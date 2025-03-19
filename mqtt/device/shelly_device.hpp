@@ -1,6 +1,6 @@
 #pragma once
-#include "device.hpp"
 #include <spdlog/spdlog.h>
+#include "device.hpp"
 
 namespace device {
 
@@ -62,9 +62,10 @@ public:
         payload.append("}}");
         output.send(topic, payload);
     }
+
 private:
     bool state = false;
     int relay = 0;
 };
 
-}
+}  // namespace device

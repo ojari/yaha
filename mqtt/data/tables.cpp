@@ -7,7 +7,7 @@ void dataToHeader(DataHeader& header, const ConfigDevice& config) {
 
 void dataFromHeader(const DataHeader& header, ConfigDevice& config) {
     config.name = header.getValue<std::string>("name");
-    config.type = header.getValue<std::string>("type"); 
+    config.type = header.getValue<std::string>("type");
 }
 
 //-----------------------------------------------------------------------------

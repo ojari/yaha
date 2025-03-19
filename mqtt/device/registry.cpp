@@ -1,20 +1,19 @@
+#include <spdlog/spdlog.h>
+#ifndef WIN32
+#include <unistd.h>  // getcwd
+#endif
+#include <fstream>
+#include <string>
 #include "registry.hpp"
 #include "light_device.hpp"
 #include "shelly_device.hpp"
 #include "switch_device.hpp"
 #include "temp_sensor_device.hpp"
-#include <fstream>
-#include <string>
 #include <nlohmann/json.hpp>
-#include <spdlog/spdlog.h>
-#ifndef WIN32
-#include <unistd.h> // getcwd
-#endif
 
 namespace device {
 
 void Registry::load(const std::string& filename) {
-
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != nullptr) {
         spdlog::info("Current working directory: {}", cwd);
@@ -49,15 +48,15 @@ bool Registry::subscribe(EventId eventId, IObserver& observer) {
 }
 
 std::shared_ptr<Device> Registry::createDevice(
-    const std::string& name, 
-    const std::string& type, 
+    const std::string& name,
+    const std::string& type,
     const std::string& eventStr) const
 {
     static const std::map<std::string, std::function<std::shared_ptr<Device>(const std::string&, EventId event)>> deviceMap = {
-        {"Light", [](const std::string& name, EventId event) { 
+        {"Light", [](const std::string& name, EventId event) {
             return std::make_shared<LightDevice>(name, event); }
         },
-        {"Switch", [](const std::string& name,EventId event) {
+        {"Switch", [](const std::string& name, EventId event) {
             return std::make_shared<SwitchDevice>(name, event); }
         },
         {"Shelly", [](const std::string& name, EventId event) {
@@ -78,4 +77,4 @@ std::shared_ptr<Device> Registry::createDevice(
     }
 }
 
-}
+}  // namespace device

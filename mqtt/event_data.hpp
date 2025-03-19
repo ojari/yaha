@@ -7,13 +7,13 @@
 
 class EventData : public IEventData {
 public:
-    EventData () :
+    EventData() :
         type(EventId::UNKNOWN),
         value(0),
         isInteger(true)
     {}
 
-    EventData(EventId type, int value) : 
+    EventData(EventId type, int value) :
         type(type),
         value(value),
         isInteger(true)

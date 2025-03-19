@@ -1,15 +1,15 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
 #include "../task.hpp"
 #include "../observable.hpp"
 #include "../event_data.hpp"
-#include <spdlog/spdlog.h>
 
 namespace task {
 
 class TaskTime : public Observable, public ITask {
 public:
-    explicit TaskTime() = default;
+    TaskTime() = default;
 
     void initialize() override {
         execute();
@@ -53,7 +53,7 @@ private:
 //-----------------------------------------------------------------------------
 class TaskDebugTime : public TaskTime {
 public:
-    explicit TaskDebugTime() = default;
+    TaskDebugTime() = default;
 
     void initialize() override {
         sendNotification(hour, minute);
@@ -64,13 +64,13 @@ public:
         int hours = hm2time(hour, minute);
         if (sunrise <= hours && hours <= sunset) {
             notify(EventData(EventId::SUNDOWN, 0));
-        }
-        else {
+        } else {
             notify(EventData(EventId::SUNDOWN, 1));
         }
 
         sendNotification(hour, minute);
     }
+
 private:
     void incrementTime(int minutes);
 
@@ -78,4 +78,4 @@ private:
     int sunset {hm2time(20, 0)};
 };
 
-}
+}  // namespace task

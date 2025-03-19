@@ -23,8 +23,8 @@ public:
 
 
     Rule(std::string target, std::string action) :
-        target(target), 
-        action(action) 
+        target(target),
+        action(action)
     {}
 
     void addCondition(std::unique_ptr<Condition> condition) {

@@ -2,7 +2,7 @@
 
 class SunTime {
 public:
-    SunTime(double latitude, double longitude) : 
+    SunTime(double latitude, double longitude) :
         latitude(latitude),
         longitude(longitude)
     {}
