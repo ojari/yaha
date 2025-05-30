@@ -62,10 +62,16 @@ public:
     void execute() override {
         incrementTime(1);
         int hours = hm2time(hour, minute);
+        int sundown {0};
+
         if (sunrise <= hours && hours <= sunset) {
-            notify(EventData(EventId::SUNDOWN, 0));
+            sundown = 0;
         } else {
-            notify(EventData(EventId::SUNDOWN, 1));
+            sundown = 1;
+        }
+
+        if (event.set(sundown)) {
+            notify(event);
         }
 
         sendNotification(hour, minute);
@@ -76,6 +82,8 @@ private:
 
     int sunrise {hm2time(6, 0)};
     int sunset {hm2time(20, 0)};
+    EventData event {EventId::SUNDOWN, 0};
+
 };
 
 }  // namespace task

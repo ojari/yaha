@@ -11,8 +11,7 @@ public:
     void execute() override {
         const int newPrice = 5;
 
-        if (price.getInt() != newPrice) {
-            price.set(newPrice);
+        if (price.set(newPrice)) {
             notify(price);
         }
     }

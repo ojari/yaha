@@ -51,7 +51,7 @@ public:
     virtual float getFloat() const = 0;
     virtual bool isInt() const = 0;
     virtual void setv(IEventData &item) = 0;
-    virtual void set(int aValue) = 0;
+    virtual bool set(int aValue) = 0;
     virtual void set(float aValue) = 0;
 };
 

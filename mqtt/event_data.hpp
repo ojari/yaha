@@ -69,13 +69,19 @@ public:
         }
     }
 
-    void set(int aValue) override {
+    bool set(int aValue) override {
+        bool changed = false;
         if (std::holds_alternative<int>(value)) {
-            value = aValue;
+            if (std::get<int>(value) != aValue) {
+                changed = true;
+                value = aValue;
+            }
         } else {
+            changed = true;
             value = static_cast<float>(aValue);
         }
         isInteger = true;
+        return changed;
     }
 
     void set(float aValue) override {
