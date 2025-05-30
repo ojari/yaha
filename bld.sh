@@ -5,6 +5,15 @@ function build {
     # cmake -DYOCTO=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --toolchain etc/toolchain-x64.cmake ..
     make
+  cd ..
+}
+
+function expert {
+  cd build
+  # cmake -DYOCTO=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --toolchain etc/toolchain-x64.cmake ..
+  make expert
+  cd ..
 }
 
 function build-arm {

@@ -2,6 +2,7 @@ include(../setup.cmake)
 cmake_minimum_required(VERSION 3.10)
 
 project(yaha)
+include(CTest)
 
 # Making flatbuffers
 #
@@ -65,11 +66,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
 )
+
+
+find_package(fmt REQUIRED)
+
 target_link_libraries(${PROJECT_NAME}
-    ${MQTT_LIB}
     ${EXTRA_LIBRARIES}
+    fmt::fmt
     sqlite3
- #   redis++
 )
 
 if(DEFINED DEBUG_TIME)
@@ -77,3 +81,6 @@ if(DEFINED DEBUG_TIME)
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+target_link_options(${PROJECT_NAME} PRIVATE --coverage)
+target_compile_options(${PROJECT_NAME} PRIVATE --coverage)

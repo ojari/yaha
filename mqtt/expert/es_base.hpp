@@ -12,8 +12,6 @@ enum class Statement {
     Summer,
     Day,
     Night,
-    ElPriceHigh,
-    ElPriceLow,
     TempHigh,
     TempLow,
     TempLowLow,
@@ -31,6 +29,23 @@ enum class ScalarStatement {
     Unknown             ///< Unknown statement
 };
 
+enum class ActionTarget {
+    LampLibrary,
+    LampLiving,
+    LampCorridor,
+    LampOutdoor,
+    LampNumber,
+    HeaterStorage,
+    HeaterCarage,
+    HeaterCarOut,
+    PcPower
+};
+
+enum class Action {
+    On,
+    Off
+};
+
 enum class Weekday {
     Mon,  // Monday
     Tue,  // Tuesday
@@ -42,7 +57,7 @@ enum class Weekday {
 };
 
 struct ExecutorBase {
-    virtual void execute(std::string target, std::string action) = 0;
+    virtual void execute(ActionTarget target, Action action) = 0;
 };
 
 /**

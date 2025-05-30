@@ -42,4 +42,8 @@ _build/
 
 # .vscode/settings.json
 build
+_build_win
+*.bak
 .cccc
+vs
+.vs

@@ -1,22 +1,25 @@
+#include "expert.hpp"
+#include "../common.hpp"
+#include "../int_time.hpp"
 #include <chrono>
 #include <thread>
 #include "expert.hpp"
 
 class MyExecutor : public ExecutorBase {
 public:
-    MyExecutor() :
+    MyExecutor(const std::string& filename) : 
         system()
     {
         system.addFact(ScalarStatement::Temperature, 20)
             .addFact(Statement::Weekday)
             .addFact(ScalarStatement::Time, 1020)
             .addFact(Statement::Day)
-            .addFact(Statement::ElPriceHigh)
+            .addFact(ScalarStatement::ElPrice, 10.0)
             .addFact(Statement::Winter)
             .addFact(Statement::TempLowLow)
             .addFact(Statement::TempLow);
 
-        system.loadRules("rules.json");
+        system.loadRules(filename);
         // system.saveRules("rules_tmp.json");
     }
 
@@ -28,7 +31,7 @@ public:
         system.infer(*this);
     }
 
-    void execute(std::string target, std::string action) override {
+    void execute(ActionTarget target, Action action) override {
         if (cache.find(target) != cache.end() && cache[target] == action) {
             return;
         }
@@ -36,13 +39,13 @@ public:
 
         std::cout << std::setw(2) << std::setfill('0') << time.getHour() << ":"
                   << std::setw(2) << std::setfill('0') << time.getMinute() << " "
-                  << target << "::" << action << std::endl;
+                  << enum2str(target, str2actiontarget) << "::" << enum2str(action, str2action)
     }
 
 private:
     ExpertSystem system;
     IntTime time {0, 0};
-    std::map<std::string, std::string> cache;
+    std::map<ActionTarget, Action> cache;
 };
 
 
@@ -68,7 +71,7 @@ void interact(ExpertSystem& system)
 
 int main()
 {
-    MyExecutor executor;
+    MyExecutor executor("rules.json");
 
     while (true) {
         executor.loop();

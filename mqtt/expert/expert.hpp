@@ -21,8 +21,7 @@ class Rule {
 public:
     Rule() = default;
 
-
-    Rule(std::string target, std::string action) :
+    Rule(ActionTarget target, Action action) :
         target(target),
         action(action)
     {}
@@ -36,21 +35,24 @@ public:
      * 
      * @return action name of empty string if no action is to be taken.
      */
-    std::string isConditionTrue(Facts& facts) const;
+    bool isConditionTrue(Facts& facts) const;
     void execute(ExecutorBase* executor) const;
 
     void load(const json& obj);
     void save(json& obj) const;
 
-    std::string getTarget() const {
+    ActionTarget getTarget() const {
         return target;
+    }
+
+    Action getAction() const {
+        return action;
     }
 
 private:
     std::vector<std::unique_ptr<Condition>> conditions; /**< The conditions of the rule. */
-    std::string target; /**< The target of the rule. */
-    std::string action; /**< The action of the rule. */
-    std::string action_off;
+    ActionTarget target;
+    Action action;
     bool timeMode = false;
 };
 
@@ -59,8 +61,7 @@ private:
 //
 class RuleBuilder {
 public:
-    RuleBuilder(std::string target, std::string action)
-    {
+    RuleBuilder(ActionTarget target, Action action) {
         root = std::make_unique<Rule>(target, action);
     }
 

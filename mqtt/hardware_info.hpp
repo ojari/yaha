@@ -89,6 +89,10 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 class ProcessMemoryReader : public Observable {
 public:
     ProcessMemoryReader()

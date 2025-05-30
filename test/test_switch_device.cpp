@@ -1,7 +1,6 @@
 #include "catch2/catch_all.hpp"
 #include "../mqtt/device/switch_device.hpp"
 #include <nlohmann/json.hpp>
-#include "common_device.hpp"
 
 namespace device {
 

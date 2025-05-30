@@ -15,8 +15,6 @@ std::unordered_map<std::string, Statement> str2statement = {
     {"Summer", Statement::Summer},
     {"Day", Statement::Day},
     {"Night", Statement::Night},
-    {"ElPriceHigh", Statement::ElPriceHigh},
-    {"ElPriceLow", Statement::ElPriceLow},
     {"TempHigh", Statement::TempHigh},
     {"TempLow", Statement::TempLow},
     {"TempLowLow", Statement::TempLowLow},
@@ -31,7 +29,25 @@ std::unordered_map<std::string, Statement> str2statement = {
 std::unordered_map<std::string, ScalarStatement> str2scalarstatement = {
     {"Temperature", ScalarStatement::Temperature},
     {"Time", ScalarStatement::Time},
+    {"ElPrice", ScalarStatement::ElPrice},
     {"Unknown", ScalarStatement::Unknown}
+};
+
+std::unordered_map<std::string, ActionTarget> str2actiontarget = {
+    {"LampLibrary", ActionTarget::LampLibrary},
+    {"LampLiving", ActionTarget::LampLiving},
+    {"LampCorridor", ActionTarget::LampCorridor},
+    {"LampOutdoor", ActionTarget::LampOutdoor},
+    {"LampNumber", ActionTarget::LampNumber},
+    {"HeaterStorage", ActionTarget::HeaterStorage},
+    {"HeaterCarage", ActionTarget::HeaterCarage},
+    {"HeaterCarOut", ActionTarget::HeaterCarOut},
+    {"PcPower", ActionTarget::PcPower}
+};
+
+std::unordered_map<std::string, Action> str2action = {
+    {"On", Action::On},
+    {"Off", Action::Off}
 };
 
 std::unordered_map<std::string, Weekday> str2weekday = {
@@ -136,23 +152,23 @@ void TimeCondition::save(json& obj) const {
 */
 
 //-----------------------------------------------------------------------------
-std::string Rule::isConditionTrue(Facts& facts) const {
+bool Rule::isConditionTrue(Facts& facts) const {
     for (const auto& condition : conditions) {
         // All conditions must pass
         //
         if (!timeMode && !condition->isTrue(facts)) {
-            return "";
+            return false;
         }
         // At least one condition must pass
         //
         if (timeMode && condition->isTrue(facts)) {
-            return action;
+            return true;
         }
     }
     if (timeMode) {
-        return action_off;
+        return true;
     }
-    return action;
+    return true;
 }
 
 void Rule::execute(ExecutorBase* executor) const {
@@ -207,9 +223,8 @@ void Rule::save(json& obj) const {
 //-----------------------------------------------------------------------------
 void ExpertSystem::infer(ExecutorBase& executor) {
     for (auto& rule : rules) {
-        std::string action = rule->isConditionTrue(facts);
-        if (!action.empty()) {
-            executor.execute(rule->getTarget(), action);
+        if (rule->isConditionTrue(facts)) {
+            executor.execute(rule->getTarget(), rule->getAction());
         }
     }
 }
