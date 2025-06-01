@@ -9,7 +9,9 @@ public:
     TaskCalcPrice() = default;
 
     void execute() override {
-        const int newPrice = 5;
+        // random number between -1 and 1
+        int randomChange = rand() % 3 - 1; // -1, 0, or 1
+        int newPrice = price.getInt() + randomChange;
 
         if (price.set(newPrice)) {
             notify(price);

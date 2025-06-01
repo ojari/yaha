@@ -10,8 +10,8 @@ param(
 )
 
 $GENERATOR = "Ninja Multi-Config"
-#$VCPKG="/home/jari/vcpkg/vcpkg"
-$VCPKG = "C:/usr/vcpkg/vcpkg.exe"
+$VCPKG = "/home/jari/vcpkg/vcpkg"
+#$VCPKG = "C:/usr/vcpkg/vcpkg.exe"
 
 if ($Arm) {
   Write-Host "ARM"
@@ -58,13 +58,12 @@ function Invoke-Build {
     -DCMAKE_BUILD_TYPE="$bld_type" `
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
     -DCOVERAGE=ON `
-    -DWIN32=ON `
     --log-level=NOTICE
   if ($LASTEXITCODE -ne 0) {
     throw "cmake config exit code: $LASTEXITCODE"
   }
 
-  cmake --build "$bld_dir" -j 10
+  cmake --build "$bld_dir" --config $bld_type -j 10
   if ($LASTEXITCODE -ne 0) {
     throw "cmake build exit code: $LASTEXITCODE"
   }

@@ -1,7 +1,9 @@
 #pragma once
 #include <uv.h>
 #include <spdlog/spdlog.h>
-#include "hardware_info.hpp"
+#include "task/load_average_reader.hpp"
+#include "task/memory_usage_reader.hpp"
+#include "task/process_memory_reader.hpp"
 #include "config.hpp"
 
 
@@ -55,24 +57,24 @@ struct TimerSlow : public TimerBase {
         TimerBase(app, SLOW_TIMER_INTERVAL)
     {
         timer.data = this;
+        // Fill the tasks vector with the required ITask implementations
+        tasks.emplace_back(std::make_unique<LoadAverageReader>());
+        tasks.emplace_back(std::make_unique<MemoryUsageReader>());
+        tasks.emplace_back(std::make_unique<ProcessMemoryReader>());
     }
 
     void onTimer() override {
-        loadAvgReader.Read();
-        memUsageReader.Read();
-        procMemReader.Read();
-
-        /*spdlog::info("Load: {}, proc mem: {}, Memory: {} / {}", 
-            loadAvgReader.getLoad(), 
-            procMemReader.getVmRSS(),
-            memUsageReader.getUsedMem()/1024,
-            memUsageReader.getTotalMem()/1024); */
+        for (auto& task : tasks) {
+            try {
+                task->execute();
+            } catch (const std::exception& ex) {
+                spdlog::error("TimerSlow task execution failed: {}", ex.what());
+            }
+        }
     }
 
 private:
-    LoadAverageReader loadAvgReader;
-    MemoryUsageReader memUsageReader;
-    ProcessMemoryReader procMemReader;
+    std::vector<std::unique_ptr<ITask>> tasks;
 };
 
 //-----------------------------------------------------------------------------

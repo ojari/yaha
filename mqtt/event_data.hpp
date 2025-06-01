@@ -84,14 +84,20 @@ public:
         return changed;
     }
 
-    void set(float aValue) override {
+    bool set(float aValue) override {
         if (std::holds_alternative<float>(value)) {
+            auto current = getFloat();
+            if (std::abs(current - aValue) < 0.01f) {
+                return false; // No significant change
+            }
             value = aValue;
+            
         } else {
             value = static_cast<int>(aValue);
         }
         this->value = aValue;
         isInteger = false;
+        return true;
     }
 
 private:

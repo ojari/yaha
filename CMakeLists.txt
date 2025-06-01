@@ -15,6 +15,7 @@ endif()
 
 # Use CMAKE_BUILD_TYPE
 if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "CMAKE_BUILD_TYPE not set, defaulting to Debug")
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 endif()
 

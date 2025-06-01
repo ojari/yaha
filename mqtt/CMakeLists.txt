@@ -72,7 +72,7 @@ find_package(fmt REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
     ${EXTRA_LIBRARIES}
-    fmt::fmt
+    # fmt::fmt
     sqlite3
 )
 
@@ -82,5 +82,5 @@ endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
-target_link_options(${PROJECT_NAME} PRIVATE --coverage)
-target_compile_options(${PROJECT_NAME} PRIVATE --coverage)
+# target_link_options(${PROJECT_NAME} PRIVATE --coverage)
+# target_compile_options(${PROJECT_NAME} PRIVATE --coverage)

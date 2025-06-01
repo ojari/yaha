@@ -18,6 +18,6 @@ else()
   message(STATUS "VCPKG_ROOT=${VCPKG_ROOT}")
   message(STATUS "EXTRA_LIBRARIES=${EXTRA_LIBRARIES}")
 
-  include_directories(${VCPKG_ROOT}/include)
-  link_directories(BEFORE ${VCPKG_ROOT}/lib)
+  # include_directories(${VCPKG_ROOT}/include)
+  # link_directories(BEFORE ${VCPKG_ROOT}/lib)
 endif()
