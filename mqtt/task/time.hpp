@@ -25,12 +25,7 @@ public:
         int new_weekday = local_tm.tm_wday;
 
         sendNotification(hour, minute);
-
-        if (new_weekday != weekday) {
-            weekday_event.set(new_weekday);
-            notify(weekday_event);
-            weekday = new_weekday;
-        }
+		sendWeekdayNotification(new_weekday);
     }
 
     bool isValidEvent(EventId eventId) override {
@@ -46,12 +41,31 @@ protected:
         time.set(hours);
         notify(time);
     }
+	void sendWeekdayNotification(int weekday) {
+		if (weekday_event.set(weekday)) {
+            notify(weekday_event);
+		}
+	}
+    void sendDateNotification(int ayear, int amonth, int aday) {
+        if (year.set(ayear)) {
+            notify(year);
+        }
+        if (month.set(amonth)) {
+            notify(month);
+        }
+        if (day.set(aday)) {
+            notify(day);
+        }
+
+    }
     int hour {0};
     int minute {1};
-    int weekday {-1};
 
 private:
-    EventData time {EventId::TIME, 0};
+    EventData time  {EventId::TIME, 0};
+    EventData year  {EventId::YEAR, 2025};
+    EventData month {EventId::MONTH, 1};
+    EventData day   {EventId::DAY, 1};
     EventData weekday_event {EventId::WEEKDAY, 0};
 };
 
@@ -62,21 +76,23 @@ public:
 
     void initialize() override {
         sendNotification(hour, minute);
+		sendWeekdayNotification(0);
+        sendDateNotification(iyear, imonth, iday);
     }
 
     void execute() override {
         incrementTime(1);
         int hours = hm2time(hour, minute);
-        int sundown {0};
+        int darkness {0};
 
         if (sunrise <= hours && hours <= sunset) {
-            sundown = 0;
+            darkness = 0;
         } else {
-            sundown = 1;
+            darkness = 1;
         }
 
-        if (event.set(sundown)) {
-            notify(event);
+        if (dark.set(darkness)) {
+            notify(dark);
         }
 
         sendNotification(hour, minute);
@@ -84,10 +100,15 @@ public:
 
 private:
     void incrementTime(int minutes);
+    void incrementDate();
 
     int sunrise {hm2time(6, 0)};
     int sunset {hm2time(20, 0)};
-    EventData event {EventId::SUNDOWN, 0};
+    int weekday {0};
+    int iyear {2026};
+    int imonth {2};
+    int iday {2};
+    EventData dark {EventId::DARK, -1};
 
 };
 

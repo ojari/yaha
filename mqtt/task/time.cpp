@@ -10,10 +10,26 @@ void TaskDebugTime::incrementTime(int minutes) {
         minute %= 60;
         if (hour >= 24) {
             hour %= 24;
-            weekday = (weekday + 1) % 7;
-            notify(EventData(EventId::WEEKDAY, weekday));
+            
+			incrementDate();
         }
     }
+}
+
+void TaskDebugTime::incrementDate() {
+    iday++;
+    if (iday > 31) { // Simplified, does not account for month lengths
+        iday = 1;
+        imonth++;
+        if (imonth > 12) {
+            imonth = 1;
+            iyear++;
+        }
+    }
+    sendDateNotification(iyear, imonth, iday);
+
+    weekday = (weekday + 1) % 7;
+    sendWeekdayNotification(weekday);
 }
 
 }  // namespace task

@@ -25,6 +25,8 @@ public:
         std::ifstream statusFile(filePath);
         if (!statusFile.is_open()) {
             spdlog::error("Error opening {}", filePath);
+            errorOccurred = true;  // Set error flag to prevent further attempts
+            update(-1);  // Notify with an error value
             return;
         }
 

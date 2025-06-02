@@ -6,7 +6,8 @@ namespace automation {
 
 struct CarHeater : public Automation  {
     CarHeater(std::shared_ptr<IActuator> actuator, const std::string& name) :
-        Automation(actuator, name)
+        Automation(actuator, name),
+		leaveTime(0700)
     {
         initial_value(false);
     }

@@ -11,20 +11,24 @@ struct DebugOutput : public IObserver {
             // do not show temperature changes
         } else {
             if (value.isInt()) {
-                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getInt());
+                spdlog::info("{}: {} = {}", time2str(time), value.name(), value.getInt());
             } else {
-                spdlog::info("{}: {} changed to {}", time2str(time), value.name(), value.getFloat());
+                spdlog::info("{}: {} = {}", time2str(time), value.name(), value.getFloat());
             }
         }
     }
 
     void registerEvents(IEventManager& evManager) {
-        const std::array<EventId, 12> events = {
+        const std::array<EventId, 16> events = {
             // EventId::TEMPERATURE,
             EventId::TEMPERATURE_ROOM,
             EventId::WEEKDAY,
             EventId::PROC_MEM,
+            EventId::DARK,
             EventId::TIME,
+            EventId::YEAR,
+			EventId::MONTH,
+			EventId::DAY,
             EventId::BUTTON_LIBRARY,
             EventId::BUTTON_LIVING_ROOM,
             EventId::SWITCH_AUTO_TALLI,
