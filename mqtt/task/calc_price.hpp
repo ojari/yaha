@@ -4,7 +4,7 @@
 
 namespace task {
 
-class TaskCalcPrice : public Observable, public ITask {
+class TaskCalcPrice : public Observable, public IObservableTask {
 public:
     TaskCalcPrice() = default;
 
@@ -16,6 +16,10 @@ public:
         if (price.set(newPrice)) {
             notify(price);
         }
+    }
+
+    bool isValidEvent(EventId eventId) override {
+        return (eventId == price.id());
     }
 
 private:

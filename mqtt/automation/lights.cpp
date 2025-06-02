@@ -1,4 +1,5 @@
 #include "lights.hpp"
+#include <stdexcept>
 
 namespace automation {
 

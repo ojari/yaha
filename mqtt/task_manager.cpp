@@ -1,26 +1,41 @@
 #include "task_manager.hpp"
+#include "task/temperature.hpp"
+#include "task/time.hpp"
+#include "task/calc_price.hpp"
+
+TaskManager::TaskManager() {
+    tasks.emplace_back(std::make_unique<task::TaskTemperature>());
+#ifdef DEBUG_TIME
+    tasks.emplace_back(std::make_unique<task::TaskDebugTime>());
+#else
+    tasks.emplace_back(std::make_unique<task::TaskTime>());
+#endif
+    tasks.emplace_back(std::make_unique<task::TaskCalcPrice>());
+}
+
+void TaskManager::initialize() {
+    for (const auto& task : tasks) {
+        task->initialize();
+    }
+}
 
 void TaskManager::execute() {
-    temperature.execute();
-    time.execute();
-    price.execute();
+    for (const auto& task : tasks) {
+        task->execute();
+    }
 }
 
 bool TaskManager::subscribe(EventId eventId, IObserver& observer) {
-    switch (eventId) {
-        case EventId::TEMPERATURE:
-            temperature.subscribe(observer);
-            break;
-        case EventId::SUNDOWN:
-        case EventId::TIME:
-            time.subscribe(observer);
-            break;
-        case EventId::ELECTRICITY_PRICE:
-            price.subscribe(observer);
-            break;
-        default:
-            return false;
-            break;
+    bool returned = false;
+    // Check if the eventId is valid for any of the tasks
+    for (const auto& task : tasks) {
+        if (task->isValidEvent(eventId)) {
+
+            if (auto observableTask = dynamic_cast<Observable*>(task.get())) {
+                observableTask->subscribe(observer);
+                returned = true;
+            }
+        }
     }
-    return true;
+    return returned;
 }

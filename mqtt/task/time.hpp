@@ -7,7 +7,7 @@
 
 namespace task {
 
-class TaskTime : public Observable, public ITask {
+class TaskTime : public Observable, public IObservableTask {
 public:
     TaskTime() = default;
 
@@ -31,6 +31,11 @@ public:
             notify(weekday_event);
             weekday = new_weekday;
         }
+    }
+
+    bool isValidEvent(EventId eventId) override {
+        return (eventId == time.id() || 
+                eventId == weekday_event.id());
     }
 
 protected:

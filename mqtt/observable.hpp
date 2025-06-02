@@ -10,6 +10,13 @@ struct Observable {
     }
 
     void subscribe(IObserver& observer) {
+        // Check if the observer is already subscribed
+        for (auto obs : observers) {
+            if (obs == &observer) {
+                return; // Already subscribed
+            }
+        }
+
         observers.push_back(&observer);
     }
 

@@ -5,7 +5,7 @@
 
 namespace task {
 
-class TaskTemperature : public Observable, public ITask {
+class TaskTemperature : public Observable, public IObservableTask {
 public:
     TaskTemperature() = default;
 
@@ -18,6 +18,10 @@ public:
             counter = 0;
         }
         counter++;
+    }
+
+    bool isValidEvent(EventId eventId) override {
+        return (eventId == temperature.id());
     }
 
 private:

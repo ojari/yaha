@@ -35,20 +35,41 @@ endforeach()
 
 add_executable(${PROJECT_NAME}
   main.cpp
-  mqtt.cpp
-  common.cpp
   actuator.cpp
+  actuator.hpp
+  application.hpp
+  common.cpp
+  common.hpp
+  config.hpp
+  debug_output.hpp
+  event_data.hpp
   history.cpp
+  history.hpp
+  int_time.hpp
+  mqtt.cpp
+  mqtt.hpp
+  observable.hpp
   task_manager.cpp
-  automation/registry.cpp
+  task_manager.hpp
+  task.hpp
   automation/automation.cpp
-  automation/lights.cpp
+  automation/automation.hpp
   automation/car_heater.cpp
+  automation/car_heater.hpp
+  automation/lights.cpp
+  automation/lights.hpp
+  automation/registry.cpp
+  automation/registry.hpp
   automation/room_heater.cpp
+  automation/room_heater.hpp
   automation/storage_heater.cpp
+  automation/storage_heater.hpp
   automation/switch_light.cpp
+  automation/switch_light.hpp
   automation/water_heater.cpp
+  automation/water_heater.hpp
   task/time.cpp
+  task/time.hpp
   data/sourcesqlite.cpp
   data/tables.cpp
   device/registry.cpp
@@ -56,8 +77,8 @@ add_executable(${PROJECT_NAME}
 )
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+set(CMAKE_CXX_STANDARD 20)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 
 target_include_directories(${PROJECT_NAME} PRIVATE 

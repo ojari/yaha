@@ -1,7 +1,9 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <fstream>
 #include "../common.hpp"
 #include "../observable.hpp"

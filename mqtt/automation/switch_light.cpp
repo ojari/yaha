@@ -1,4 +1,5 @@
 #include "switch_light.hpp"
+#include <stdexcept>
 
 namespace automation {
 
