@@ -6,11 +6,11 @@ namespace device {
 
 class SwitchDevice : public Device, public IDeviceBoolOut {
 public:
-    explicit SwitchDevice(const std::string& name, EventId eid) :
-        Device(name, eid)
+    explicit SwitchDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
+        Device(name, eid, evbus)
     {}
 
-    void on_message(std::string& _deviceName, nlohmann::json& payload) override {
+    void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
         if (payload.contains("state")) {
             state = payload["state"].get<std::string>() == "ON";
         } else {

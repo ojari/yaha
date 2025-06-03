@@ -3,7 +3,7 @@
 #include <vector>
 #include "common.hpp"
 
-struct Observable {
+/*struct Observable {
     void notify(const IEventData& value) const {
         for (auto observer : observers)
             observer->onChange(value);
@@ -21,14 +21,9 @@ struct Observable {
     }
 
     void unsubscribe(IObserver& observer) {
-        // @TODO: use std::remove_if
-        /* observers.erase(
-            remove(observers.begin(), observers.end(), &observer),
-            observers.end()
-        );*/
-    }
+
 
 private:
     std::vector<IObserver*> observers;
 };
-
+*/

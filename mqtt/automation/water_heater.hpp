@@ -1,6 +1,5 @@
 #pragma once
 #include "automation.hpp"
-#include "../task_manager.hpp"
 
 namespace automation {
 
@@ -12,8 +11,8 @@ public:
         initial_value(false);
     }
 
-    void registerEvents(IEventManager& evman) override {
-        evman.subscribe(EventId::TIME, *this);
+    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
+        evbus->subscribe(EventId::TIME, this);
     }
 
     void onChange(const IEventData& event) override;

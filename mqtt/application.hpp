@@ -6,6 +6,9 @@
 #include "task/process_memory_reader.hpp"
 #include "config.hpp"
 
+#include "task/temperature.hpp"
+#include "task/time.hpp"
+#include "task/calc_price.hpp"
 
 struct Application {
     Application() {
@@ -47,20 +50,21 @@ struct TimerBase {
 
 protected:
     uv_timer_t timer;
+    std::vector<std::unique_ptr<ITask>> tasks;
 };
 
 //-----------------------------------------------------------------------------
 // 5 minutes timer
 //
 struct TimerSlow : public TimerBase {
-    explicit TimerSlow(Application& app) :
+    explicit TimerSlow(std::shared_ptr<IEventBus> evbus, Application& app) :
         TimerBase(app, SLOW_TIMER_INTERVAL)
     {
         timer.data = this;
         // Fill the tasks vector with the required ITask implementations
         tasks.emplace_back(std::make_unique<LoadAverageReader>());
         tasks.emplace_back(std::make_unique<MemoryUsageReader>());
-        tasks.emplace_back(std::make_unique<ProcessMemoryReader>());
+        tasks.emplace_back(std::make_unique<ProcessMemoryReader>(evbus));
     }
 
     void onTimer() override {
@@ -72,27 +76,39 @@ struct TimerSlow : public TimerBase {
             }
         }
     }
-
-private:
-    std::vector<std::unique_ptr<ITask>> tasks;
 };
 
 //-----------------------------------------------------------------------------
 // One minute timer
 //
 struct TimerFast : public TimerBase {
-    TimerFast(Application& app, TaskManager& taskManager) :
-        TimerBase(app, FAST_TIMER_INTERVAL),
-        taskManager(taskManager)
+    TimerFast(std::shared_ptr<IEventBus> evbus, Application& app) :
+        TimerBase(app, FAST_TIMER_INTERVAL)
     {
         timer.data = this;
+
+        tasks.emplace_back(std::make_unique<task::TaskTemperature>(evbus));
+#ifdef DEBUG_TIME
+        tasks.emplace_back(std::make_unique<task::TaskDebugTime>(evbus));
+#else
+        tasks.emplace_back(std::make_unique<task::TaskTime>(evbus));
+#endif
+        tasks.emplace_back(std::make_unique<task::TaskCalcPrice>(evbus));
+
+        for (const auto& task : tasks) {
+            task->initialize();
+        }
     }
 
     void onTimer() override {
-        taskManager.execute();
+        for (auto& task : tasks) {
+            try {
+                task->execute();
+            }
+            catch (const std::exception& ex) {
+                spdlog::error("TimerFast task execution failed: {}", ex.what());
+            }
+        }
     }
-
-private:
-    TaskManager &taskManager;
 };
 

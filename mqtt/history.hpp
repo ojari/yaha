@@ -1,6 +1,5 @@
 #pragma once
 
-#include <chrono>
 #include "common.hpp"
 #include "data/sourcesqlite.hpp"
 #include "data/tables.hpp"
@@ -13,7 +12,7 @@ public:
     virtual ~History() = default;
 
     void onChange(const IEventData& value) override;
-    void registerEvents(IEventManager &evman);
+    void registerEvents(std::shared_ptr<IEventBus> evbus);
 
 private:
     SourceSqlite &history;

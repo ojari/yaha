@@ -18,7 +18,7 @@ struct DebugOutput : public IObserver {
         }
     }
 
-    void registerEvents(IEventManager& evManager) {
+    void registerEvents(std::shared_ptr<IEventBus> bus) {
         const std::array<EventId, 16> events = {
             // EventId::TEMPERATURE,
             EventId::TEMPERATURE_ROOM,
@@ -40,7 +40,7 @@ struct DebugOutput : public IObserver {
         };
 
         for (const auto& event : events) {
-            evManager.subscribe(event, *this);
+            bus->subscribe(event, this);
         }
     }
 

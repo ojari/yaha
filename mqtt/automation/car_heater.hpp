@@ -27,9 +27,9 @@ struct CarHeater : public Automation  {
         }
     }
 
-    void registerEvents(IEventManager& evman) override {
-        evman.subscribe(EventId::TIME, *this);
-        evman.subscribe(EventId::TEMPERATURE, *this);
+    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
+        evbus->subscribe(EventId::TIME, this);
+        evbus->subscribe(EventId::TEMPERATURE, this);
     }
 
     void onChange(const IEventData& event) override;

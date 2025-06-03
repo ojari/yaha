@@ -7,8 +7,8 @@
 
 class MessageRouter {
 public:
-    explicit MessageRouter(device::Registry *deviceReg) :
-        deviceRegistry(deviceReg)
+    explicit MessageRouter(device::Registry *deviceReg)
+        : deviceRegistry(deviceReg)
     {}
 
     void route(std::string& deviceName, std::string& payload);
@@ -23,13 +23,11 @@ private:
 
 class Mqtt : public ITask, public IOutput {
 public:
-    explicit Mqtt(const std::string& filename);
+    explicit Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus);
+
     void execute() override;
     void send(std::string_view topic, const std::string& message) override;
 
-    IEventManager* getEventManager() {
-        return &deviceRegistry;
-    }
 private:
     MQTTClient client;
     device::Registry deviceRegistry;

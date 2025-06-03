@@ -2,7 +2,6 @@
 #include <memory>
 #include <string>
 #include "automation.hpp"
-#include "../task_manager.hpp"
 
 namespace automation {
 
@@ -17,9 +16,9 @@ struct SwitchLight : public Automation {
 
     std::string toString() override;
 
-    void registerEvents(IEventManager& evman) override {
-        evman.subscribe(buttonEvent, *this);
-        evman.subscribe(lampEvent, *this);
+    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
+        evbus->subscribe(buttonEvent, this);
+        evbus->subscribe(lampEvent, this);
     }
 
     void onChange(const IEventData& event) override;

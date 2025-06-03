@@ -17,7 +17,7 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 
         json jsonPayload = json::parse(payload);
         try {
-            device->on_message(deviceName, jsonPayload);
+            device->onMessage(deviceName, jsonPayload);
         } catch (const nlohmann::json::parse_error& e) {
             spdlog::error("Json parse error: {}", e.what());
         } catch (const nlohmann::json::type_error& e) {
@@ -97,7 +97,8 @@ void mqtt_connlost(void *context, char *cause)
 }
 
 //------------------------------------------------------------------
-Mqtt::Mqtt(const std::string& filename) :
+Mqtt::Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus) :
+	deviceRegistry(evbus),
     messageRouter(&deviceRegistry)
 {
     int rc = 0;

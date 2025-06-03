@@ -4,20 +4,21 @@
 #include "../common.hpp"
 #include "../data/data.hpp"
 #include "../event_data.hpp"
-#include "../observable.hpp"
+#include "../event_bus.hpp"
 
 namespace device {
 
-class Device : public Observable {
+class Device {
 public:
-    Device(const std::string& name, EventId eid) :
+    Device(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
         deviceName(name),
+		eventBus(evbus),
         eventData(eid, 2)  // value that is not 0 or 1
     {}
 
     virtual ~Device() = default;
 
-    virtual void on_message(std::string& deviceName, nlohmann::json& payload) = 0;
+    virtual void onMessage(std::string& deviceName, nlohmann::json& payload) = 0;
 
     bool hasEvent(EventId eventId) const {
         return eventData.id() == eventId;
@@ -31,10 +32,11 @@ protected:
     template <typename T>
     void notifyValue(T value) {
         eventData.set(value);
-        notify(eventData);
+		eventBus->publish(eventData);
     }
 
     std::string deviceName;
+	std::shared_ptr<IEventBus> eventBus;
 
 private:
     EventData eventData;

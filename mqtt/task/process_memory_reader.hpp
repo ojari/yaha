@@ -6,17 +6,18 @@
 #endif
 #include <fstream>
 #include "../common.hpp"
-#include "../observable.hpp"
 #include "../event_data.hpp"
 
 #ifndef WIN32
 #include <unistd.h>
 #endif
 
-class ProcessMemoryReader : public Observable, public ITask {
+class ProcessMemoryReader : public ITask {
 public:
-    ProcessMemoryReader()
-        : filePath("/proc/" + std::to_string(getpid()) + "/status") {}
+    ProcessMemoryReader(std::shared_ptr<IEventBus> evbus) :
+        evbus(evbus),
+        filePath("/proc/" + std::to_string(getpid()) + "/status")
+    {}
 
     void execute() override {
         if (errorOccurred) {
@@ -48,10 +49,11 @@ public:
 private:
     void update(float value) {
         if (vmRss.set(value)) {
-            notify(vmRss);
+            evbus->publish(vmRss);
         }
     }
 
+    std::shared_ptr<IEventBus> evbus;
     EventData vmRss {EventId::PROC_MEM, 0};
     std::string filePath;
     bool errorOccurred = false;

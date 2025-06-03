@@ -2,14 +2,16 @@
 
 #include <spdlog/spdlog.h>
 #include "../task.hpp"
-#include "../observable.hpp"
 #include "../event_data.hpp"
 
 namespace task {
 
-class TaskTime : public Observable, public IObservableTask {
+class TaskTime : public IObservableTask {
 public:
-    TaskTime() = default;
+    TaskTime(std::shared_ptr<IEventBus> evbus) :
+        evbus(evbus)
+    {
+    }
 
     void initialize() override {
         execute();
@@ -39,27 +41,27 @@ protected:
 
         int hours = hm2time(hour, minute);
         time.set(hours);
-        notify(time);
+        evbus->publish(time);
     }
 	void sendWeekdayNotification(int weekday) {
 		if (weekday_event.set(weekday)) {
-            notify(weekday_event);
+            evbus->publish(weekday_event);
 		}
 	}
     void sendDateNotification(int ayear, int amonth, int aday) {
         if (year.set(ayear)) {
-            notify(year);
+            evbus->publish(year);
         }
         if (month.set(amonth)) {
-            notify(month);
+            evbus->publish(month);
         }
         if (day.set(aday)) {
-            notify(day);
+            evbus->publish(day);
         }
-
     }
     int hour {0};
     int minute {1};
+    std::shared_ptr<IEventBus> evbus;
 
 private:
     EventData time  {EventId::TIME, 0};
@@ -72,7 +74,10 @@ private:
 //-----------------------------------------------------------------------------
 class TaskDebugTime : public TaskTime {
 public:
-    TaskDebugTime() = default;
+    TaskDebugTime(std::shared_ptr<IEventBus> evbus) :
+        TaskTime(evbus)
+    {
+    }
 
     void initialize() override {
         sendNotification(hour, minute);
@@ -92,7 +97,7 @@ public:
         }
 
         if (dark.set(darkness)) {
-            notify(dark);
+            evbus->publish(dark);
         }
 
         sendNotification(hour, minute);

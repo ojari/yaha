@@ -24,12 +24,12 @@ int parseRelay(const std::string& name) {
 
 class ShellyDevice : public Device, public IDeviceBoolOut {
 public:
-    explicit ShellyDevice(const std::string& name, EventId eid) :
-        Device(parseDeviceName(name), eid),
+    explicit ShellyDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
+        Device(parseDeviceName(name), eid, evbus),
         relay(parseRelay(name))
     {}
 
-    void on_message(std::string& _deviceName, nlohmann::json& payload) override {
+    void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
         /*if (payload.contains("state")) {
             state = payload["state"].get<std::string>() == "ON";
         }

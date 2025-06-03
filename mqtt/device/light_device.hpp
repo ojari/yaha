@@ -6,12 +6,12 @@ namespace device {
 
 class LightDevice : public Device, public IDeviceLightOut {
 public:
-    explicit LightDevice(const std::string& name, EventId eid) :
-        Device(name, eid)
+    explicit LightDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
+        Device(name, eid, evbus)
     {
     }
 
-    void on_message(std::string& devName, nlohmann::json& payload) override {
+    void onMessage(std::string& devName, nlohmann::json& payload) override {
         brightness = payload["brightness"];
         if (payload["state"].is_boolean()) {
             state = payload["state"];

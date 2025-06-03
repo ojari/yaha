@@ -1,4 +1,5 @@
 #include "history.hpp"
+#include <chrono>
 
 void History::onChange(const IEventData& value) {
     DataHistory data;
@@ -11,7 +12,7 @@ void History::onChange(const IEventData& value) {
     history.insert(table);
 }
 
-void History::registerEvents(IEventManager &evman) {
+void History::registerEvents(std::shared_ptr<IEventBus> bus) {
     const std::array<EventId, 9> events = {
         EventId::TEMPERATURE,
         EventId::TEMPERATURE_ROOM,
@@ -25,7 +26,7 @@ void History::registerEvents(IEventManager &evman) {
     };
 
     for (const auto& event : events) {
-        evman.subscribe(event, *this);
+        bus->subscribe(event, this);
     }
 }
 

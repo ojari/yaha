@@ -1,25 +1,19 @@
 // #include <unistd.h>
 #include <spdlog/spdlog.h>
-#include <map>
-#include <chrono>
 #include <thread>
 #include <iomanip>
 #include <fstream>
+#include <spdlog/spdlog.h>
 #include "mqtt.hpp"
 #include "common.hpp"
 #include "data/sourcesqlite.hpp"
 #include "data/tables.hpp"
-#include "task_manager.hpp"
 #include "debug_output.hpp"
+#include "event_bus.hpp"
 #include "history.hpp"
 #include "automation/registry.hpp"
 #include "application.hpp"
 #include "int_time.hpp"
-#include <map>
-#include <chrono>
-#include <thread>
-#include <iomanip>
-#include <spdlog/spdlog.h>
 // #include <spdlog/sinks/basic_file_sink.h>
 #ifndef WIN32
 #include <spdlog/sinks/syslog_sink.h>
@@ -87,23 +81,20 @@ int main(int argc, char* argv[]) {
 
     // initialize system
     //
-    auto mqtt = std::make_shared<Mqtt>(devicesFile);
-    TaskManager taskManager;
-    automation::Registry automations(mqtt);
+    auto evBus = std::make_shared<EventBus>();
+    auto mqtt = std::make_shared<Mqtt>(devicesFile, evBus);
+    automation::Registry automations(mqtt, evBus);
     DebugOutput debugOutput;
     History history(source);
-    DualEventManager evManager(&taskManager, mqtt->getEventManager());
 
-    taskManager.initialize();
+    automations.load(automationFile, evBus);
 
-    automations.load(automationFile, evManager);
-
-    debugOutput.registerEvents(evManager);
-    history.registerEvents(evManager);
+    debugOutput.registerEvents(evBus);
+    history.registerEvents(evBus);
 
     Application app;
-    TimerSlow timer1(app);
-    TimerFast timer2(app, taskManager);
+    TimerSlow timer1(evBus, app);
+    TimerFast timer2(evBus, app);
 
     app.run();
 

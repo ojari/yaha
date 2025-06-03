@@ -35,8 +35,6 @@ endforeach()
 
 add_executable(${PROJECT_NAME}
   main.cpp
-  actuator.cpp
-  actuator.hpp
   application.hpp
   common.cpp
   common.hpp
@@ -49,8 +47,6 @@ add_executable(${PROJECT_NAME}
   mqtt.cpp
   mqtt.hpp
   observable.hpp
-  task_manager.cpp
-  task_manager.hpp
   task.hpp
   automation/automation.cpp
   automation/automation.hpp

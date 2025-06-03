@@ -4,17 +4,19 @@
 
 namespace task {
 
-class TaskCalcPrice : public Observable, public IObservableTask {
+class TaskCalcPrice : public IObservableTask {
 public:
-    TaskCalcPrice() = default;
+    TaskCalcPrice(std::shared_ptr<IEventBus> evbus) :
+        evbus(evbus)
+    {
+    }
 
     void execute() override {
-        // random number between -1 and 1
         int randomChange = rand() % 3 - 1; // -1, 0, or 1
         int newPrice = price.getInt() + randomChange;
 
         if (price.set(newPrice)) {
-            notify(price);
+            evbus->publish(price);
         }
     }
 
@@ -23,6 +25,7 @@ public:
     }
 
 private:
+    std::shared_ptr<IEventBus> evbus;
     EventData price {EventId::ELECTRICITY_PRICE, 10};
 };
 

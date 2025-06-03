@@ -13,7 +13,7 @@
 
 namespace automation {
 
-void Registry::load(const std::string& filename, IEventManager& evman) {
+void Registry::load(const std::string& filename, std::shared_ptr<IEventBus> evbus) {
     std::ifstream ifile(filename);
     if (ifile.is_open()) {
         nlohmann::json data;
@@ -43,7 +43,7 @@ void Registry::load(const std::string& filename, IEventManager& evman) {
                 }
             }
 
-            ctrl->registerEvents(evman);
+            ctrl->registerEvents(evbus);
             controllers.push_back(ctrl);
         }
 

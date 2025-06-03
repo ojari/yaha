@@ -1,13 +1,16 @@
 #pragma once
 #include "../task.hpp"
-#include "../observable.hpp"
 #include "../event_data.hpp"
 
 namespace task {
 
-class TaskTemperature : public Observable, public IObservableTask {
+class TaskTemperature : public IObservableTask {
 public:
-    TaskTemperature() = default;
+    explicit TaskTemperature(std::shared_ptr<IEventBus> eventBus)
+        : evbus {eventBus}
+    {}
+
+    TaskTemperature() = delete;
 
     void execute() override {
         if (counter < 30) {
@@ -28,9 +31,10 @@ private:
     void update(float temp) {
         if (temperature.getFloat() != temp) {
             temperature.set(temp);
-            notify(temperature);
+            evbus->publish(temperature);
         }
     }
+    std::shared_ptr<IEventBus> evbus;
     EventData temperature {EventId::TEMPERATURE, 20.0f};
     int counter {0};
 };

@@ -67,33 +67,18 @@ struct IObserver {
     virtual void onChange(const IEventData& value) = 0;
 };
 
+class IEventBus {
+public:
+    virtual ~IEventBus() = default;
+
+    virtual void subscribe(EventId eventId, IObserver* observer) = 0;
+    virtual void unsubscribe(EventId eventId, IObserver* observer) = 0;
+    virtual void publish(const IEventData& eventData) = 0;
+};
+
+
 struct IEventManager {
     virtual ~IEventManager() = default;
 
     virtual bool subscribe(EventId eventId, IObserver& observer) = 0;
-};
-
-
-struct DualEventManager : IEventManager {
-    DualEventManager(IEventManager* manager1, IEventManager* manager2) :
-        manager1(manager1),
-        manager2(manager2)
-    {}
-    virtual ~DualEventManager() = default;
-
-    bool subscribe(EventId eventId, IObserver& observer) {
-        if (eventId == EventId::UNKNOWN) {
-            return true;
-        }
-        if (manager1->subscribe(eventId, observer) == false) {
-            if (manager2->subscribe(eventId, observer) == false) {
-                return false;
-            }
-            return true;
-        }
-        return true;
-    }
-private:
-    IEventManager* manager1;
-    IEventManager* manager2;
 };
