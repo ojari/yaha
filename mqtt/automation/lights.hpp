@@ -7,14 +7,14 @@
 namespace automation {
 
 struct Lights : public Automation {
-    Lights(std::shared_ptr<IActuator> actuator, const std::string& name) :
-        Automation(actuator, name)
+    Lights(std::shared_ptr<IOutput> output, const std::string& name) :
+        Automation(output, name)
     {
         initial_value(false);
     }
 
-    Lights(std::shared_ptr<IActuator> actuator, const std::string& name, int onTime, int offTime) :
-        Automation(actuator, name),
+    Lights(std::shared_ptr<IOutput> output, const std::string& name, int onTime, int offTime) :
+        Automation(output, name),
         onTime(onTime),
         offTime(offTime)
     {
@@ -33,9 +33,9 @@ struct Lights : public Automation {
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IActuator> actuator)
+        std::shared_ptr<IOutput> output)
     {
-        return std::make_shared<Lights>(actuator, name);
+        return std::make_shared<Lights>(output, name);
     }
 
 private:

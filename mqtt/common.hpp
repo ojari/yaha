@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 extern int hm2time(int hour, int minute);
 extern std::string time2str(int time);

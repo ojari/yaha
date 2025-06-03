@@ -9,9 +9,10 @@ param(
   [bool]$Arm = $false
 )
 
-$GENERATOR = "Ninja Multi-Config"
-$VCPKG = "/home/jari/vcpkg/vcpkg"
-#$VCPKG = "C:/usr/vcpkg/vcpkg.exe"
+# $GENERATOR = "Ninja Multi-Config"
+$GENERATOR = "Visual Studio 17 2022"
+# $VCPKG = "/home/jari/vcpkg/vcpkg"
+$VCPKG = "C:/usr/vcpkg/vcpkg.exe"
 
 if ($Arm) {
   Write-Host "ARM"

@@ -76,32 +76,32 @@ std::shared_ptr<Automation> Registry::create(
     const std::string& name,
     AutomationType type) const
 {
-    using CreateFunc = std::shared_ptr<Automation>(*)(const std::string&, std::shared_ptr<IActuator>);
+    using CreateFunc = std::shared_ptr<Automation>(*)(const std::string&, std::shared_ptr<IOutput>);
 
     static const std::pair<AutomationType, CreateFunc> createMap[] = {
-        {AutomationType::CAR_HEATER, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return CarHeater::create(name, actuator);
+        {AutomationType::CAR_HEATER, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return CarHeater::create(name, output);
         }},
-        {AutomationType::LIGHTS, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return Lights::create(name, actuator);
+        {AutomationType::LIGHTS, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return Lights::create(name, output);
         }},
-        {AutomationType::SWITCH, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return SwitchLight::create(name, actuator);
+        {AutomationType::SWITCH, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return SwitchLight::create(name, output);
         }},
-        {AutomationType::STORAGE_HEATER, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return StorageHeater::create(name, actuator);
+        {AutomationType::STORAGE_HEATER, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return StorageHeater::create(name, output);
         }},
-        {AutomationType::WATER_HEATER, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return WaterHeater::create(name, actuator);
+        {AutomationType::WATER_HEATER, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return WaterHeater::create(name, output);
         }},
-        {AutomationType::ROOM_HEATER, [](const std::string& name, std::shared_ptr<IActuator> actuator) {
-            return RoomHeater::create(name, actuator);
+        {AutomationType::ROOM_HEATER, [](const std::string& name, std::shared_ptr<IOutput> output) {
+            return RoomHeater::create(name, output);
         }}
     };
 
     for (const auto& pair : createMap) {
         if (pair.first == type) {
-            return pair.second(name, actuator);
+            return pair.second(name, output);
         }
     }
 

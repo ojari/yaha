@@ -6,8 +6,8 @@ namespace automation {
 
 class WaterHeater : public Automation  {
 public:
-    explicit WaterHeater(std::shared_ptr<IActuator> actuator, const std::string& name) :
-        Automation(actuator, name)
+    explicit WaterHeater(std::shared_ptr<IOutput> output, const std::string& name) :
+        Automation(output, name)
     {
         initial_value(false);
     }
@@ -20,9 +20,9 @@ public:
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IActuator> actuator)
+        std::shared_ptr<IOutput> output)
     {
-        return std::make_shared<WaterHeater>(actuator, name);
+        return std::make_shared<WaterHeater>(output, name);
     }
 };
 

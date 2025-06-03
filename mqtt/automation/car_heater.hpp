@@ -5,15 +5,15 @@
 namespace automation {
 
 struct CarHeater : public Automation  {
-    CarHeater(std::shared_ptr<IActuator> actuator, const std::string& name) :
-        Automation(actuator, name),
+    CarHeater(std::shared_ptr<IOutput> output, const std::string& name) :
+        Automation(output, name),
 		leaveTime(0700)
     {
         initial_value(false);
     }
 
-    CarHeater(std::shared_ptr<IActuator> actuator, const std::string& name, const int& leaveTime) :
-        Automation(actuator, name),
+    CarHeater(std::shared_ptr<IOutput> output, const std::string& name, const int& leaveTime) :
+        Automation(output, name),
         leaveTime(leaveTime)
     {
         initial_value(false);
@@ -36,9 +36,9 @@ struct CarHeater : public Automation  {
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IActuator> actuator)
+        std::shared_ptr<IOutput> output)
     {
-        return std::make_shared<CarHeater>(actuator, name);
+        return std::make_shared<CarHeater>(output, name);
     }
 
 private:

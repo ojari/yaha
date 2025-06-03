@@ -19,9 +19,9 @@ void SwitchLight::setArg(const std::string& name, const std::string& value) {
 
 void SwitchLight::toggleLight() {
     if (getInt() == 0) {
-        set(brightness);
+        send(brightness);
     } else {
-        set(0);
+        send(0);
     }
 }
 
@@ -40,9 +40,9 @@ void SwitchLight::onChange(const IEventData& event) {
                 break;
             case 2:  // both buttons works
                 if (event.getInt()) {
-                    set(brightness);
+                    send(brightness);
                 } else {
-                    set(0);
+                    send(0);
                 }
                 break;
         }

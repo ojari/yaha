@@ -6,9 +6,9 @@
 
 namespace automation {
 
-struct SwitchLight : public Automation  {
-    SwitchLight(std::shared_ptr<IActuator> actuator, const std::string& name) :
-        Automation(actuator, name)
+struct SwitchLight : public Automation {
+    SwitchLight(std::shared_ptr<IOutput> output, const std::string& name) :
+        Automation(output, name)
     {
         initial_value(0);
     }
@@ -26,9 +26,9 @@ struct SwitchLight : public Automation  {
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IActuator> actuator)
+        std::shared_ptr<IOutput> output)
     {
-        return std::make_shared<SwitchLight>(actuator, name);
+        return std::make_shared<SwitchLight>(output, name);
     }
 
 private:

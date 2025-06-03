@@ -19,9 +19,9 @@ void Lights::onChange(const IEventData& event) {
     if (event.id() == EventId::TIME) {
         int time = event.getInt();
         if (time >= onTime && time < offTime) {
-            set(true);
+            send(true);
         } else {
-            set(false);
+            send(false);
         }
     }
 }

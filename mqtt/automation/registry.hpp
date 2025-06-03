@@ -12,24 +12,12 @@ namespace automation {
 
 class Registry {
 public:
-    explicit Registry(std::shared_ptr<IActuator> actuator) :
-        actuator { actuator }
+    explicit Registry(std::shared_ptr<IOutput> output) :
+        output { output }
     {}
 
     void load(const std::string& filename, IEventManager& evman);
 
-    /*template <typename... Args>
-    void add(
-        ITaskManager& tasks,
-        const std::string_view name,
-        const std::string& type,
-        std::shared_ptr<IActuator> actuator,
-        Args&&... args)
-    {
-        auto ctrl = create(tasks, name, type, actuator, std::forward<Args>(args)...);
-        controllers.push_back(ctrl);
-    }
-    */
     void add(
         IEventManager& evman,
         const std::string& name,
@@ -42,15 +30,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<Automation>> controllers;
-    std::shared_ptr<IActuator> actuator;
-
-    /*template <typename... Args>
-    std::shared_ptr<Automation> create(
-        ITaskManager& tasks,
-        const std::string_view name,
-        const std::string& type,
-        std::shared_ptr<IActuator> actuator,
-        Args&&... args) const;*/
+    std::shared_ptr<IOutput> output;
 
     AutomationType toAutomationType(const std::string& typeStr);
 

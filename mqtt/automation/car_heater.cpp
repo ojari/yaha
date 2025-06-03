@@ -7,9 +7,9 @@ void CarHeater::onChange(const IEventData& event) {
         int time = event.getInt();
         int startTime = timeAdd(leaveTime, -offset);
         if ((time >= startTime) && time < leaveTime) {
-            set(true);
+            send(true);
         } else {
-            set(false);
+            send(false);
         }
     } else if (event.id() == EventId::TEMPERATURE) {
         offset = calculateDuration(event.getFloat());

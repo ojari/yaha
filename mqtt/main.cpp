@@ -10,7 +10,6 @@
 #include "data/sourcesqlite.hpp"
 #include "data/tables.hpp"
 #include "task_manager.hpp"
-#include "actuator.hpp"
 #include "debug_output.hpp"
 #include "history.hpp"
 #include "automation/registry.hpp"
@@ -88,10 +87,9 @@ int main(int argc, char* argv[]) {
 
     // initialize system
     //
-    auto mqtt = std::make_unique<Mqtt>(devicesFile);
-    auto actuator = std::make_shared<Actuator>(dynamic_cast<IOutput*>(mqtt.get()));
+    auto mqtt = std::make_shared<Mqtt>(devicesFile);
     TaskManager taskManager;
-    automation::Registry automations(actuator);
+    automation::Registry automations(mqtt);
     DebugOutput debugOutput;
     History history(source);
     DualEventManager evManager(&taskManager, mqtt->getEventManager());
@@ -102,8 +100,6 @@ int main(int argc, char* argv[]) {
 
     debugOutput.registerEvents(evManager);
     history.registerEvents(evManager);
-
-    evManager.subscribe(EventId::TIME, *actuator);
 
     Application app;
     TimerSlow timer1(app);
