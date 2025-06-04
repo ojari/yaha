@@ -12,6 +12,8 @@
 #include <unistd.h>
 #endif
 
+namespace task {
+
 class ProcessMemoryReader : public ITask {
 public:
     ProcessMemoryReader(std::shared_ptr<IEventBus> evbus) :
@@ -58,3 +60,5 @@ private:
     std::string filePath;
     bool errorOccurred = false;
 };
+
+} // namespace task

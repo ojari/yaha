@@ -40,13 +40,13 @@ add_executable(${PROJECT_NAME}
   common.hpp
   config.hpp
   debug_output.hpp
+  event_bus.hpp
   event_data.hpp
   history.cpp
   history.hpp
   int_time.hpp
   mqtt.cpp
   mqtt.hpp
-  observable.hpp
   task.hpp
   automation/automation.cpp
   automation/automation.hpp
@@ -64,6 +64,33 @@ add_executable(${PROJECT_NAME}
   automation/switch_light.hpp
   automation/water_heater.cpp
   automation/water_heater.hpp
+  data/config.hpp
+  data/data.hpp
+  data/datasource.hpp
+  data/sourcesqlite.cpp
+  data/sourcesqlite.hpp
+  data/sourcestring.cpp
+  data/sourcestring.hpp
+  data/tables.cpp
+  data/tables.hpp
+  demo/suntime.cpp
+  demo/suntime.hpp
+  device/device.hpp
+  device/light_device.hpp
+    device/registry.cpp
+    device/registry.hpp
+    device/shelly_device.hpp
+    device/switch_device.hpp
+    device/temp_sensor_device.hpp
+    expert/es_base.hpp
+    expert/es_cond.hpp
+    expert/expert.cpp
+    expert/expert.hpp
+  task/calc_price.hpp
+  task/load_average_reader.hpp
+  task/memory_usage_reader.hpp
+  task/process_memory_reader.hpp
+  task/temperature.hpp
   task/time.cpp
   task/time.hpp
   data/sourcesqlite.cpp

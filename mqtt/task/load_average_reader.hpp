@@ -4,6 +4,8 @@
 #include "../task.hpp"
 #include "spdlog/spdlog.h"
 
+namespace task {
+
 class LoadAverageReader : public ITask {
 public:
     explicit LoadAverageReader(const std::string& loadavgFilePath = "/proc/loadavg")
@@ -40,3 +42,5 @@ private:
     std::string filepath;
     bool errorOccurred = false;
 };
+
+}  // namespace task

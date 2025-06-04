@@ -2,7 +2,7 @@
 #include <chrono>
 
 void History::onChange(const IEventData& value) {
-    DataHistory data;
+    data::DataHistory data;
 
     data.epoch = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     data.event = value.id();

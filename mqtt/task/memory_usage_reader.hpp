@@ -4,6 +4,8 @@
 #include "../task.hpp"
 #include "spdlog/spdlog.h"
 
+namespace task {
+
 class MemoryUsageReader : public ITask {
 public:
     explicit MemoryUsageReader(const std::string& filePath_ = "/proc/meminfo")
@@ -54,3 +56,5 @@ private:
     std::string filePath;
     bool errorOccurred = false;
 };
+
+}  // namespace task

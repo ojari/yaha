@@ -59,9 +59,9 @@ int main(int argc, char* argv[]) {
         devicesFile = argv[1];
 
         if (devicesFile == "create") {
-            sqlite3* db = createDatabase("data_yaha.db");
-            SourceSqlite source(db);
-            TableHistory tableHistory;
+            sqlite3* db = data::createDatabase("data_yaha.db");
+            data::SourceSqlite source(db);
+            data::TableHistory tableHistory;
 
             source.createTable(tableHistory);
             return 0;
@@ -73,9 +73,9 @@ int main(int argc, char* argv[]) {
 
     // database initialization
     //
-    sqlite3* db = createDatabase("data_yaha.db");
-    SourceSqlite source(db);
-    TableHistory tableHistory;
+    sqlite3* db = data::createDatabase("data_yaha.db");
+    data::SourceSqlite source(db);
+    data::TableHistory tableHistory;
 
     source.createSql(tableHistory);
 

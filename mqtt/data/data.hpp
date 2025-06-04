@@ -2,6 +2,8 @@
 #include <string>
 #include "../common.hpp"
 
+namespace data {
+
 struct BaseData {
     long epoch;
 
@@ -107,3 +109,5 @@ struct DataInsertHistory {
 
     virtual void insert(const DataHistory& data) = 0;
 };
+
+}  // namespace data

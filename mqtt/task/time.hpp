@@ -6,7 +6,7 @@
 
 namespace task {
 
-class TaskTime : public IObservableTask {
+class TaskTime : public ITask {
 public:
     TaskTime(std::shared_ptr<IEventBus> evbus) :
         evbus(evbus)
@@ -28,11 +28,6 @@ public:
 
         sendNotification(hour, minute);
 		sendWeekdayNotification(new_weekday);
-    }
-
-    bool isValidEvent(EventId eventId) override {
-        return (eventId == time.id() || 
-                eventId == weekday_event.id());
     }
 
 protected:

@@ -6,7 +6,7 @@
 
 class History : public IObserver {
 public:
-    explicit History(SourceSqlite &history) :
+    explicit History(data::SourceSqlite &history) :
         history(history)
     {}
     virtual ~History() = default;
@@ -15,6 +15,6 @@ public:
     void registerEvents(std::shared_ptr<IEventBus> evbus);
 
 private:
-    SourceSqlite &history;
-    TableHistory table;
+    data::SourceSqlite &history;
+    data::TableHistory table;
 };

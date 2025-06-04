@@ -4,6 +4,8 @@
 #include <vector>
 #include <stdexcept>
 
+namespace data {
+
 enum class DataValueType {
     INT,
     LONG,
@@ -60,3 +62,5 @@ struct IDataHeader {
 
     virtual const std::string& getTableName() const = 0;
 };
+
+}  // namespace data

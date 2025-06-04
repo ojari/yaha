@@ -11,7 +11,3 @@ struct ITask {
 
     virtual void execute() = 0;
 };
-
-struct IObservableTask : public ITask {
-    virtual bool isValidEvent(EventId eventId) = 0;
-};

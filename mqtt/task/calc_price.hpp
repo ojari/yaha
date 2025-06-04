@@ -4,7 +4,7 @@
 
 namespace task {
 
-class TaskCalcPrice : public IObservableTask {
+class TaskCalcPrice : public ITask {
 public:
     TaskCalcPrice(std::shared_ptr<IEventBus> evbus) :
         evbus(evbus)
@@ -18,10 +18,6 @@ public:
         if (price.set(newPrice)) {
             evbus->publish(price);
         }
-    }
-
-    bool isValidEvent(EventId eventId) override {
-        return (eventId == price.id());
     }
 
 private:

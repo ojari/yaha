@@ -2,6 +2,8 @@
 #include <spdlog/spdlog.h>
 #include <memory>
 
+namespace data {
+
 /*std::unique_ptr<Database> createDatabase(const std::string& filename) {
     sqlite3* db;
 
@@ -27,3 +29,5 @@ sqlite3* createDatabase(const std::string& filename) {
     }
     return db;
 }
+
+} // namespace data

@@ -6,6 +6,8 @@
 #include <map>
 #include "es_cond.hpp"
 
+namespace expert {
+
 
 /**
  * Prints the statements.
@@ -116,3 +118,5 @@ public:
     void loadRules(const std::string& filename);
     void saveRules(const std::string& filename) const;
 };
+
+}  // namespace expert

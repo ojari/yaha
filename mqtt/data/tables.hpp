@@ -5,6 +5,8 @@
 #include "data.hpp"
 #include "datasource.hpp"
 
+namespace data {
+
 class DataHeader : public IDataHeader {
 public:
     explicit DataHeader(const std::string& tableName) :
@@ -154,3 +156,5 @@ public:
 private:
     std::vector<std::unique_ptr<DataHeader>> tables;
 };
+
+} // namespace data

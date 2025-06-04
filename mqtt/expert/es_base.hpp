@@ -3,6 +3,8 @@
 
 using json = nlohmann::json;
 
+namespace expert {
+
 /**
  * @brief Represents different types of boolean statements.
  */
@@ -90,3 +92,5 @@ public:
     bool getValue(Statement statement);
     int getValue(ScalarStatement statement);
 };
+
+}  // namespace expert

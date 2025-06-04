@@ -4,6 +4,8 @@
 #include <functional>
 #include "tables.hpp"
 
+namespace data {
+
 class SqlException : public std::runtime_error {
 public:
     using runtime_error::runtime_error;
@@ -249,5 +251,6 @@ private:
     sqlite3* db;
 };
 
-
 extern sqlite3* createDatabase(const std::string& filename);
+
+}  // namespace data

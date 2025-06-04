@@ -62,9 +62,9 @@ struct TimerSlow : public TimerBase {
     {
         timer.data = this;
         // Fill the tasks vector with the required ITask implementations
-        tasks.emplace_back(std::make_unique<LoadAverageReader>());
-        tasks.emplace_back(std::make_unique<MemoryUsageReader>());
-        tasks.emplace_back(std::make_unique<ProcessMemoryReader>(evbus));
+        tasks.emplace_back(std::make_unique<task::LoadAverageReader>());
+        tasks.emplace_back(std::make_unique<task::MemoryUsageReader>());
+        tasks.emplace_back(std::make_unique<task::ProcessMemoryReader>(evbus));
     }
 
     void onTimer() override {

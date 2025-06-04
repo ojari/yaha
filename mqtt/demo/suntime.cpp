@@ -7,6 +7,21 @@
 const double PI = 3.14159265358979323846;
 const double ZENITH = 90.833;  // Official zenith for sunrise/sunset
 
+#if defined(_WIN32) || defined(_MSC_VER)
+#include <time.h>
+
+// Portable timegm implementation for Windows
+time_t timegm(struct tm* tm) {
+    // Save current timezone information
+    _tzset();
+    time_t local = mktime(tm);
+    if (local == -1) return -1;
+    long timezone = 0;
+    _get_timezone(&timezone);
+    return local - timezone;
+}
+#endif
+
 double degToRad(double deg) {
     return (deg * PI / 180.0);
 }

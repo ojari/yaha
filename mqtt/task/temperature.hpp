@@ -4,7 +4,7 @@
 
 namespace task {
 
-class TaskTemperature : public IObservableTask {
+class TaskTemperature : public ITask {
 public:
     explicit TaskTemperature(std::shared_ptr<IEventBus> eventBus)
         : evbus {eventBus}
@@ -21,10 +21,6 @@ public:
             counter = 0;
         }
         counter++;
-    }
-
-    bool isValidEvent(EventId eventId) override {
-        return (eventId == temperature.id());
     }
 
 private:

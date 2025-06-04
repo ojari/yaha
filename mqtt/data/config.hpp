@@ -2,6 +2,8 @@
 #include <string>
 #include <memory>
 
+namespace data {
+
 struct ConfigDevice {
     std::string name;
     std::string type;
@@ -35,3 +37,5 @@ struct ConfigController {
         time2(time2)
     {}
 };
+
+}  // namespace data

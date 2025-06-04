@@ -1,5 +1,7 @@
 #include "tables.hpp"
 
+namespace data {
+
 void dataToHeader(DataHeader& header, const ConfigDevice& config) {
     header.setValue("name", config.name);
     header.setValue("type", config.type);
@@ -86,4 +88,4 @@ void dataFromHeader(const DataHeader& header, DataHistory& data) {
     data.val = header.getValue<int>("val");
 }
 
-//-----------------------------------------------------------------------------
+}  // namespace data

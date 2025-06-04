@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "expert.hpp"
 
+namespace expert {
 
 std::unordered_map<std::string, Statement> str2statement = {
     {"Weekday", Statement::Weekday},
@@ -181,11 +182,11 @@ void Rule::load(const json& obj) {
         // std::string key = element.key();
         if (element.key() == "then") {
             json thenArray = element.value();
-            target = thenArray[0].get<std::string>();
-            action = thenArray[1].get<std::string>();
-            if (thenArray.size() > 2) {
-                action_off = thenArray[2].get<std::string>();
-            }
+            auto targetStr = thenArray[0].get<std::string>();
+            target = str2enum(targetStr, str2actiontarget);
+
+			auto actionStr = thenArray[1].get<std::string>();
+			action = str2enum(actionStr, str2action);
         } else {
             json conditionsArray = element.value();
             for (const auto& conditionObj : conditionsArray) {
@@ -214,8 +215,6 @@ void Rule::save(json& obj) const {
     json thenArr = json::array();
     thenArr.push_back(target);
     thenArr.push_back(action);
-    if (action_off.length() > 0)
-        thenArr.push_back(action_off);
     obj["then"] = thenArr;
 }
 
@@ -262,3 +261,5 @@ void ExpertSystem::saveRules(const std::string& filename) const {
 
     file << root.dump(2);
 }
+
+}  // namespace expert

@@ -75,10 +75,3 @@ public:
     virtual void unsubscribe(EventId eventId, IObserver* observer) = 0;
     virtual void publish(const IEventData& eventData) = 0;
 };
-
-
-struct IEventManager {
-    virtual ~IEventManager() = default;
-
-    virtual bool subscribe(EventId eventId, IObserver& observer) = 0;
-};

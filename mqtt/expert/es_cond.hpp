@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 
+namespace expert {
 
 struct Condition {
     virtual bool isTrue(Facts& facts) const = 0;
@@ -98,3 +99,4 @@ public:
     }
 };
 
+}  // namespace expert
