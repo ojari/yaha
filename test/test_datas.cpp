@@ -2,23 +2,23 @@
 #include "../mqtt/data/tables.hpp"
 
 TEST_CASE("DataValue Test", "[DataValue]") {
-    DataValue value1("name1", 10);
+    data::DataValue value1("name1", 10);
     REQUIRE(value1.getName() == "name1");
     REQUIRE(value1.getValue<int>() == 10);
 
-    DataValue value2("name2", 3.14f);
+    data::DataValue value2("name2", 3.14f);
     REQUIRE(value2.getName() == "name2");
     REQUIRE(value2.getValue<float>() == 3.14f);
 
-    DataValue value3("name3", "hello");
+    data::DataValue value3("name3", "hello");
     REQUIRE(value3.getName() == "name3");
     REQUIRE(value3.getValue<std::string>() == "hello");
 }
 
 TEST_CASE("TableConfigDevice Test", "[TableConfigDevice]") {
-    TableConfigDevice table;
+    data::TableConfigDevice table;
 
-    ConfigDevice config("device1", "type1");
+    data::ConfigDevice config("device1", "type1");
     dataToHeader(table, config);
 
     const std::string name = table.getValue<std::string>("name");
@@ -29,9 +29,9 @@ TEST_CASE("TableConfigDevice Test", "[TableConfigDevice]") {
 }
 
 TEST_CASE("TableConfigController Test", "[TableConfigController]") {
-    TableConfigController table;
+    data::TableConfigController table;
 
-    ConfigController config("controller1", "type1", "actuator1", 10, 20);
+    data::ConfigController config("controller1", "type1", "actuator1", 10, 20);
     dataToHeader(table, config);
 
     REQUIRE(table.getValue<std::string>("name") == "controller1");

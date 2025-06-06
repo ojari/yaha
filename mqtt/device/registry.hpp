@@ -8,12 +8,10 @@ namespace device {
 
 class Registry {
 public:
-
     explicit Registry(std::shared_ptr<IEventBus> evBus)
         : eventBus(evBus)
     {}
-
-        
+   
     void load(const std::string& filename);
 
     std::shared_ptr<Device> getDevice(const std::string& name) {

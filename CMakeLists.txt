@@ -26,5 +26,5 @@ add_subdirectory(mqtt)
 add_subdirectory(weather)
 #add_subdirectory(spot)
 
-#enable_testing()
-#add_subdirectory(test)
+enable_testing()
+add_subdirectory(test)

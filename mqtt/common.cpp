@@ -15,10 +15,11 @@ EventIdString eventNames[] = {
     { EventId::WEEKDAY,              "Weekday" },
     { EventId::DARK,                 "Dark" },
     { EventId::YEAR,                 "Year" },
-    { EventId::MONTH,                "Month" },
-    { EventId::DAY,                  "Day" },
+    { EventId::DATE,                 "Date" },
     { EventId::LATITUDE,             "Latitude" },
     { EventId::LONGITUDE,            "Longitude" },
+    { EventId::SUNRISE,              "Sunrise" },
+    { EventId::SUNSET,               "Sunset" },
     { EventId::BUTTON_LIVING_ROOM,   "Button Living Room" },
     { EventId::BUTTON_LIBRARY,       "Button Library" },
     { EventId::SWITCH_AUTO_TALLI,    "Switch Auto Talli" },
@@ -55,6 +56,42 @@ EventId str2event(const std::string& str) {
 int hm2time(int hour, int minute) {
     return hour * 100 + minute;
 }
+
+int dm2date(int day, int month) {
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+        return -1; // Invalid date
+    }
+    return day * 100 + month;
+}
+
+int dm2day(int date) {
+    return date / 100; // Extract day from date (DDMM format)
+}
+
+int dm2month(int date) {
+    return date % 100; // Extract month from date (DDMM format)
+}
+
+int dm2yday(int date) {
+    int day = dm2day(date);
+    int month = dm2month(date);
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+        return -1; // Invalid date
+    }
+    // Calculate the day of the year (yday)
+    int yday = 0;
+    for (int m = 1; m < month; ++m) {
+        if (m == 2) {
+            yday += 28; // February, not considering leap years
+        } else if (m == 4 || m == 6 || m == 9 || m == 11) {
+            yday += 30; // April, June, September, November
+        } else {
+            yday += 31; // Other months
+        }
+    }
+    return yday + day;
+}
+
 
 std::string time2str(int time) {
     int hour = time / 100;

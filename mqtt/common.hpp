@@ -6,6 +6,10 @@
 extern int hm2time(int hour, int minute);
 extern std::string time2str(int time);
 extern int timeAdd(int time, int minutes);
+extern int dm2date(int day, int month);
+extern int dm2day(int date);
+extern int dm2month(int date);
+extern int dm2yday(int date);
 
 struct IOutput {
     virtual ~IOutput() = default;
@@ -21,10 +25,11 @@ enum class EventId {
   WEEKDAY,
   DARK,
   YEAR,
-  MONTH,
-  DAY,
+  DATE,
   LATITUDE,
   LONGITUDE,
+  SUNRISE,
+  SUNSET,
 
   BUTTON_LIVING_ROOM,
   BUTTON_LIBRARY,

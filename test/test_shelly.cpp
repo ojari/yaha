@@ -15,13 +15,14 @@ public:
 };
 
 TEST_CASE("ShellyDevice class test") {
-    device::ShellyDevice shelly("test_dev", EventId::BUTTON_LIVING_ROOM);
+	auto evbus = std::make_shared<EventBus>();
+    device::ShellyDevice shelly("test_dev", EventId::BUTTON_LIVING_ROOM, evbus);
     MockOutput output;
     SECTION("Turn on switch") {
         nlohmann::json payload;
         payload["state"] = "ON";
         std::string deviceName = "test_dev";
-        shelly.on_message(deviceName, payload);
+        shelly.onMessage(deviceName, payload);
         // REQUIRE(shelly.get() == true);
     }
     SECTION("Send ON method") {

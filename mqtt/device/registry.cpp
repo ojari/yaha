@@ -9,6 +9,7 @@
 #include "shelly_device.hpp"
 #include "switch_device.hpp"
 #include "temp_sensor_device.hpp"
+#include "debug_device.h"
 #include <nlohmann/json.hpp>
 
 namespace device {
@@ -65,6 +66,9 @@ std::shared_ptr<Device> Registry::createDevice(
         },
         {"TempSensor", [](const std::string& name, EventId event, std::shared_ptr<IEventBus> evbus) {
             return std::make_shared<TempSensorDevice>(name, event, evbus); }
+        },
+        {"Debug", [](const std::string& name, EventId event, std::shared_ptr<IEventBus> evbus) {
+            return std::make_shared<DebugDevice>(name, event, evbus); }
         }
     };
 

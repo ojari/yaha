@@ -1,10 +1,12 @@
 #include "catch2/catch_all.hpp"
 #include "../mqtt/device/light_device.hpp"
 #include <nlohmann/json.hpp>
+#include "mocks.h"
 
 namespace device {
 TEST_CASE("LightDevice construction", "[light]") {
-    device::LightDevice device("bedroom_light", EventId::LAMP_LIVING_ROOM);
+	auto evbus = std::make_shared<EventBus>();
+    device::LightDevice device("bedroom_light", EventId::LAMP_LIVING_ROOM, evbus);
     
     // Since the internals are private, we'll test indirectly via send method
     MockOutput output;
@@ -17,9 +19,8 @@ TEST_CASE("LightDevice construction", "[light]") {
 
 TEST_CASE("LightDevice on_message method", "[light]") {
     std::string deviceName = "bedroom_light";
-    device::LightDevice device(deviceName, EventId::LAMP_LIVING_ROOM);
-    MockEventListener listener;
-    device.subscribe(listener);
+	auto evbus = std::make_shared<MockEventBus>();
+    device::LightDevice device(deviceName, EventId::LAMP_LIVING_ROOM, evbus);
     
     SECTION("Process ON state with brightness") {
         nlohmann::json payload = {
@@ -27,10 +28,10 @@ TEST_CASE("LightDevice on_message method", "[light]") {
             {"brightness", 150}
         };
         
-        device.on_message(deviceName, payload);
+        device.onMessage(deviceName, payload);
         
-        REQUIRE(listener.notified == true);
-        REQUIRE(listener.lastValue == 150);
+        REQUIRE(evbus->notified == true);
+        REQUIRE(evbus->lastValue == 150);
     }
     
     SECTION("Process OFF state") {
@@ -39,10 +40,10 @@ TEST_CASE("LightDevice on_message method", "[light]") {
             {"brightness", 150}
         };
         
-        device.on_message(deviceName, payload);
+        device.onMessage(deviceName, payload);
         
-        REQUIRE(listener.notified == true);
-        REQUIRE(listener.lastValue == 0);  // Should notify 0 when state is OFF
+        REQUIRE(evbus->notified == true);
+        REQUIRE(evbus->lastValue == 0);  // Should notify 0 when state is OFF
     }
     
     SECTION("Process false state") {
@@ -51,15 +52,16 @@ TEST_CASE("LightDevice on_message method", "[light]") {
             {"brightness", 200}
         };
         
-        device.on_message(deviceName, payload);
+        device.onMessage(deviceName, payload);
         
-        REQUIRE(listener.notified == true);
-        REQUIRE(listener.lastValue == 0);
+        REQUIRE(evbus->notified == true);
+        REQUIRE(evbus->lastValue == 0);
     }
 }
 
 TEST_CASE("LightDevice send method", "[light]") {
-    device::LightDevice device("kitchen_light", EventId::LAMP_LIVING_ROOM);
+	auto evbus = std::make_shared<EventBus>();
+    device::LightDevice device("kitchen_light", EventId::LAMP_LIVING_ROOM, evbus);
     MockOutput output;
     
     SECTION("Send ON command with brightness 100") {
@@ -92,7 +94,8 @@ TEST_CASE("LightDevice send method", "[light]") {
 }
 
 TEST_CASE("LightDevice edge cases", "[light]") {
-    device::LightDevice device("living_light", EventId::LAMP_LIVING_ROOM);
+	auto evbus = std::make_shared<EventBus>();
+    device::LightDevice device("living_light", EventId::LAMP_LIVING_ROOM, evbus);
     std::string deviceName = "living_light";
     MockOutput output;
 
@@ -103,7 +106,7 @@ TEST_CASE("LightDevice edge cases", "[light]") {
         };
         
         // This should throw an exception due to missing brightness
-        REQUIRE_THROWS(device.on_message(deviceName, payload));
+        REQUIRE_THROWS(device.onMessage(deviceName, payload));
     }
     
     SECTION("Handle malformed JSON missing state") {
@@ -113,7 +116,7 @@ TEST_CASE("LightDevice edge cases", "[light]") {
         };
         
         // This should throw an exception due to missing state
-        REQUIRE_THROWS(device.on_message(deviceName, payload));
+        REQUIRE_THROWS(device.onMessage(deviceName, payload));
     }
     
     SECTION("Send with invalid brightness values") {

@@ -9,6 +9,7 @@
 #include "task/temperature.hpp"
 #include "task/time.hpp"
 #include "task/calc_price.hpp"
+#include "task/calc_sun.hpp"
 
 struct Application {
     Application() {
@@ -42,7 +43,16 @@ struct TimerBase {
         timer.data = this;
     }
 
-    virtual void onTimer() = 0;
+    void onTimer() {
+        for (auto& task : tasks) {
+            try {
+                task->execute();
+            }
+            catch (const std::exception& ex) {
+                spdlog::error("TimerSlow task execution failed: {}", ex.what());
+            }
+        }
+    }
 
     virtual ~TimerBase() {
         uv_timer_stop(&timer);
@@ -65,16 +75,8 @@ struct TimerSlow : public TimerBase {
         tasks.emplace_back(std::make_unique<task::LoadAverageReader>());
         tasks.emplace_back(std::make_unique<task::MemoryUsageReader>());
         tasks.emplace_back(std::make_unique<task::ProcessMemoryReader>(evbus));
-    }
 
-    void onTimer() override {
-        for (auto& task : tasks) {
-            try {
-                task->execute();
-            } catch (const std::exception& ex) {
-                spdlog::error("TimerSlow task execution failed: {}", ex.what());
-            }
-        }
+        tasks.emplace_back(std::make_unique<task::TaskCalcSun>(evbus));
     }
 };
 
@@ -97,17 +99,6 @@ struct TimerFast : public TimerBase {
 
         for (const auto& task : tasks) {
             task->initialize();
-        }
-    }
-
-    void onTimer() override {
-        for (auto& task : tasks) {
-            try {
-                task->execute();
-            }
-            catch (const std::exception& ex) {
-                spdlog::error("TimerFast task execution failed: {}", ex.what());
-            }
         }
     }
 };

@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # add the executable
 add_executable(${PROJECT_NAME}
+  mocks.h
   main.cpp
   # test_orm.cpp
   test_logic.cpp
@@ -24,6 +25,7 @@ add_executable(${PROJECT_NAME}
   #test_sourcestring.cpp
 
   ../mqtt/common.cpp
+  ../mqtt/common.hpp
   ../mqtt/task/time.cpp
   ../mqtt/automation/lights.cpp
   ../mqtt/automation/switch_light.cpp
@@ -40,10 +42,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
+    ${VCPKG_ROOT}/debug/lib
     ${VCPKG_ROOT}/lib/manual-link
 )
 target_link_libraries(${PROJECT_NAME}
-    Catch2
+    Catch2d
     ${EXTRA_LIBRARIES}
 )
 

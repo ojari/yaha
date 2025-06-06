@@ -47,11 +47,8 @@ protected:
         if (year.set(ayear)) {
             evbus->publish(year);
         }
-        if (month.set(amonth)) {
-            evbus->publish(month);
-        }
-        if (day.set(aday)) {
-            evbus->publish(day);
+        if (date.set(dm2date(aday, amonth))) {
+            evbus->publish(date);
         }
     }
     int hour {0};
@@ -61,8 +58,7 @@ protected:
 private:
     EventData time  {EventId::TIME, 0};
     EventData year  {EventId::YEAR, 2025};
-    EventData month {EventId::MONTH, 1};
-    EventData day   {EventId::DAY, 1};
+    EventData date  {EventId::DATE, 0101};
     EventData weekday_event {EventId::WEEKDAY, 0};
 };
 
@@ -81,7 +77,7 @@ public:
     }
 
     void execute() override {
-        incrementTime(1);
+        incrementTime(5);
         int hours = hm2time(hour, minute);
         int darkness {0};
 
@@ -106,8 +102,8 @@ private:
     int sunset {hm2time(20, 0)};
     int weekday {0};
     int iyear {2026};
-    int imonth {2};
-    int iday {2};
+    int imonth {4};
+    int iday {15};
     EventData dark {EventId::DARK, -1};
 
 };

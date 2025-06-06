@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <time.h>
 #include <chrono>
 #include "suntime.hpp"
 

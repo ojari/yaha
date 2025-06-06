@@ -75,8 +75,11 @@ add_executable(${PROJECT_NAME}
   data/tables.hpp
   demo/suntime.cpp
   demo/suntime.hpp
-  device/device.hpp
-  device/light_device.hpp
+  demo/sun_data.cpp
+  demo/sun_data.h
+    device/debug_device.h
+    device/device.hpp
+    device/light_device.hpp
     device/registry.cpp
     device/registry.hpp
     device/shelly_device.hpp
@@ -87,6 +90,7 @@ add_executable(${PROJECT_NAME}
     expert/expert.cpp
     expert/expert.hpp
   task/calc_price.hpp
+  task/calc_sun.hpp
   task/load_average_reader.hpp
   task/memory_usage_reader.hpp
   task/process_memory_reader.hpp
