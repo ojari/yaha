@@ -19,16 +19,17 @@ struct DebugOutput : public IObserver {
     }
 
     void registerEvents(std::shared_ptr<IEventBus> bus) {
-        const std::array<EventId, 16> events = {
+        const std::array<EventId, 18> events = {
             // EventId::TEMPERATURE,
             EventId::TEMPERATURE_ROOM,
             EventId::WEEKDAY,
             EventId::PROC_MEM,
             EventId::DARK,
+            EventId::SUNRISE,
+            EventId::SUNSET,
             EventId::TIME,
             EventId::YEAR,
-			EventId::MONTH,
-			EventId::DAY,
+			EventId::DATE,
             EventId::BUTTON_LIBRARY,
             EventId::BUTTON_LIVING_ROOM,
             EventId::SWITCH_AUTO_TALLI,

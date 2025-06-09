@@ -5,9 +5,51 @@
 
 namespace automation {
 
+struct LightValue {
+    static const int NONE = -1;
+
+    enum LightMode {
+        FIXED,
+        SUNRISE,
+        SUNSET
+    };
+
+    LightValue(int _time) {
+        set(_time);
+    }
+
+    void set(int value) {
+        if (value == 9990) {
+            mode = LightMode::SUNRISE;
+        }
+        else if (value == 9991) {
+            mode = LightMode::SUNSET;
+        }
+        else {
+            mode = LightMode::FIXED;
+        }
+        time = value;
+    }
+
+    friend bool operator>=(int lhs, const LightValue& rhs) {
+        return lhs >= rhs.time;
+    }
+
+    friend bool operator<(int lhs, const LightValue& rhs) {
+        return lhs < rhs.time;
+    }
+
+private:
+    int time;
+    LightMode mode = LightMode::FIXED;
+};
+
 struct Lights : public Automation {
+
     Lights(std::shared_ptr<IOutput> output, const std::string& name) :
-        Automation(output, name)
+        Automation(output, name),
+        onTime(LightValue::NONE),
+        offTime(LightValue::NONE)
     {
         initial_value(false);
     }
@@ -24,6 +66,8 @@ struct Lights : public Automation {
 
     void registerEvents(std::shared_ptr<IEventBus> evbus) override {
         evbus->subscribe(EventId::TIME, this);
+        evbus->subscribe(EventId::SUNRISE, this);
+        evbus->subscribe(EventId::SUNSET, this);
     }
 
     std::string toString() override;
@@ -38,8 +82,8 @@ struct Lights : public Automation {
     }
 
 private:
-    int onTime = -1;
-    int offTime = -1;
+    LightValue onTime;
+    LightValue offTime;
     int brightness = NAN_VALUE;
 };
 

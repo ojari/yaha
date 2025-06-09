@@ -9,6 +9,7 @@ extern int timeAdd(int time, int minutes);
 extern int dm2date(int day, int month);
 extern int dm2day(int date);
 extern int dm2month(int date);
+extern int month2mday(int month);
 extern int dm2yday(int date);
 
 struct IOutput {

@@ -42,6 +42,11 @@ public:
                 sunTime.setDate(year, month, day);
                 break;
             case EventId::DATE:
+                if (date != value.getInt()) {
+                    int yday = dm2yday(value.getInt());
+                    spdlog::info("{} yday={} date={}", time2str(time), yday, date);
+
+                }
 				date = value.getInt();
                 // spdlog::info("{} year={}  {}", time2str(time), year, date);
                 sunTime.setDate(year, month, day);

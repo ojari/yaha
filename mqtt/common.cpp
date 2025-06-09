@@ -71,6 +71,15 @@ int dm2day(int date) {
 int dm2month(int date) {
     return date % 100; // Extract month from date (DDMM format)
 }
+int month2mday(int month) {
+    if (month == 2) {
+        return 28; // February, not considering leap years
+    }
+    else if (month == 4 || month == 6 || month == 9 || month == 11) {
+        return 30; // April, June, September, November
+    }
+    return 31; // Other months
+}
 
 int dm2yday(int date) {
     int day = dm2day(date);
@@ -81,13 +90,7 @@ int dm2yday(int date) {
     // Calculate the day of the year (yday)
     int yday = 0;
     for (int m = 1; m < month; ++m) {
-        if (m == 2) {
-            yday += 28; // February, not considering leap years
-        } else if (m == 4 || m == 6 || m == 9 || m == 11) {
-            yday += 30; // April, June, September, November
-        } else {
-            yday += 31; // Other months
-        }
+        yday += month2mday(m);
     }
     return yday + day;
 }

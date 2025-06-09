@@ -18,7 +18,7 @@ void TaskDebugTime::incrementTime(int minutes) {
 
 void TaskDebugTime::incrementDate() {
     iday++;
-    if (iday > 31) { // Simplified, does not account for month lengths
+    if (iday > month2mday(imonth)) {
         iday = 1;
         imonth++;
         if (imonth > 12) {
