@@ -41,7 +41,7 @@ add_executable(${PROJECT_NAME}
   config.hpp
   debug_output.hpp
   event_bus.hpp
-  event_data.hpp
+  events.h
   history.cpp
   history.hpp
   int_time.hpp

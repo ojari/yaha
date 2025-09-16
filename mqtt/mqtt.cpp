@@ -4,14 +4,15 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "mqtt.hpp"
+#include "config.hpp"
 #include "common.hpp"
 using json = nlohmann::json;
 
 
-void MessageRouter::route(std::string& deviceName, std::string& payload) {
-    std::shared_ptr<device::Device> device = deviceRegistry->getDevice(deviceName);
+void Mqtt::route(std::string& deviceName, std::string& payload) {
+    std::shared_ptr<device::Device> device = deviceRegistry.getDevice(deviceName);
     if (device) {
-        if (verbose) {
+        if (0) {
             spdlog::info("Device: {} Payload: {}", deviceName, payload);
         }
 
@@ -29,9 +30,9 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
     }
 }
 
-void MessageRouter::bridge_msg(std::string& topic, std::string& payload) {
+void Mqtt::bridge_msg(std::string& topic, std::string& payload) {
 #if 0
-    if (topic == "zigbee2mqtt/bridge/devices") {
+    if (topic == std::string(MQTT_TOPIC) + "/bridge/devices") {
         // spdlog::info("Bridge log: {}", payload);
         std::ofstream file("payload.json");
         if (file.is_open()) {
@@ -61,8 +62,8 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     int slashCount = std::count(topic.begin(), topic.end(), '/');
 
     if (topic.find("/bridge") != std::string::npos) {
-        auto* router = static_cast<MessageRouter*>(context);
-        router->bridge_msg(topic, payload);
+        auto* mqtt = static_cast<Mqtt*>(context);
+        mqtt->bridge_msg(topic, payload);
         MQTTClient_freeMessage(&message);
         MQTTClient_free(topicName);
         return 1;
@@ -79,10 +80,10 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
 
     size_t firstSlash = topic.find('/');
     if (firstSlash != std::string::npos) {
-        auto* router = static_cast<MessageRouter*>(context);
+        auto* mqtt = static_cast<Mqtt*>(context);
 
         std::string device_name = topic.substr(firstSlash + 1);
-        router->route(device_name, payload);
+        mqtt->route(device_name, payload);
     } else {
         spdlog::error("Invalid topic format: {}", topic);
     }
@@ -97,9 +98,8 @@ void mqtt_connlost(void *context, char *cause)
 }
 
 //------------------------------------------------------------------
-Mqtt::Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus) :
-	deviceRegistry(evbus),
-    messageRouter(&deviceRegistry)
+Mqtt::Mqtt(const std::string& filename, EventBus& evbus) :
+	deviceRegistry(evbus)
 {
     int rc = 0;
     const char* hostname = getenv("RPI_HOST");
@@ -118,7 +118,7 @@ Mqtt::Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus) :
 
     rc = MQTTClient_setCallbacks(
         client,
-        static_cast<void*>(&messageRouter),
+        static_cast<void*>(this),
         mqtt_connlost,
         mqtt_msgarrvd,
         mqtt_delivered);
@@ -133,10 +133,16 @@ Mqtt::Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus) :
         return;
     }
 
-    rc = MQTTClient_subscribe(client, "zigbee2mqtt/#", 0);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        spdlog::error("Unable to subscribe: {}", rc);
-        return;
+    const std::vector<std::string> topics = {
+        std::string(MQTT_TOPIC) + "/#"
+    };
+
+    for (const auto& t : topics) {
+        rc = MQTTClient_subscribe(client, t.c_str(), 0);
+        if (rc != MQTTCLIENT_SUCCESS) {
+            spdlog::error("Unable to subscribe to topic '{}': {}", t, rc);
+            return;
+        }
     }
 }
 

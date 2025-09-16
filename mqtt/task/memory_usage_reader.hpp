@@ -1,6 +1,5 @@
 #pragma once
 #include <fstream>
-#include "../event_data.hpp"
 #include "../task.hpp"
 #include "spdlog/spdlog.h"
 

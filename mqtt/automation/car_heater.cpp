@@ -2,18 +2,19 @@
 
 namespace automation {
 
-void CarHeater::onChange(const IEventData& event) {
-    if (event.id() == EventId::TIME) {
-        int time = event.getInt();
-        int startTime = timeAdd(leaveTime, -offset);
-        if ((time >= startTime) && time < leaveTime) {
-            send(true);
-        } else {
-            send(false);
-        }
-    } else if (event.id() == EventId::TEMPERATURE) {
-        offset = calculateDuration(event.getFloat());
+void CarHeater::onEvent(const TimeEvent& event) {
+    int time = event.GetTime();
+    int startTime = timeAdd(leaveTime, -offset);
+    if ((time >= startTime) && time < leaveTime) {
+        send(true);
     }
+    else {
+        send(false);
+    }
+}
+
+void CarHeater::onEvent(const TemperatureEvent& event) {
+    offset = calculateDuration(event.value);
 }
 
 // Calculate the duration of the car heater based on the temperature

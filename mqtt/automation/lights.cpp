@@ -15,14 +15,12 @@ void Lights::setArg(const std::string& name, const std::string& value) {
     }
 }
 
-void Lights::onChange(const IEventData& event) {
-    if (event.id() == EventId::TIME) {
-        int time = event.getInt();
-        if (time >= onTime && time < offTime) {
-            send(true);
-        } else {
-            send(false);
-        }
+void Lights::onEvent(const TimeEvent& event) {
+    int time = event.GetTime();
+    if (time >= onTime && time < offTime) {
+        send(true);
+    } else {
+        send(false);
     }
 }
 

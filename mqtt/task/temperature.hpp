@@ -1,12 +1,11 @@
 #pragma once
 #include "../task.hpp"
-#include "../event_data.hpp"
 
 namespace task {
 
 class TaskTemperature : public ITask {
 public:
-    explicit TaskTemperature(std::shared_ptr<IEventBus> eventBus)
+    explicit TaskTemperature(EventBus& eventBus)
         : evbus {eventBus}
     {}
 
@@ -25,13 +24,13 @@ public:
 
 private:
     void update(float temp) {
-        if (temperature.getFloat() != temp) {
-            temperature.set(temp);
-            evbus->publish(temperature);
+        if (temp != last_temp) {
+            evbus.publish<TemperatureEvent>(TemperatureEvent("TaskTemp", temp));
+            last_temp = temp;
         }
     }
-    std::shared_ptr<IEventBus> evbus;
-    EventData temperature {EventId::TEMPERATURE, 20.0f};
+    EventBus& evbus;
+    float last_temp = -99.0;
     int counter {0};
 };
 

@@ -16,12 +16,19 @@ struct SwitchLight : public Automation {
 
     std::string toString() override;
 
-    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
-        evbus->subscribe(buttonEvent, this);
-        evbus->subscribe(lampEvent, this);
-    }
+    void registerEvents(EventBus& evbus) override {
+        evbus.subscribe<ButtonEvent>([&](const ButtonEvent& e) {
+            if (e.location == buttonLocation) {
+                onButton(e.pressed);
+            }
+        });
 
-    void onChange(const IEventData& event) override;
+        evbus.subscribe<LampEvent>([&](const LampEvent& e) {
+            if (e.location == lampLocation) {
+                onLamp(e.brightness);
+            }
+        });
+    }
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
@@ -30,11 +37,13 @@ struct SwitchLight : public Automation {
         return std::make_shared<SwitchLight>(output, name);
     }
 
+    void onButton(bool pressed);
+    void onLamp(int brightness);
 private:
     void toggleLight();
 
-    EventId buttonEvent = EventId::UNKNOWN;
-    EventId lampEvent = EventId::UNKNOWN;
+    std::string buttonLocation;
+    std::string lampLocation;
     int mode = 0;
     int brightness = NAN_VALUE;
     bool current = false;

@@ -15,8 +15,9 @@ public:
 };
 
 TEST_CASE("ShellyDevice class test") {
-	auto evbus = std::make_shared<EventBus>();
-    device::ShellyDevice shelly("test_dev", EventId::BUTTON_LIVING_ROOM, evbus);
+    EventBus evbus;
+
+    device::ShellyDevice shelly("test_dev", evbus);
     MockOutput output;
     SECTION("Turn on switch") {
         nlohmann::json payload;

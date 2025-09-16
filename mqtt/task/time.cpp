@@ -29,7 +29,7 @@ void TaskDebugTime::incrementDate() {
     sendDateNotification(iyear, imonth, iday);
 
     weekday = (weekday + 1) % 7;
-    sendWeekdayNotification(weekday);
+    // sendWeekdayNotification(weekday);
 }
 
 }  // namespace task

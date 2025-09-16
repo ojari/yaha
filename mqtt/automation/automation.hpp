@@ -17,7 +17,7 @@ enum AutomationType {
     ROOM_HEATER
 };
 
-struct Automation : public IObserver {
+struct Automation {
     Automation(std::shared_ptr<IOutput> output, const std::string& name) :
         output(output),
         name(name)
@@ -26,7 +26,7 @@ struct Automation : public IObserver {
     virtual void setArg(const std::string& name, const std::string& value) {
     }
 
-    virtual void registerEvents(std::shared_ptr<IEventBus> evbus) = 0;
+    virtual void registerEvents(EventBus& evbus) = 0;
 
     virtual std::string toString() {
         std::string str_value = get() ? "ON" : "OFF";

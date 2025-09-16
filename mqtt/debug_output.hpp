@@ -3,46 +3,39 @@
 #include "common.hpp"
 
 
-struct DebugOutput : public IObserver {
-    void onChange(const IEventData& value) override {
-        if (value.id() == EventId::TIME) {
-            time = value.getInt();
-        } else if (value.id() == EventId::TEMPERATURE) {
-            // do not show temperature changes
-        } else {
-            if (value.isInt()) {
-                spdlog::info("{}: {} = {}", time2str(time), value.name(), value.getInt());
-            } else {
-                spdlog::info("{}: {} = {}", time2str(time), value.name(), value.getFloat());
-            }
-        }
-    }
+struct DebugOutput {
+    void registerEvents(EventBus& bus) {
+        bus.subscribe<ButtonEvent>([&](const ButtonEvent& e) {
+            spdlog::info("{}: Button {} = {}", time2str(time), e.location, e.pressed);
+        });
 
-    void registerEvents(std::shared_ptr<IEventBus> bus) {
-        const std::array<EventId, 18> events = {
-            // EventId::TEMPERATURE,
-            EventId::TEMPERATURE_ROOM,
+        bus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
+            spdlog::info("{}: Switch {} = {}", time2str(time), e.name, e.state);
+        });
+
+        bus.subscribe<LampEvent>([&](const LampEvent& e) {
+            spdlog::info("{}: Lamp {} = {}", time2str(time), e.location, e.brightness);
+        });
+
+        bus.subscribe<TemperatureEvent>([&](const TemperatureEvent& e) {
+            spdlog::info("{}: Temp {} = {}", time2str(time), e.room, e.value);
+        });
+
+        bus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            time = e.GetTime();
+        });
+
+
+        /*const std::array<EventId, 18> events = {
             EventId::WEEKDAY,
             EventId::PROC_MEM,
             EventId::DARK,
             EventId::SUNRISE,
             EventId::SUNSET,
-            EventId::TIME,
             EventId::YEAR,
-			EventId::DATE,
-            EventId::BUTTON_LIBRARY,
-            EventId::BUTTON_LIVING_ROOM,
-            EventId::SWITCH_AUTO_TALLI,
-            EventId::SWITCH_AUTO_ULKO,
-            EventId::SWITCH_VARASTO,
-            EventId::SWITCH_PC_POWER,
-            EventId::LAMP_LIVING_ROOM,
-            EventId::LAMP_LIBRARY
+	    EventId::DATE,
         };
-
-        for (const auto& event : events) {
-            bus->subscribe(event, this);
-        }
+        */
     }
 
 private:

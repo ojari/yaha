@@ -5,32 +5,23 @@
 #include "device/registry.hpp"
 #include "data/sourcesqlite.hpp"
 
-class MessageRouter {
-public:
-    explicit MessageRouter(device::Registry *deviceReg)
-        : deviceRegistry(deviceReg)
-    {}
-
-    void route(std::string& deviceName, std::string& payload);
-
-    void bridge_msg(std::string& topic, std::string& payload);
-
-private:
-    device::Registry* deviceRegistry;
-    bool verbose = false;
-};
-
-
 class Mqtt : public ITask, public IOutput {
 public:
-    explicit Mqtt(const std::string& filename, std::shared_ptr<IEventBus> evbus);
+    explicit Mqtt(const std::string& filename, EventBus& evbus);
 
     void execute() override;
     void send(std::string_view topic, const std::string& message) override;
 
+    /** Incoming MQTT message uses this method to route message to correct device
+     */
+    void route(std::string& deviceName, std::string& payload);
+
+    /** Incoming bridge messages are handled here.
+     */
+    void bridge_msg(std::string& topic, std::string& payload);
+
 private:
     MQTTClient client;
     device::Registry deviceRegistry;
-    MessageRouter messageRouter;
     int errorCounter = 0;
 };

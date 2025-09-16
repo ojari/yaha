@@ -64,15 +64,20 @@ struct Lights : public Automation {
 
     void setArg(const std::string& name, const std::string& value) override;
 
-    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
-        evbus->subscribe(EventId::TIME, this);
-        evbus->subscribe(EventId::SUNRISE, this);
-        evbus->subscribe(EventId::SUNSET, this);
+    void registerEvents(EventBus& evbus) override {
+        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            this->onEvent(e);
+        });
+
+        evbus.subscribe<DarkEvent>([&](const DarkEvent& e) {
+            //this->onEvent(e);
+        });
+
+        //evbus->subscribe(EventId::SUNRISE, this);
+        //evbus->subscribe(EventId::SUNSET, this);
     }
 
     std::string toString() override;
-
-    void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
@@ -80,6 +85,8 @@ struct Lights : public Automation {
     {
         return std::make_shared<Lights>(output, name);
     }
+
+    void onEvent(const TimeEvent& event);
 
 private:
     LightValue onTime;

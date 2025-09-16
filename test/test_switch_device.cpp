@@ -5,10 +5,27 @@
 
 namespace device {
 
+struct MockSwitch {
+    MockSwitch(EventBus& evbus) {
+        evbus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
+            name = e.name;
+            state = e.state;
+            notified = true;
+            // Print to Catch2 logs
+            INFO("SwitchEvent received: name=" << name << ", state=" << state);
+        });
+    }
+
+    std::string name;
+    bool state = false;
+    int notified = false;
+};
+
 
 TEST_CASE("SwitchDevice - on_message with state key") {
-	auto evbus = std::make_shared<MockEventBus>();
-    SwitchDevice device("test_switch", EventId::TEMPERATURE, evbus);
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
 
     SECTION("State ON") {
         nlohmann::json payload = {{"state", "ON"}};
@@ -16,8 +33,8 @@ TEST_CASE("SwitchDevice - on_message with state key") {
 
         device.onMessage(deviceName, payload);
 
-        REQUIRE(evbus->notified);
-        REQUIRE(evbus->lastValue == 1);
+        REQUIRE(mock.notified);
+        REQUIRE(mock.state == true);
     }
 
     SECTION("State OFF") {
@@ -26,14 +43,15 @@ TEST_CASE("SwitchDevice - on_message with state key") {
 
         device.onMessage(deviceName, payload);
 
-        REQUIRE(evbus->notified);
-        REQUIRE(evbus->lastValue == 0);
+        REQUIRE(mock.notified);
+        REQUIRE(mock.state == false);
     }
 }
 
 TEST_CASE("SwitchDevice - on_message with action key") {
-	auto evbus = std::make_shared<MockEventBus>();
-    SwitchDevice device("test_switch", EventId::TEMPERATURE, evbus);
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
 
     SECTION("Action on") {
         nlohmann::json payload = {{"action", "on"}};
@@ -41,8 +59,8 @@ TEST_CASE("SwitchDevice - on_message with action key") {
 
         device.onMessage(deviceName, payload);
 
-        REQUIRE(evbus->notified);
-        REQUIRE(evbus->lastValue == 1);
+        REQUIRE(mock.notified);
+        REQUIRE(mock.state == true);
     }
 
     SECTION("Action off") {
@@ -51,36 +69,36 @@ TEST_CASE("SwitchDevice - on_message with action key") {
 
         device.onMessage(deviceName, payload);
 
-        REQUIRE(evbus->notified);
-        REQUIRE(evbus->lastValue == 0);
+        REQUIRE(mock.notified);
+        REQUIRE(mock.state == false);
     }
 
     SECTION("Invalid action") {
         nlohmann::json payload = {{"action", "invalid"}};
         std::string deviceName = "test_switch";
 
-        evbus->notified = false;
+        mock.notified = false;
         device.onMessage(deviceName, payload);
 
         // Should not notify on invalid action
-        REQUIRE_FALSE(evbus->notified);
+        REQUIRE_FALSE(mock.notified);
     }
 
     SECTION("Null action") {
         nlohmann::json payload = {{"action", nullptr}};
         std::string deviceName = "test_switch";
 
-        evbus->notified = false;
+        mock.notified = false;
         device.onMessage(deviceName, payload);
 
         // Should not notify on null action
-        REQUIRE_FALSE(evbus->notified);
+        REQUIRE_FALSE(mock.notified);
     }
 }
 
 TEST_CASE("SwitchDevice - send method") {
-	auto evbus = std::make_shared<EventBus>();
-    SwitchDevice device("test_switch", EventId::TEMPERATURE, evbus);
+    EventBus evbus;
+    SwitchDevice device("test_switch", evbus);
     MockOutput output;
 
     SECTION("Send ON") {
@@ -100,8 +118,9 @@ TEST_CASE("SwitchDevice - send method") {
 
 // Bug detection test - this test exposes a bug in the current implementation
 TEST_CASE("SwitchDevice - bug in on_message") {
-	auto evbus = std::make_shared<MockEventBus>();
-    SwitchDevice device("test_switch", EventId::TEMPERATURE, evbus);
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
 
     nlohmann::json payload = {{"action", "off"}};
     std::string deviceName = "test_switch";
@@ -110,7 +129,7 @@ TEST_CASE("SwitchDevice - bug in on_message") {
 
     // Current implementation has a bug where it overwrites state with payload["action"] == "on"
     // after already setting it based on the string value
-    REQUIRE(evbus->lastValue == 0);  // This might fail with current implementation
+    REQUIRE(mock.state == false);  // This might fail with current implementation
 }
 
 }  // namespace device

@@ -1,28 +1,29 @@
 #pragma once
 #include "../task.hpp"
-#include "../event_data.hpp"
 
 namespace task {
 
 class TaskCalcPrice : public ITask {
 public:
-    TaskCalcPrice(std::shared_ptr<IEventBus> evbus) :
+    TaskCalcPrice(EventBus& evbus) :
         evbus(evbus)
     {
     }
 
     void execute() override {
         int randomChange = rand() % 3 - 1; // -1, 0, or 1
-        int newPrice = price.getInt() + randomChange;
+        int newPrice = last_price + randomChange;
 
-        if (price.set(newPrice)) {
-            evbus->publish(price);
+        if (newPrice != last_price) {
+            evbus.publish<ElectricityPriceEvent>(ElectricityPriceEvent(newPrice));
+
+            last_price = newPrice;
         }
     }
 
 private:
-    std::shared_ptr<IEventBus> evbus;
-    EventData price {EventId::ELECTRICITY_PRICE, 10};
+    EventBus& evbus;
+    int last_price = -10;
 };
 
 }  // namespace task

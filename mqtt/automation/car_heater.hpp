@@ -27,12 +27,14 @@ struct CarHeater : public Automation  {
         }
     }
 
-    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
-        evbus->subscribe(EventId::TIME, this);
-        evbus->subscribe(EventId::TEMPERATURE, this);
+    void registerEvents(EventBus& evbus) override {
+        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            this->onEvent(e);
+        });
+        evbus.subscribe<TemperatureEvent>([&](const TemperatureEvent& e) {
+            onEvent(e);
+        });
     }
-
-    void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
@@ -40,6 +42,9 @@ struct CarHeater : public Automation  {
     {
         return std::make_shared<CarHeater>(output, name);
     }
+
+    void onEvent(const TimeEvent& event);
+    void onEvent(const TemperatureEvent& event);
 
 private:
     int calculateDuration(const float temperature) const;

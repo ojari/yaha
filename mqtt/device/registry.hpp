@@ -8,7 +8,7 @@ namespace device {
 
 class Registry {
 public:
-    explicit Registry(std::shared_ptr<IEventBus> evBus)
+    explicit Registry(EventBus& evBus)
         : eventBus(evBus)
     {}
    
@@ -24,13 +24,12 @@ public:
     // bool subscribe(EventId eventId, IObserver& observer) override;
 
 private:
-    std::shared_ptr<IEventBus> eventBus;
+    EventBus& eventBus;
 
     std::shared_ptr<Device> createDevice(
         const std::string& name,
         const std::string& type,
-        const std::string& eventStr,
-        std::shared_ptr<IEventBus> eventBus) const;
+        EventBus& eventBus) const;
     std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
 

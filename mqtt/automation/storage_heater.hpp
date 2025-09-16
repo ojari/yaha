@@ -13,11 +13,11 @@ public:
         initial_value(false);
     }
 
-    void registerEvents(std::shared_ptr<IEventBus> evbus) override {
-        evbus->subscribe(EventId::TIME, this);
+    void registerEvents(EventBus& evbus) override {
+        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            this->onEvent(e);
+        });
     }
-
-    void onChange(const IEventData& event) override;
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
@@ -27,7 +27,9 @@ public:
     }
 
 private:
-    int calculateStartTime(const IEventData& value);
-    int calculateEndTime(const IEventData& value);
+    void onEvent(const TimeEvent& event);
+
+    //int calculateStartTime(const IEventData& value);
+    //int calculateEndTime(const IEventData& value);
 };
 }

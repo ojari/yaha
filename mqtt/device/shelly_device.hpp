@@ -24,8 +24,8 @@ int parseRelay(const std::string& name) {
 
 class ShellyDevice : public Device, public IDeviceBoolOut {
 public:
-    explicit ShellyDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
-        Device(parseDeviceName(name), eid, evbus),
+    explicit ShellyDevice(const std::string& name, EventBus& evbus) :
+        Device(parseDeviceName(name), evbus),
         relay(parseRelay(name))
     {}
 

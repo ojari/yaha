@@ -67,7 +67,7 @@ protected:
 // 5 minutes timer
 //
 struct TimerSlow : public TimerBase {
-    explicit TimerSlow(std::shared_ptr<IEventBus> evbus, Application& app) :
+    explicit TimerSlow(EventBus& evbus, Application& app) :
         TimerBase(app, SLOW_TIMER_INTERVAL)
     {
         timer.data = this;
@@ -84,7 +84,7 @@ struct TimerSlow : public TimerBase {
 // One minute timer
 //
 struct TimerFast : public TimerBase {
-    TimerFast(std::shared_ptr<IEventBus> evbus, Application& app) :
+    TimerFast(EventBus& evbus, Application& app) :
         TimerBase(app, FAST_TIMER_INTERVAL)
     {
         timer.data = this;

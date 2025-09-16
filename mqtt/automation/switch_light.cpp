@@ -7,9 +7,9 @@ void SwitchLight::setArg(const std::string& name, const std::string& value) {
     if (name == "mode") {
         mode = std::stoi(value);
     } else if (name == "event") {
-        buttonEvent = str2event(value);
+        buttonLocation = value;
     } else if (name == "eventLamp") {
-        lampEvent = str2event(value);
+        lampLocation = value;
     } else if (name == "brightness") {
         brightness = std::stoi(value);
     } else {
@@ -25,30 +25,33 @@ void SwitchLight::toggleLight() {
     }
 }
 
-void SwitchLight::onChange(const IEventData& event) {
-    if (event.id() == buttonEvent) {
-        switch (mode) {
-            case 0:  // off button toggles the light
-                if (event.getInt() == 0) {
-                    toggleLight();
-                }
-                break;
-            case 1:  // on button toggles the light
-                if (event.getInt() == 1) {
-                    toggleLight();
-                }
-                break;
-            case 2:  // both buttons works
-                if (event.getInt()) {
-                    send(brightness);
-                } else {
-                    send(0);
-                }
-                break;
+void SwitchLight::onButton(bool pressed)
+{
+    switch (mode) {
+    case 0:  // off button toggles the light
+        if (!pressed) {
+            toggleLight();
         }
-    } else if (event.id() == lampEvent) {
-        initial_value(event.getInt());
+        break;
+    case 1:  // on button toggles the light
+        if (pressed) {
+            toggleLight();
+        }
+        break;
+    case 2:  // both buttons works
+        if (pressed) {
+            send(brightness);
+        }
+        else {
+            send(0);
+        }
+        break;
     }
+}
+
+void SwitchLight::onLamp(int brightness)
+{
+    initial_value(brightness);
 }
 
 std::string SwitchLight::toString() {

@@ -1,13 +1,14 @@
 #pragma once
 #include <spdlog/spdlog.h>
+#include "../config.hpp"
 #include "device.hpp"
 
 namespace device {
 
 class LightDevice : public Device, public IDeviceLightOut {
 public:
-    explicit LightDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
-        Device(name, eid, evbus)
+    explicit LightDevice(const std::string& name, EventBus& evbus) :
+        Device(name, evbus)
     {
     }
 
@@ -18,17 +19,17 @@ public:
         } else {
             state = str2bool(payload["state"]);
         }
-        spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
+        // spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
 
         if (state == false) {
-            notifyValue(0);
+            evbus.publish<LampEvent>(LampEvent(deviceName, 0));
         } else {
-            notifyValue(brightness);
+            evbus.publish<LampEvent>(LampEvent(deviceName, brightness));
         }
     }
 
     void send(IOutput& output, bool value, int newBrightness) override {
-        std::string topic = "zigbee2mqtt/" + deviceName + "/set";
+        std::string topic = std::string(MQTT_TOPIC) + "/" + deviceName + "/set";
         std::string payload;
         payload.append(R"({"state": ")");
         payload.append(value ? "ON" : "OFF");

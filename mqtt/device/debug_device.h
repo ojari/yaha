@@ -1,24 +1,79 @@
 #pragma once
 #include <spdlog/spdlog.h>
 #include "device.hpp"
+#include "../events.h"
 
 namespace device {
 
 class DebugDevice : public Device, public IDeviceBoolOut {
 public:
-    explicit DebugDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
-        Device(name, eid, evbus),
+    explicit DebugDevice(const std::string& name, EventBus& evbus) :
+        Device(name, evbus),
         evbus(evbus)
     {}
 
     void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
-        EventId event = str2event(payload["event"]);
-        if (payload["value"].is_number_float()) {
-            float value = payload["value"].get<float>();
-            evbus->publish(EventData(event, value));
-        } else if (payload["value"].is_number_integer()) {
-            int value = payload["value"].get<int>();
-            evbus->publish(EventData(event, value));
+        if (!payload.contains("event") || !payload["event"].is_string()) {
+            spdlog::warn("DebugDevice: Payload missing 'event' field or it is not a string");
+            return;
+        }
+
+        std::string eventType = payload["event"].get<std::string>();
+
+        if (eventType == "Temperature" && payload.contains("room") && payload.contains("value")) {
+            evbus.publish(TemperatureEvent(
+                payload["room"].get<std::string>(),
+                payload["value"].get<float>()));
+        }
+        else if (eventType == "Dark" && payload.contains("isDark")) {
+            evbus.publish(DarkEvent(
+                payload["isDark"].get<bool>()));
+        }
+        else if (eventType == "Date" && payload.contains("year") && payload.contains("month") && payload.contains("day") && payload.contains("weekday")) {
+            evbus.publish(DateEvent(
+                payload["year"].get<int>(),
+                payload["month"].get<int>(),
+                payload["day"].get<int>(),
+                payload["weekday"].get<int>()));
+        }
+        else if (eventType == "Time" && payload.contains("hour") && payload.contains("minute")) {
+            evbus.publish(TimeEvent(
+                payload["hour"].get<int>(),
+                payload["minute"].get<int>()));
+        }
+        else if (eventType == "Location" && payload.contains("latitude") && payload.contains("longitude")) {
+            evbus.publish(LocationEvent(
+                payload["latitude"].get<double>(),
+                payload["longitude"].get<double>()));
+        }
+        else if (eventType == "ElectricityPrice" && payload.contains("price")) {
+            evbus.publish(ElectricityPriceEvent(
+                payload["price"].get<double>()));
+        }
+        else if (eventType == "Button" && payload.contains("location") && payload.contains("pressed")) {
+            evbus.publish(ButtonEvent(
+                payload["location"].get<std::string>(),
+                payload["pressed"].get<bool>()));
+        }
+        else if (eventType == "Switch" && payload.contains("name") && payload.contains("state")) {
+            evbus.publish(SwitchEvent(
+                payload["name"].get<std::string>(),
+                payload["state"].get<bool>()));
+        }
+        else if (eventType == "Lamp" && payload.contains("location") && payload.contains("brightness")) {
+            evbus.publish(LampEvent(
+                payload["location"].get<std::string>(),
+                payload["brightness"].get<int>()));
+        }
+        else if (eventType == "Pc" && payload.contains("eventType") && payload.contains("value")) {
+            PcEvent::EventClass pcEventType = PcEvent::process_memory;
+            if (payload["eventType"] == "cpu_average") {
+                pcEventType = PcEvent::cpu_average;
+            }
+            evbus.publish(PcEvent(pcEventType, payload["value"].get<unsigned long>()));
+        }
+        else {
+            spdlog::warn("DebugDevice: Unknown event type or missing fields in payload");
         }
     }
 
@@ -32,7 +87,7 @@ public:
     }
 
 private:
-    std::shared_ptr<IEventBus> evbus;
+    EventBus& evbus;
 };
 
 }  // namespace device

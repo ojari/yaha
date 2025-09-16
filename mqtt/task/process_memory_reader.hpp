@@ -1,22 +1,16 @@
 #pragma once
-
 #include <spdlog/spdlog.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
 #include <fstream>
 #include "../common.hpp"
-#include "../event_data.hpp"
-
-#ifndef WIN32
-#include <unistd.h>
-#endif
 
 namespace task {
 
 class ProcessMemoryReader : public ITask {
 public:
-    ProcessMemoryReader(std::shared_ptr<IEventBus> evbus) :
+    ProcessMemoryReader(EventBus& evbus) :
         evbus(evbus),
         filePath("/proc/" + std::to_string(getpid()) + "/status")
     {}
@@ -44,21 +38,18 @@ public:
         statusFile.close();
     }
 
-    unsigned int getVmRSS() const {
-        return vmRss.getInt(-1);
-    }
-
 private:
     void update(float value) {
-        if (vmRss.set(value)) {
-            evbus->publish(vmRss);
+        if (last_value != value) {
+            evbus.publish<PcEvent>(PcEvent(PcEvent::process_memory, static_cast<unsigned long>(value)));
+            last_value = value;
         }
     }
 
-    std::shared_ptr<IEventBus> evbus;
-    EventData vmRss {EventId::PROC_MEM, 0};
+    EventBus& evbus;
     std::string filePath;
     bool errorOccurred = false;
+    float last_value = 0.0f;
 };
 
 } // namespace task

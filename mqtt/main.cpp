@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 
     // initialize system
     //
-    auto evBus = std::make_shared<EventBus>();
+    EventBus evBus;
     auto mqtt = std::make_shared<Mqtt>(devicesFile, evBus);
     automation::Registry automations(mqtt, evBus);
     DebugOutput debugOutput;

@@ -5,8 +5,8 @@
 
 namespace device {
 TEST_CASE("LightDevice construction", "[light]") {
-	auto evbus = std::make_shared<EventBus>();
-    device::LightDevice device("bedroom_light", EventId::LAMP_LIVING_ROOM, evbus);
+    EventBus evbus;
+    device::LightDevice device("bedroom_light", evbus);
     
     // Since the internals are private, we'll test indirectly via send method
     MockOutput output;
@@ -17,10 +17,26 @@ TEST_CASE("LightDevice construction", "[light]") {
     REQUIRE(output.lastPayload.find("\"brightness\": 100") != std::string::npos);
 }
 
+struct MockListener {
+    MockListener(EventBus& evbus) {
+        evbus.subscribe<LampEvent>([&](const LampEvent& e) {
+            location = e.location;
+            brightness = e.brightness;
+            notified = true;
+        });
+    }
+
+    std::string location;
+    int brightness = -1;
+    int notified = false;
+};
+
 TEST_CASE("LightDevice on_message method", "[light]") {
     std::string deviceName = "bedroom_light";
-	auto evbus = std::make_shared<MockEventBus>();
-    device::LightDevice device(deviceName, EventId::LAMP_LIVING_ROOM, evbus);
+    EventBus evbus;
+    MockListener mock(evbus);
+
+    device::LightDevice device(deviceName, evbus);
     
     SECTION("Process ON state with brightness") {
         nlohmann::json payload = {
@@ -30,8 +46,8 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(evbus->notified == true);
-        REQUIRE(evbus->lastValue == 150);
+        REQUIRE(mock.notified == true);
+        REQUIRE(mock.brightness == 150);
     }
     
     SECTION("Process OFF state") {
@@ -42,8 +58,8 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(evbus->notified == true);
-        REQUIRE(evbus->lastValue == 0);  // Should notify 0 when state is OFF
+        REQUIRE(mock.notified == true);
+        REQUIRE(mock.brightness == 0);  // Should notify 0 when state is OFF
     }
     
     SECTION("Process false state") {
@@ -54,14 +70,14 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(evbus->notified == true);
-        REQUIRE(evbus->lastValue == 0);
+        REQUIRE(mock.notified == true);
+        REQUIRE(mock.brightness == 0);
     }
 }
 
 TEST_CASE("LightDevice send method", "[light]") {
-	auto evbus = std::make_shared<EventBus>();
-    device::LightDevice device("kitchen_light", EventId::LAMP_LIVING_ROOM, evbus);
+    EventBus evbus;
+    device::LightDevice device("kitchen_light", evbus);
     MockOutput output;
     
     SECTION("Send ON command with brightness 100") {
@@ -94,8 +110,8 @@ TEST_CASE("LightDevice send method", "[light]") {
 }
 
 TEST_CASE("LightDevice edge cases", "[light]") {
-	auto evbus = std::make_shared<EventBus>();
-    device::LightDevice device("living_light", EventId::LAMP_LIVING_ROOM, evbus);
+    EventBus evbus;
+    device::LightDevice device("living_light", evbus);
     std::string deviceName = "living_light";
     MockOutput output;
 

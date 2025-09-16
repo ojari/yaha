@@ -1,6 +1,5 @@
 #pragma once
 #include <fstream>
-#include "../event_data.hpp"
 #include "../task.hpp"
 #include "spdlog/spdlog.h"
 
@@ -30,17 +29,18 @@ public:
         loadavgFile >> load1 >> load5 >> load15;
         loadavgFile.close();
 
-        event.set(load5);
+        // event.set(load5);
+        last_value = load5;
     }
 
     float getLoad() const {
-        return event.getFloat();
+        return last_value;
     }
 
 private:
-    EventData event {EventId::LOAD_AVG, 0.0f};
     std::string filepath;
     bool errorOccurred = false;
+    float last_value;
 };
 
 }  // namespace task

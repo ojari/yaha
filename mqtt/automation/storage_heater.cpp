@@ -2,10 +2,8 @@
 
 namespace automation {
 
-void StorageHeater::onChange(const IEventData& event) {
-    if (event.id() == EventId::TIME) {
-        // implement the logic here
-    }
+void StorageHeater::onEvent(const TimeEvent& event) {
+
 }
 
 }

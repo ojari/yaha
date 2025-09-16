@@ -2,56 +2,6 @@
 #include <iomanip>
 #include "common.hpp"
 
-struct EventIdString {
-    EventId type;
-    const char* str;
-};
-
-EventIdString eventNames[] = {
-    { EventId::TEMPERATURE,          "Temperature" },
-    { EventId::TEMPERATURE_ROOM,     "Temperature Room" },
-    { EventId::ELECTRICITY_PRICE,    "Electricity Price" },
-    { EventId::TIME,                 "Time" },
-    { EventId::WEEKDAY,              "Weekday" },
-    { EventId::DARK,                 "Dark" },
-    { EventId::YEAR,                 "Year" },
-    { EventId::DATE,                 "Date" },
-    { EventId::LATITUDE,             "Latitude" },
-    { EventId::LONGITUDE,            "Longitude" },
-    { EventId::SUNRISE,              "Sunrise" },
-    { EventId::SUNSET,               "Sunset" },
-    { EventId::BUTTON_LIVING_ROOM,   "Button Living Room" },
-    { EventId::BUTTON_LIBRARY,       "Button Library" },
-    { EventId::SWITCH_AUTO_TALLI,    "Switch Auto Talli" },
-    { EventId::SWITCH_AUTO_ULKO,     "Switch Auto Ulko" },
-    { EventId::SWITCH_VARASTO,       "Switch Varasto" },
-    { EventId::SWITCH_PC_POWER,      "Switch PC Power" },
-    { EventId::LAMP_LIVING_ROOM,     "Lamp Living Room" },
-    { EventId::LAMP_LIBRARY,         "Lamp Library" },
-    { EventId::PROC_MEM,             "Process Mem" },
-    { EventId::USED_MEM,             "Used Mem" },
-    { EventId::LOAD_AVG,             "Load Avg" },
-    { EventId::CPU_TEMP,             "Cpu Temp" },
-    { EventId::UNKNOWN,              "Unknown" }
-};
-
-std::string event2str(EventId type) {
-    for (auto& eventName : eventNames) {
-        if (eventName.type == type) {
-            return eventName.str;
-        }
-    }
-    return "Unknown";
-}
-
-EventId str2event(const std::string& str) {
-    for (auto& eventName : eventNames) {
-        if (eventName.str == str) {
-            return eventName.type;
-        }
-    }
-    return EventId::UNKNOWN;
-}
 
 int hm2time(int hour, int minute) {
     return hour * 100 + minute;

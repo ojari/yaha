@@ -25,7 +25,7 @@ void MessageRouter::route(std::string& deviceName, std::string& payload) {
 void on_connect(struct mosquitto *mosq, void *obj, int result) {
     if (!result) {
         spdlog::info("Connected");
-        mosquitto_subscribe(mosq, NULL, "zigbee2mqtt/+", 0);
+        mosquitto_subscribe(mosq, NULL, std::string(MQTT_TOPIC) + "/+", 0);
     } else {
         spdlog::error("Connect failed: {}", result);
     }

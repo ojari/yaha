@@ -6,8 +6,8 @@ namespace device {
 
 class TempSensorDevice : public Device {
 public:
-    explicit TempSensorDevice(const std::string& name, EventId eid, std::shared_ptr<IEventBus> evbus) :
-        Device(name, eid, evbus)
+    explicit TempSensorDevice(const std::string& name, EventBus& evbus) :
+        Device(name, evbus)
     {}
 
     void onMessage(std::string& deviceName, nlohmann::json& payload) override {
@@ -18,7 +18,7 @@ public:
 
         if (fabs(temperature - new_temperature) > 0.1) {
             temperature = new_temperature;
-            notifyValue(temperature);
+            evbus.publish<TemperatureEvent>(TemperatureEvent("Default", temperature));
         }
     }
 

@@ -1,59 +1,26 @@
 #pragma once
 #include "../task.hpp"
 #include "../common.hpp"
-#include "../event_data.hpp"
 #include "../demo/suntime.hpp"
 #include "../demo/sun_data.h"
 #include <spdlog/spdlog.h>
 
 namespace task {
 
-class TaskCalcSun : public ITask, public IObserver {
+class TaskCalcSun : public ITask {
 public:
-    TaskCalcSun(std::shared_ptr<IEventBus> aevbus) :
+    TaskCalcSun(EventBus& aevbus) :
         evbus(aevbus)
     {
-        evbus->subscribe(EventId::LATITUDE, this);
-        evbus->subscribe(EventId::LONGITUDE, this);
-        evbus->subscribe(EventId::TIME, this);
-        evbus->subscribe(EventId::YEAR, this);
-        evbus->subscribe(EventId::DATE, this);
-    }
-
-    void onChange(const IEventData& value) override {
-        switch (value.id()) {
-            case EventId::LATITUDE:
-                latitude = value.getFloat();
-                spdlog::info("{} latitude={}  longitude={}", time2str(time), latitude, longitude);
-
-                sunTime.setLocation(latitude, longitude);
-                break;
-            case EventId::LONGITUDE:
-                longitude = value.getFloat();
-                spdlog::info("{} latitude={}  longitude={}", time2str(time), latitude, longitude);
-                sunTime.setLocation(latitude, longitude);
-                break;
-            case EventId::TIME:
-                time = value.getInt();
-                break;
-            case EventId::YEAR:
-                year = value.getInt();
-                // spdlog::info("{} year={}  {}", time2str(time), year, date);
-                sunTime.setDate(year, month, day);
-                break;
-            case EventId::DATE:
-                if (date != value.getInt()) {
-                    int yday = dm2yday(value.getInt());
-                    spdlog::info("{} yday={} date={}", time2str(time), yday, date);
-
-                }
-				date = value.getInt();
-                // spdlog::info("{} year={}  {}", time2str(time), year, date);
-                sunTime.setDate(year, month, day);
-                break;
-            default:
-                return; // Ignore other events
-        }
+        evbus.subscribe<LocationEvent>([&](const LocationEvent& e) {
+            sunTime.setLocation(e.latitude, e.longitude);
+        });
+        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            time = e.GetTime();
+        });
+        evbus.subscribe<DateEvent>([&](const DateEvent& e) {
+            sunTime.setDate(e.year, e.month, e.day);
+        });
     }
 
     void execute() override {
@@ -62,12 +29,8 @@ public:
         int sunriseTime = GetSunrise(yday);
         int sunsetTime = GetSunset(yday);
 
-        if (sunrise.set(sunriseTime)) {
-            evbus->publish(sunrise);
-        }
-        if (sunset.set(sunsetTime)) {
-            evbus->publish(sunset);
-        }
+            // evbus->publish(sunrise);
+            // evbus->publish(sunset);
         /*
         auto sunriseTime = sunTime.calculate(true);
         auto sunsetTime = sunTime.calculate(false);
@@ -91,10 +54,7 @@ public:
     }
 
 private:
-    std::shared_ptr<IEventBus> evbus;
-    EventData sunrise {EventId::SUNRISE, 0600};
-    EventData sunset {EventId::SUNSET, 2100};
-    EventData dark {EventId::DARK, 0};
+    EventBus& evbus;
 
     SunTime sunTime;
     float latitude = 60.2055f;

@@ -1,8 +1,26 @@
 #include "history.hpp"
 #include <chrono>
 
-void History::onChange(const IEventData& value) {
-    data::DataHistory data;
+void History::registerEvents(EventBus& bus) {
+    bus.subscribe<TemperatureEvent>([&](const TemperatureEvent& e) {
+        this->onEvent(e);
+    });
+    bus.subscribe<ElectricityPriceEvent>([&](const ElectricityPriceEvent& e) {
+        this->onEvent(e);
+    });
+    bus.subscribe<ButtonEvent>([&](const ButtonEvent& e) {
+        this->onEvent(e);
+    });
+    bus.subscribe<LampEvent>([&](const LampEvent& e) {
+        this->onEvent(e);
+    });
+    bus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
+        this->onEvent(e);
+    });
+}
+
+void History::onEvent(const TemperatureEvent& e) {
+/*    data::DataHistory data;
 
     data.epoch = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     data.event = value.id();
@@ -10,23 +28,17 @@ void History::onChange(const IEventData& value) {
 
     dataToHeader(table, data);
     history.insert(table);
+*/
 }
 
-void History::registerEvents(std::shared_ptr<IEventBus> bus) {
-    const std::array<EventId, 9> events = {
-        EventId::TEMPERATURE,
-        EventId::TEMPERATURE_ROOM,
-        EventId::ELECTRICITY_PRICE,
-        EventId::BUTTON_LIVING_ROOM,
-        EventId::BUTTON_LIBRARY,
-        EventId::LAMP_LIBRARY,
-        EventId::LAMP_LIVING_ROOM,
-        EventId::SWITCH_AUTO_TALLI,
-        EventId::SWITCH_AUTO_ULKO
-    };
-
-    for (const auto& event : events) {
-        bus->subscribe(event, this);
-    }
+void History::onEvent(const ElectricityPriceEvent& e) {
 }
 
+void History::onEvent(const ButtonEvent& e) {
+}
+
+void History::onEvent(const LampEvent& e) {
+}
+
+void History::onEvent(const SwitchEvent& e) {
+}
