@@ -19,23 +19,48 @@ public:
     void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
         bool state;
 
-        if (payload.contains("state")) {
-            state = payload["state"].get<std::string>() == "ON";
-        } else {
-            if (payload["action"].is_null()) {
-                return;
-            }
-            const std::string& state_str = payload["action"].get<std::string>();
-            if (state_str == "on") {
-                state = true;
-            } else if (state_str == "off") {
-                state = false;
-            } else {
-                return;
-            }
-            state = payload["action"].get<std::string>() == "on";
+        if (deviceName != _deviceName) { // this message was not for me
+            return;
         }
-        // spdlog::info("Switch {} :: {}", deviceName, state);
+
+        if (payload.contains("state")) {
+            const auto& j = payload["state"];
+            if (j.is_string()) {
+                state = j.get<std::string>() == "ON";
+            } else if (j.is_boolean()) {
+                state = j.get<bool>();
+            } else if (j.is_number_integer()) {
+                state = j.get<int>() != 0;
+            } else if (j.is_null()) {
+                spdlog::warn("Switch {}: 'state' is null, ignoring", deviceName);
+                return;
+            } else {
+                spdlog::warn("Switch {}: unexpected type for 'state'", deviceName);
+                return;
+            }
+        } else if (payload.contains("action")) {
+            const auto& j = payload["action"];
+            if (j.is_string()) {
+                const std::string s = j.get<std::string>();
+                if (s == "on") state = true;
+                else if (s == "off") state = false;
+                else {
+                    spdlog::warn("Switch {}: unknown action '{}'", deviceName, s);
+                    return;
+                }
+            } else if (j.is_boolean()) {
+                state = j.get<bool>();
+            } else if (j.is_null()) {
+                spdlog::warn("Switch {}: 'action' is null, ignoring", deviceName);
+                return;
+            } else {
+                spdlog::warn("Switch {}: unexpected type for 'action'", deviceName);
+                return;
+            }
+        } else {
+            // No relevant field found
+            return;
+        }
 
         if (first_time || (state != last_state)) {
             evbus.publish<SwitchEvent>(SwitchEvent(deviceName, state));

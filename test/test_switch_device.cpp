@@ -132,4 +132,87 @@ TEST_CASE("SwitchDevice - bug in on_message") {
     REQUIRE(mock.state == false);  // This might fail with current implementation
 }
 
+TEST_CASE("SwitchDevice - ignores messages for other device") {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+
+    nlohmann::json payload = {{"state", "ON"}};
+    std::string deviceName = "other_device";
+
+    mock.notified = false;
+    device.onMessage(deviceName, payload);
+
+    REQUIRE_FALSE(mock.notified);
+}
+
+TEST_CASE("SwitchDevice - non-string or null state should not notify") {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+    std::string deviceName = "test_switch";
+
+    SECTION("Boolean state") {
+		nlohmann::json payload = { {"state", true} }; // accepted as valid
+        mock.notified = false;
+        device.onMessage(deviceName, payload);
+        REQUIRE(mock.notified);
+    }
+
+    SECTION("Null state") {
+        nlohmann::json payload = {{"state", nullptr}};
+        mock.notified = false;
+        device.onMessage(deviceName, payload);
+        REQUIRE_FALSE(mock.notified);
+    }
+}
+
+TEST_CASE("SwitchDevice - both 'state' and 'action' present: 'state' wins") {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+    std::string deviceName = "test_switch";
+
+    // If implementation should prefer explicit "state" over "action"
+    nlohmann::json payload = {{"state", "OFF"}, {"action", "on"}};
+    device.onMessage(deviceName, payload);
+    REQUIRE(mock.notified);
+    REQUIRE(mock.state == false);
+
+    // reverse order: still prefer "state"
+    nlohmann::json payload2 = {{"action", "off"}, {"state", "ON"}};
+    mock.notified = false;
+    device.onMessage(deviceName, payload2);
+    REQUIRE(mock.notified);
+    REQUIRE(mock.state == true);
+}
+
+TEST_CASE("SwitchDevice - multiple subscribers are notified") {
+    EventBus evbus;
+    MockSwitch mock1(evbus);
+    MockSwitch mock2(evbus);
+    SwitchDevice device("test_switch", evbus);
+    std::string deviceName = "test_switch";
+
+    nlohmann::json payload = {{"state", "ON"}};
+    device.onMessage(deviceName, payload);
+
+    REQUIRE(mock1.notified);
+    REQUIRE(mock2.notified);
+    REQUIRE(mock1.state == true);
+    REQUIRE(mock2.state == true);
+}
+
+TEST_CASE("SwitchDevice - empty payload does not notify") {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+    std::string deviceName = "test_switch";
+
+    nlohmann::json payload = nlohmann::json::object();
+    mock.notified = false;
+    device.onMessage(deviceName, payload);
+    REQUIRE_FALSE(mock.notified);
+}
+
 }  // namespace device

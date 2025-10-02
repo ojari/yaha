@@ -46,7 +46,7 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(mock.notified == true);
+        REQUIRE(mock.notified > 0);
         REQUIRE(mock.brightness == 150);
     }
     
@@ -58,7 +58,7 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(mock.notified == true);
+        REQUIRE(mock.notified > 0);
         REQUIRE(mock.brightness == 0);  // Should notify 0 when state is OFF
     }
     
@@ -70,7 +70,7 @@ TEST_CASE("LightDevice on_message method", "[light]") {
         
         device.onMessage(deviceName, payload);
         
-        REQUIRE(mock.notified == true);
+        REQUIRE(mock.notified > 0);
         REQUIRE(mock.brightness == 0);
     }
 }
@@ -147,6 +147,71 @@ TEST_CASE("LightDevice edge cases", "[light]") {
         
         REQUIRE(output.lastTopic == "zigbee2mqtt/living_light/set");
         REQUIRE(output.lastPayload == R"({"state": "ON", "brightness": 1000})");
+    }
+}
+
+//
+// Additional improved coverage
+//
+TEST_CASE("LightDevice additional parsing cases", "[light][extended]") {
+    std::string deviceName = "office_light";
+    EventBus evbus;
+    MockListener listener(evbus);
+    device::LightDevice device(deviceName, evbus);
+
+    SECTION("Process ON state with brightness 0") {
+        nlohmann::json payload = {
+            {"state", "ON"},
+            {"brightness", 0}
+        };
+        device.onMessage(deviceName, payload);
+        REQUIRE(listener.notified);
+        REQUIRE(listener.brightness == 0);
+    }
+
+    SECTION("Process ON state with extra unrelated fields") {
+        nlohmann::json payload = {
+            {"state", "ON"},
+            {"brightness", 42},
+            {"color_temp", 300},
+            {"transition", 2}
+        };
+        device.onMessage(deviceName, payload);
+        REQUIRE(listener.notified);
+        REQUIRE(listener.brightness == 42);
+    }
+
+    SECTION("Malformed JSON missing both state and brightness") {
+        nlohmann::json payload = {
+            {"foo", "bar"}
+        };
+        REQUIRE_THROWS(device.onMessage(deviceName, payload));
+    }
+
+    SECTION("Invalid brightness type (string)") {
+        nlohmann::json payload = {
+            {"state", "ON"},
+            {"brightness", "high"}
+        };
+        REQUIRE_THROWS(device.onMessage(deviceName, payload));
+    }
+
+    SECTION("Invalid state type (number)") {
+        nlohmann::json payload = {
+            {"state", 123},
+            {"brightness", 10}
+        };
+        REQUIRE_THROWS(device.onMessage(deviceName, payload));
+    }
+
+    SECTION("OFF state with large brightness still yields 0 event brightness") {
+        nlohmann::json payload = {
+            {"state", "OFF"},
+            {"brightness", 999}
+        };
+        device.onMessage(deviceName, payload);
+        REQUIRE(listener.notified);
+        REQUIRE(listener.brightness == 0);
     }
 }
 

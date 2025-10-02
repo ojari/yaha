@@ -21,12 +21,16 @@ add_executable(${PROJECT_NAME}
   test_shelly.cpp
   test_light_device.cpp
   test_switch_device.cpp
+  test_task_calc_sun_reference.cpp
   #test_sourcesqlite.cpp
   #test_sourcestring.cpp
 
   ../mqtt/common.cpp
   ../mqtt/common.hpp
+  ../mqtt/demo/suntime.cpp
+  ../mqtt/demo/sun_data.cpp
   ../mqtt/task/time.cpp
+  ../mqtt/task/calc_sun.hpp
   ../mqtt/automation/lights.cpp
   ../mqtt/automation/switch_light.cpp
   ../mqtt/automation/car_heater.cpp
@@ -36,7 +40,7 @@ add_executable(${PROJECT_NAME}
   ../mqtt/data/tables.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/include
     ../mqtt
 )
