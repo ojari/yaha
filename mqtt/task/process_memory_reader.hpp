@@ -41,7 +41,7 @@ public:
 private:
     void update(float value) {
         if (last_value != value) {
-            evbus.publish<PcEvent>(PcEvent(PcEvent::process_memory, static_cast<unsigned long>(value)));
+            evbus.publish(PcEvent(PcEvent::process_memory, static_cast<unsigned long>(value)));
             last_value = value;
         }
     }

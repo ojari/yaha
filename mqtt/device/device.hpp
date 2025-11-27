@@ -16,7 +16,7 @@ public:
 
     virtual ~Device() = default;
 
-    virtual void onMessage(std::string& deviceName, nlohmann::json& payload) = 0;
+    virtual void onMessage(const std::string& deviceName, nlohmann::json& payload) = 0;
 
 protected:
     bool str2bool(const std::string& str) const {

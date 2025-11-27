@@ -85,10 +85,10 @@ add_executable(${PROJECT_NAME}
     device/shelly_device.hpp
     device/switch_device.hpp
     device/temp_sensor_device.hpp
-    expert/es_base.hpp
-    expert/es_cond.hpp
-    expert/expert.cpp
-    expert/expert.hpp
+  #  expert/es_base.hpp
+  #  expert/es_cond.hpp
+  #  expert/expert.cpp
+  #  expert/expert.hpp
   task/calc_price.hpp
   task/calc_sun.hpp
   task/load_average_reader.hpp

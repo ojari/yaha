@@ -12,7 +12,7 @@ public:
     {
     }
 
-    void onMessage(std::string& devName, nlohmann::json& payload) override {
+    void onMessage(const std::string& devName, nlohmann::json& payload) override {
         brightness = payload["brightness"];
         if (payload["state"].is_boolean()) {
             state = payload["state"];
@@ -22,9 +22,9 @@ public:
         // spdlog::info("Light  {} :: {} :: {}", devName, state, brightness);
 
         if (state == false) {
-            evbus.publish<LampEvent>(LampEvent(deviceName, 0));
+            evbus.publish(LampEvent(deviceName, 0));
         } else {
-            evbus.publish<LampEvent>(LampEvent(deviceName, brightness));
+            evbus.publish(LampEvent(deviceName, brightness));
         }
     }
 

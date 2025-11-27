@@ -99,10 +99,10 @@ switch ($Do) {
   "Clean" {
     Clear-Build $bld_dir
   }
-  "Build" { Invoke-Build "toolchain-x64.cmake" "_build" "Debug" }
+  "Build"    { Invoke-Build "toolchain-x64.cmake" "_build" "Debug" }
   "BuildArm" { Invoke-Build "toolchain-arm64.cmake" "_build_arm" "Release" }
   "BuildWin" { Invoke-Build "toolchain-win.cmake" "_build_win" "Release" }
-  "Vcpkg" { Invoke-Vcpkg x64-linux-release }
+  "Vcpkg"    { Invoke-Vcpkg x64-linux-release }
   "VcpkgArm" { Invoke-Vcpkg arm64-linux-release }
   "VcpkgWin" { Invoke-Vcpkg x64-windows }
   "Wc" {

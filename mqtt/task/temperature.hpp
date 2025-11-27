@@ -25,7 +25,7 @@ public:
 private:
     void update(float temp) {
         if (temp != last_temp) {
-            evbus.publish<TemperatureEvent>(TemperatureEvent("TaskTemp", temp));
+            evbus.publish(TemperatureEvent("TaskTemp", temp));
             last_temp = temp;
         }
     }

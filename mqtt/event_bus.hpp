@@ -23,10 +23,7 @@ public:
     EventBus& operator=(const EventBus&) = delete;
 
     template<typename EventT>
-    using Listener = std::function<void(const EventT&)>;
-
-    template<typename EventT>
-    void subscribe(Listener<EventT> listener) {
+    void subscribe(std::function<void(const EventT&)> listener) {
         std::lock_guard<std::mutex> lock(mutex_);
         auto& vec = m_listeners[typeid(EventT).name()];
         vec.push_back([listener](const EventBase& e) {
@@ -34,10 +31,9 @@ public:
         });
     }
 
-    template<typename EventT>
-    void publish(const EventT& event) {
+    void publish(const EventBase& event) {
         std::lock_guard<std::mutex> lock(mutex_);
-        auto it = m_listeners.find(typeid(EventT).name());
+        auto it = m_listeners.find(typeid(EventBase).name());
         if (it != m_listeners.end()) {
             for (auto& listener : it->second) {
                 listener(event);

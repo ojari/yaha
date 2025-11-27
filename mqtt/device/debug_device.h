@@ -12,7 +12,7 @@ public:
         evbus(evbus)
     {}
 
-    void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
+    void onMessage(const std::string& _deviceName, nlohmann::json& payload) override {
         if (!payload.contains("event") || !payload["event"].is_string()) {
             spdlog::warn("DebugDevice: Payload missing 'event' field or it is not a string");
             return;

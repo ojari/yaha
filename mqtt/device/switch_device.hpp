@@ -16,7 +16,7 @@ public:
         last_state = false;
     }
 
-    void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
+    void onMessage(const std::string& _deviceName, nlohmann::json& payload) override {
         bool state;
 
         if (deviceName != _deviceName) { // this message was not for me
@@ -63,7 +63,7 @@ public:
         }
 
         if (first_time || (state != last_state)) {
-            evbus.publish<SwitchEvent>(SwitchEvent(deviceName, state));
+            evbus.publish(SwitchEvent(deviceName, state));
             last_state = state;
             first_time = false;
         }

@@ -31,44 +31,48 @@ void writePidToFile(const std::string& filePath) {
     }
 }
 
-/**
- * @brief The main function of the program.
- */
-int main(int argc, char* argv[]) {
-    // initialize logging
-    //
+void initializeLogger() {
     // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 #ifndef WIN32
     auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("yaha", LOG_PID, LOG_USER, true);
-    spdlog::sinks_init_list sink_list = { syslog_sink, console_sink };
+    spdlog::sinks_init_list sink_list = { syslog_sink };
 #else
     spdlog::sinks_init_list sink_list = { console_sink };
 #endif
-    writePidToFile("/tmp/yaha.pid");
 
     auto logger = std::make_shared<spdlog::logger>("yaha", sink_list.begin(), sink_list.end());
     logger->set_pattern("%H:%M:%S %L %^%v%$");
     spdlog::set_default_logger(logger);
+}
 
-    // read filenames from command line
+/**
+ * @brief The main function of the program.
+ */
+int main(int argc, char* argv[]) {
+    bool createTables = false;
+    bool simulatedMode = false;
+    
+    initializeLogger();
+    
+    writePidToFile("/tmp/yaha.pid");
+
+    // Command line parsing using modern C++
+    // Usage: program [--create] [--simulate] [devicesFile] [automationFile]
     std::string devicesFile = "devices.json";
     std::string automationFile = "automation.json";
 
-    if (argc > 1) {
-        devicesFile = argv[1];
-
-        if (devicesFile == "create") {
-            sqlite3* db = data::createDatabase("data_yaha.db");
-            data::SourceSqlite source(db);
-            data::TableHistory tableHistory;
-
-            source.createTable(tableHistory);
-            return 0;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--create") {
+            createTables = true;
+        } else if (arg == "--simulate") {
+            simulatedMode = true;
+        } else if (devicesFile == "devices.json") {  // except that deviceFile content is changed
+            devicesFile = arg;
+        } else if (automationFile == "automation.json") {
+            automationFile = arg;
         }
-    }
-    if (argc > 2) {
-        automationFile = argv[2];
     }
 
     // database initialization
@@ -76,13 +80,19 @@ int main(int argc, char* argv[]) {
     sqlite3* db = data::createDatabase("data_yaha.db");
     data::SourceSqlite source(db);
     data::TableHistory tableHistory;
+    if (createTables) {
+	    source.createTable(tableHistory);
+	    return 0;
+    }
 
     source.createSql(tableHistory);
 
     // initialize system
     //
     EventBus evBus;
-    auto mqtt = std::make_shared<Mqtt>(devicesFile, evBus);
+	DeviceMessageRouter devRouter(devicesFile, evBus);
+	BridgeMessageRouter bridgeRouter;
+    auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
     automation::Registry automations(mqtt, evBus);
     DebugOutput debugOutput;
     History history(source);

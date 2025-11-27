@@ -10,7 +10,7 @@ public:
         Device(name, evbus)
     {}
 
-    void onMessage(std::string& deviceName, nlohmann::json& payload) override {
+    void onMessage(const std::string& deviceName, nlohmann::json& payload) override {
         float new_temperature = payload["temperature"];
         humidity = payload["humidity"];
 
@@ -18,7 +18,7 @@ public:
 
         if (fabs(temperature - new_temperature) > 0.1) {
             temperature = new_temperature;
-            evbus.publish<TemperatureEvent>(TemperatureEvent("Default", temperature));
+            evbus.publish(TemperatureEvent("Default", temperature));
         }
     }
 

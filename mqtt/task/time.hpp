@@ -33,12 +33,12 @@ protected:
     void sendNotification(int hour, int minute) {
         // spdlog::info("Time: {}:{} weekday: {}", hour, minute, weekday);
 
-        evbus.publish<TimeEvent>(TimeEvent(hour, minute));
+        evbus.publish(TimeEvent(hour, minute));
     }
 
     
     void sendDateNotification(int ayear, int amonth, int aday) {
-        evbus.publish<DateEvent>(DateEvent(ayear, amonth, aday, 0));
+        evbus.publish(DateEvent(ayear, amonth, aday, 0));
     }
     int hour {0};
     int minute {1};
@@ -70,7 +70,7 @@ public:
             darkness = 1;
         }
 
-        evbus.publish<DarkEvent>(DarkEvent(darkness));
+        evbus.publish(DarkEvent(darkness));
 
         sendNotification(hour, minute);
     }

@@ -29,7 +29,7 @@ public:
         relay(parseRelay(name))
     {}
 
-    void onMessage(std::string& _deviceName, nlohmann::json& payload) override {
+    void onMessage(const std::string& _deviceName, nlohmann::json& payload) override {
         /*if (payload.contains("state")) {
             state = payload["state"].get<std::string>() == "ON";
         }

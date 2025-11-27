@@ -45,10 +45,10 @@ public:
     unsigned long getUsedMem() const { return usedMem; }
 
 private:
-    unsigned long totalMem;
-    unsigned long freeMem;
-    unsigned long buffers;
-    unsigned long cached;
+    unsigned long totalMem = 0;
+    unsigned long freeMem = 0;
+    unsigned long buffers = 0;
+    unsigned long cached = 0;
     unsigned long usedMem;
 
 private:

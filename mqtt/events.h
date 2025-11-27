@@ -17,19 +17,22 @@ enum class EventId {
 
 #define DEFINE_EVENT(eventName) \
     static constexpr EventId ID = EventId::eventName; \
-    EventId GetId() const override { return ID; } \
     const char* GetName() const override { return #eventName; } \
     eventName##Event() = delete;
+//EventId GetId() const override { return ID; } \
 
 struct EventBase {
     virtual ~EventBase() = default;
-    virtual EventId GetId() const = 0;
+    //virtual EventId GetId() const = 0;
     virtual const char* GetName() const = 0;
 };
 
 struct TemperatureEvent : public EventBase {
     DEFINE_EVENT(Temperature)
-    TemperatureEvent(const std::string& room, float value) : room(room), value(value) {}
+    TemperatureEvent(const std::string& room, float value) :
+        room(room),
+        value(value)
+    {}
     std::string room;         // e.g. "LivingRoom"
     float value;              // °C
 };
@@ -54,7 +57,10 @@ struct DateEvent : public EventBase {
 
 struct TimeEvent : public EventBase {
     DEFINE_EVENT(Time)
-    TimeEvent(int ahour, int aminute) : hour(ahour), minute(aminute) {
+    TimeEvent(int ahour, int aminute) :
+        hour(ahour),
+        minute(aminute)
+    {
         if (minute >= 60) {
             hour += minute / 60;
             minute %= 60;

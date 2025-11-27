@@ -18,5 +18,11 @@ struct IOutput {
     virtual void send(std::string_view topic, const std::string& message) = 0;
 };
 
+struct IMessageRouter {
+    virtual ~IMessageRouter() = default;
+    virtual void route(const std::string& topic, const std::string& payload) = 0;
+};
+
+
 #include "events.h"
 #include "event_bus.hpp"

@@ -8,8 +8,14 @@
 #include "common.hpp"
 using json = nlohmann::json;
 
+DeviceMessageRouter::DeviceMessageRouter(const std::string& filename, EventBus& evbus) :
+    deviceRegistry(evbus)
+{
+	deviceRegistry.load(filename);
+}
 
-void Mqtt::route(std::string& deviceName, std::string& payload) {
+
+void DeviceMessageRouter::route(const std::string& deviceName, const std::string& payload) {
     std::shared_ptr<device::Device> device = deviceRegistry.getDevice(deviceName);
     if (device) {
         if (0) {
@@ -30,7 +36,7 @@ void Mqtt::route(std::string& deviceName, std::string& payload) {
     }
 }
 
-void Mqtt::bridge_msg(std::string& topic, std::string& payload) {
+void BridgeMessageRouter::route(const std::string& topic, const std::string& payload) {
 #if 0
     if (topic == std::string(MQTT_TOPIC) + "/bridge/devices") {
         // spdlog::info("Bridge log: {}", payload);
@@ -98,13 +104,12 @@ void mqtt_connlost(void *context, char *cause)
 }
 
 //------------------------------------------------------------------
-Mqtt::Mqtt(const std::string& filename, EventBus& evbus) :
-	deviceRegistry(evbus)
+Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
+	devRouter(devrouter),
+	bridgeRouter(bridgerouter)
 {
     int rc = 0;
     const char* hostname = getenv("RPI_HOST");
-
-    deviceRegistry.load(filename);
 
     if (hostname == nullptr) {
         spdlog::error("Missing RPI_HOST environmental variable");

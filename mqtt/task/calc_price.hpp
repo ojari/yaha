@@ -15,7 +15,7 @@ public:
         int newPrice = last_price + randomChange;
 
         if (newPrice != last_price) {
-            evbus.publish<ElectricityPriceEvent>(ElectricityPriceEvent(newPrice));
+            evbus.publish(ElectricityPriceEvent(newPrice));
 
             last_price = newPrice;
         }
