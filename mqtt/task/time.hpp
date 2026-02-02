@@ -35,7 +35,6 @@ protected:
 
         evbus.publish(TimeEvent(hour, minute));
     }
-
     
     void sendDateNotification(int ayear, int amonth, int aday) {
         evbus.publish(DateEvent(ayear, amonth, aday, 0));
@@ -64,11 +63,6 @@ public:
         int hours = hm2time(hour, minute);
         int darkness {0};
 
-        if (sunrise <= hours && hours <= sunset) {
-            darkness = 0;
-        } else {
-            darkness = 1;
-        }
 
         evbus.publish(DarkEvent(darkness));
 

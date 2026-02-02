@@ -25,17 +25,6 @@ struct DebugOutput {
             time = e.GetTime();
         });
 
-
-        /*const std::array<EventId, 18> events = {
-            EventId::WEEKDAY,
-            EventId::PROC_MEM,
-            EventId::DARK,
-            EventId::SUNRISE,
-            EventId::SUNSET,
-            EventId::YEAR,
-	    EventId::DATE,
-        };
-        */
     }
 
 private:

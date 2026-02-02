@@ -28,7 +28,7 @@ add_executable(${PROJECT_NAME}
   ../mqtt/common.cpp
   ../mqtt/common.hpp
   ../mqtt/demo/suntime.cpp
-  ../mqtt/demo/sun_data.cpp
+  #../mqtt/demo/sun_data.cpp
   ../mqtt/task/time.cpp
   ../mqtt/task/calc_sun.hpp
   ../mqtt/automation/lights.cpp

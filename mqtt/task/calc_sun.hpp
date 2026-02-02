@@ -2,10 +2,54 @@
 #include "../task.hpp"
 #include "../common.hpp"
 #include "../demo/suntime.hpp"
-#include "../demo/sun_data.h"
+// #include "../demo/sun_data.h"
 #include <spdlog/spdlog.h>
 
 namespace task {
+
+class TaskSimpleCalcSun {
+public:
+    TaskSimpleCalcSun(EventBus& aevbus) :
+        evbus(aevbus)
+    {
+        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            bool dark = isDark(e.hour, e.minute);
+            if (dark != isDarkLast) {
+                isDarkLast = dark;
+                evbus.publish(DarkEvent(dark));
+            }            
+        });
+        evbus.subscribe<DateEvent>([&](const DateEvent& e) {
+            calculateDark(e.month, e.day);
+        });
+    }
+
+    bool isDark(int hour, int minute) {
+        int currentTime = hm2time(hour, minute);
+
+        if (currentTime < 0) { // Invalid time
+            return false;
+        }
+        if (sunrise == 0 && sunset == 0) {
+            return false;
+        }
+        if (sunrise >= sunset) {
+            return false;
+        }
+        if (currentTime < sunrise || currentTime > sunset) {
+            return true;
+        }
+        return false;
+    }
+    void calculateDark(int month, int day);
+
+private:
+    EventBus& evbus;
+    int sunrise = 0;
+    int sunset = 0;
+    bool isDarkLast = false;
+};
+
 
 class TaskCalcSun : public ITask {
 public:
@@ -26,8 +70,8 @@ public:
     void execute() override {
 		int yday = dm2yday(date);
 
-        int sunriseTime = GetSunrise(yday);
-        int sunsetTime = GetSunset(yday);
+        //int sunriseTime = GetSunrise(yday);
+        //int sunsetTime = GetSunset(yday);
 
             // evbus->publish(sunrise);
             // evbus->publish(sunset);

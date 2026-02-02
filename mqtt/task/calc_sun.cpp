@@ -1,7 +1,16 @@
-#include "sun_data.h"
+#include <array>
+#include "calc_sun.hpp"
 
-const std::array<SunData, 365> sunTimesTable = {
-    SunData { 925, 1524 }, // 1
+namespace task {
+
+struct SunTimes {
+    int sunrise; // in HHMM format
+    int sunset;  // in HHMM format
+};
+
+static const int daysInMonth[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+static const std::array<SunTimes, 366> sunTimesTable = {{
+    { 925, 1524 }, // 1
     { 925, 1525 }, // 2
     { 924, 1527 }, // 3
     { 924, 1529 }, // 4
@@ -365,20 +374,17 @@ const std::array<SunData, 365> sunTimesTable = {
     { 927, 1518 }, // 362
     { 927, 1519 }, // 363
     { 926, 1521 }, // 364
-    { 926, 1522 }, // 365
-};
+    { 926, 1522 }  // 365
+}};
 
-
-int GetSunrise(int dayOfYear) {
-	if (dayOfYear < 0 || dayOfYear >= sunTimesTable.size()) {
-		return sunTimesTable[0].sunrise;
-	}
-    return sunTimesTable[dayOfYear].sunrise;
-}
-
-int GetSunset(int dayOfYear) {
-    if (dayOfYear < 0 || dayOfYear >= sunTimesTable.size()) {
-        return sunTimesTable[0].sunset;
+void TaskSimpleCalcSun::calculateDark(int amonth, int aday) {
+    int dayOfYear = aday;
+    for (int m = 0; m < amonth - 1 && m < 12; ++m) {
+        dayOfYear += daysInMonth[m];
     }
-    return sunTimesTable[dayOfYear].sunset;
+
+    sunrise = sunTimesTable[dayOfYear - 1].sunrise;
+    sunset = sunTimesTable[dayOfYear - 1].sunset;
 }
+
+} // namespace task

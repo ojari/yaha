@@ -18,12 +18,12 @@ enum class EventId {
 #define DEFINE_EVENT(eventName) \
     static constexpr EventId ID = EventId::eventName; \
     const char* GetName() const override { return #eventName; } \
+    EventId GetId() const override { return ID; } \
     eventName##Event() = delete;
-//EventId GetId() const override { return ID; } \
 
 struct EventBase {
     virtual ~EventBase() = default;
-    //virtual EventId GetId() const = 0;
+    virtual EventId GetId() const = 0;
     virtual const char* GetName() const = 0;
 };
 

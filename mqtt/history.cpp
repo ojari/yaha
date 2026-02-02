@@ -2,6 +2,11 @@
 #include <chrono>
 
 void History::registerEvents(EventBus& bus) {
+    /*bus.subscribeAll<TemperatureEvent,
+        ElectricityPriceEvent,
+        ButtonEvent,
+        LampEvent,
+        SwitchEvent>(   this);*/
     bus.subscribe<TemperatureEvent>([&](const TemperatureEvent& e) {
         this->onEvent(e);
     });

@@ -4,7 +4,11 @@
 
 
 int hm2time(int hour, int minute) {
-    return hour * 100 + minute;
+    if (hour < 0 || hour >= 24 || minute < 0 || minute >= 60) {
+        return -1; // Invalid time
+    }
+    int ctime = hour * 100 + minute;
+    return ctime;
 }
 
 int dm2date(int day, int month) {
