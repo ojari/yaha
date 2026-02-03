@@ -2,8 +2,12 @@
 #ifndef WIN32
 #include <unistd.h>  // getcwd
 #endif
+#include <algorithm>
+#include <array>
 #include <fstream>
+#include <memory>
 #include <string>
+#include <string_view>
 #include "registry.hpp"
 #include "light_device.hpp"
 #include "shelly_device.hpp"
@@ -13,6 +17,28 @@
 #include <nlohmann/json.hpp>
 
 namespace device {
+
+namespace {
+
+template <typename T>
+std::shared_ptr<Device> makeDevice(const std::string& name, EventBus& evbus) {
+    return std::make_shared<T>(name, evbus);
+}
+
+struct DeviceDescriptor {
+    std::string_view type;
+    std::shared_ptr<Device> (*create)(const std::string&, EventBus&);
+};
+
+constexpr std::array<DeviceDescriptor, 5> deviceDescriptors{ {
+    {"Light", &makeDevice<LightDevice>},
+    {"Switch", &makeDevice<SwitchDevice>},
+    {"Shelly", &makeDevice<ShellyDevice>},
+    {"TempSensor", &makeDevice<TempSensorDevice>},
+    {"Debug", &makeDevice<DebugDevice>}
+} };
+
+}  // namespace
 
 void Registry::load(const std::string& filename) {
     char cwd[1024];
@@ -52,31 +78,19 @@ std::shared_ptr<Device> Registry::createDevice(
     const std::string& type,
     EventBus& eventBus) const
 {
-    static const std::map<std::string, std::function<std::shared_ptr<Device>(const std::string&, EventBus& evbus)>> deviceMap = {
-        {"Light", [](const std::string& name, EventBus& evbus) {
-            return std::make_shared<LightDevice>(name,evbus); }
-        },
-        {"Switch", [](const std::string& name, EventBus& evbus) {
-            return std::make_shared<SwitchDevice>(name, evbus); }
-        },
-        {"Shelly", [](const std::string& name, EventBus& evbus) {
-            return std::make_shared<ShellyDevice>(name, evbus); }
-        },
-        {"TempSensor", [](const std::string& name, EventBus& evbus) {
-            return std::make_shared<TempSensorDevice>(name, evbus); }
-        },
-        {"Debug", [](const std::string& name, EventBus& evbus) {
-            return std::make_shared<DebugDevice>(name, evbus); }
-        }
-    };
+    const auto it = std::find_if(
+        deviceDescriptors.begin(),
+        deviceDescriptors.end(),
+        [&](const DeviceDescriptor& descriptor) {
+            return descriptor.type == type;
+        });
 
-    auto it = deviceMap.find(type);
-    if (it != deviceMap.end()) {
-        return std::move((it->second)(name, eventBus));
-    } else {
-        spdlog::error("Unknown device type: {}", type);
-        return nullptr;
+    if (it != deviceDescriptors.end()) {
+        return it->create(name, eventBus);
     }
+
+    spdlog::error("Unknown device type: {}", type);
+    return nullptr;
 }
 
 }  // namespace device

@@ -56,37 +56,29 @@ add_executable(${PROJECT_NAME}
   automation/lights.hpp
   automation/registry.cpp
   automation/registry.hpp
-  automation/room_heater.cpp
-  automation/room_heater.hpp
   automation/storage_heater.cpp
   automation/storage_heater.hpp
   automation/switch_light.cpp
   automation/switch_light.hpp
-  automation/water_heater.cpp
-  automation/water_heater.hpp
   data/config.hpp
   data/data.hpp
   data/datasource.hpp
   data/sourcesqlite.cpp
   data/sourcesqlite.hpp
-  data/sourcestring.cpp
-  data/sourcestring.hpp
   data/tables.cpp
   data/tables.hpp
+  data/sourcesqlite.cpp
+  data/tables.cpp
   demo/suntime.cpp
   demo/suntime.hpp
-    device/debug_device.h
-    device/device.hpp
-    device/light_device.hpp
-    device/registry.cpp
-    device/registry.hpp
-    device/shelly_device.hpp
-    device/switch_device.hpp
-    device/temp_sensor_device.hpp
-  #  expert/es_base.hpp
-  #  expert/es_cond.hpp
-  #  expert/expert.cpp
-  #  expert/expert.hpp
+  device/debug_device.h
+  device/device.hpp
+  device/light_device.hpp
+  device/registry.cpp
+  device/registry.hpp
+  device/shelly_device.hpp
+  device/switch_device.hpp
+  device/temp_sensor_device.hpp
   task/calc_price.hpp
   task/calc_sun.hpp
   task/calc_sun.cpp
@@ -96,8 +88,6 @@ add_executable(${PROJECT_NAME}
   task/temperature.hpp
   task/time.cpp
   task/time.hpp
-  data/sourcesqlite.cpp
-  data/tables.cpp
   device/registry.cpp
   ${GENERATED_HEADERS}
 )

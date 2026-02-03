@@ -39,7 +39,9 @@ vcpkg_installed/
 vs/.vs/
 _build_arm/
 _build/
-
+TestGui/bin/
+TestGui/obj/
+TestGui/.vs/
 # .vscode/settings.json
 build
 _build_win
