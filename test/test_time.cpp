@@ -1,32 +1,33 @@
-#include "catch2/catch_all.hpp"
+#include <gtest/gtest.h>
+
 #include "../mqtt/common.hpp"
 
-TEST_CASE("addTime") {
+TEST(TimeTest, AddTime) {
     int t1 { hm2time(10, 30) };
     int result = timeAdd(t1, 20);
-    REQUIRE(result == 1050);
+    EXPECT_EQ(result, 1050);
 
     result = timeAdd(t1, -20);
-    REQUIRE(result == 1010);
+    EXPECT_EQ(result, 1010);
 
     result = timeAdd(t1, 60);
-    REQUIRE(result == 1130);
+    EXPECT_EQ(result, 1130);
 
     result = timeAdd(t1, -60);
-    REQUIRE(result == 930);
+    EXPECT_EQ(result, 930);
 
     result = timeAdd(t1, -120);
-    REQUIRE(result == 830);
+    EXPECT_EQ(result, 830);
 }
 
-TEST_CASE("addTime 2") {
+TEST(TimeTest, AddTimeHourWrap) {
     int t1 { hm2time(10, 0) };
     int result = timeAdd(t1, 60);
-    REQUIRE(result == 1100);
+    EXPECT_EQ(result, 1100);
 
     result = timeAdd(t1, -60);
-    REQUIRE(result == 900);
+    EXPECT_EQ(result, 900);
 
     result = timeAdd(t1, -120);
-    REQUIRE(result == 800);
+    EXPECT_EQ(result, 800);
 }

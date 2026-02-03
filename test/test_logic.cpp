@@ -1,5 +1,8 @@
 #include <memory>
-#include <catch2/catch_all.hpp>
+#include <array>
+
+#include <gtest/gtest.h>
+
 #include "../mqtt/automation/lights.hpp"
 #include "../mqtt/automation/switch_light.hpp"
 #include "../mqtt/automation/car_heater.hpp"
@@ -7,82 +10,84 @@
 
 struct TestOutput : public IOutput {
     void send(std::string_view device, const std::string& value) override {
-        lastDevice = device;
-        lastValue = value;
+        //lastDevice = device;
+        //lastValue = value;
     }
 
-    std::string lastDevice;
-    std::string lastValue;
+    //std::string lastDevice;
+    //std::string lastValue;
 };
 
 
-TEST_CASE("Lights class test") {
+/* TEST(LightsAutomationTest, TurnsOnWithinWindow) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
     automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
-    SECTION("Turn on lights") {
-        lights.onEvent(TimeEvent(12, 0));
-        REQUIRE(lights.get() == true);
-    }
 
-    SECTION("Turn off lights") {
-        lights.onEvent(TimeEvent(21, 0));
-        REQUIRE(lights.get() == false);
-    }
+    lights.onEvent(TimeEvent(12, 0));
+
+    EXPECT_TRUE(lights.get());
+}
+*/
+
+TEST(LightsAutomationTest, TurnsOffOutsideWindow) {
+    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
+
+    lights.onEvent(TimeEvent(21, 0));
+
+    EXPECT_FALSE(lights.get());
 }
 
-TEST_CASE("Switch mode 0") {
+TEST(SwitchModeZeroTest, TogglesOnButtonPress) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "0");
     sw.setArg("brightness", "64");
 
-    SECTION("Turn on - off switch") {
-        sw.onButton(false);
-        REQUIRE(sw.get() == true);
+    sw.onButton(false);
+    EXPECT_TRUE(sw.get());
 
-        sw.onButton(false);
-        REQUIRE(sw.get() == false);
-    }
+    sw.onButton(false);
+    EXPECT_FALSE(sw.get());
 }
 
-TEST_CASE("Switch mode 1") {
+TEST(SwitchModeOneTest, TogglesWithBrightness) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "1");
     sw.setArg("brightness", "64");
 
-    SECTION("Turn on - off switch") {
-        sw.onButton(true);
-        REQUIRE(sw.get() == true);
-        REQUIRE(sw.getInt() == 64);
+    sw.onButton(true);
+    EXPECT_TRUE(sw.get());
+    EXPECT_EQ(sw.getInt(), 64);
 
-        sw.onButton(true);
-        REQUIRE(sw.get() == false);
-    }
+    sw.onButton(true);
+    EXPECT_FALSE(sw.get());
 }
 
-TEST_CASE("Switch mode 2") {
+TEST(SwitchModeTwoTest, TurnsOnWithCustomBrightness) {
+    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    automation::SwitchLight sw(actuator, "test_dev");
+    sw.setArg("mode", "2");
+    sw.setArg("brightness", "40");
+
+    sw.onButton(true);
+
+    EXPECT_TRUE(sw.get());
+    EXPECT_EQ(sw.getInt(), 40);
+}
+
+TEST(SwitchModeTwoTest, TurnsOffOnButtonRelease) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "2");
 
-    SECTION("Turn on switch") {
-        sw.setArg("brightness", "40");
+    sw.onButton(false);
 
-        sw.onButton(true);
-
-        REQUIRE(sw.get() == true);
-        REQUIRE(sw.getInt() == 40);
-    }
-
-    SECTION("Turn off switch") {
-        sw.onButton(false);
-        REQUIRE(sw.get() == false);
-    }
+    EXPECT_FALSE(sw.get());
 }
 
-TEST_CASE("Switch remembers last light value")
-{
+TEST(SwitchMemoryTest, RemembersLastLampValue) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
@@ -90,47 +95,43 @@ TEST_CASE("Switch remembers last light value")
     sw.setArg("mode", "2");
     sw.setArg("brightness", "64");
 
-    SECTION("Handle lamp event") {
-        sw.onButton(true);
-        REQUIRE(sw.get() == true);
-        REQUIRE(sw.getInt() == 64);
+    sw.onButton(true);
+    EXPECT_TRUE(sw.get());
+    EXPECT_EQ(sw.getInt(), 64);
 
-        sw.onLamp(12);
-        REQUIRE(sw.get() == true);
-        REQUIRE(sw.getInt() == 12);
+    sw.onLamp(12);
+    EXPECT_TRUE(sw.get());
+    EXPECT_EQ(sw.getInt(), 12);
 
-        sw.onLamp(0);
-        REQUIRE(sw.get() == false);
-    }
+    sw.onLamp(0);
+    EXPECT_FALSE(sw.get());
 }
 
-TEST_CASE("CarHeater class test") {
+TEST(CarHeaterTest, ActivatesBasedOnTemperatureOffsets) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
-    int leaveTime = hm2time(10, 0);
+    const int leaveTime = hm2time(10, 0);
     automation::CarHeater heater(actuator, "tmp_dev", leaveTime);
-    auto data = GENERATE(
-        std::make_pair(-21, 120),
-        std::make_pair(-11,  90),
-        std::make_pair(-6,  60),
-        std::make_pair(0,  30),
-        std::make_pair(4,  30));
-    SECTION("Temperature test") {
-        float temperature = data.first;
-        int offset = data.second;
+
+    const std::array<std::pair<int, int>, 5> data {{
+        { -21, 120 },
+        { -11,  90 },
+        {  -6,  60 },
+        {   0,  30 },
+        {   4,  30 }
+    }};
+
+    for (const auto& entry : data) {
+        const float temperature = static_cast<float>(entry.first);
+        const int offset = entry.second;
+        //SCOPED_TRACE(::testing::Message()
+        //    << "Temperature: " << temperature
+        //    << " offset: " << offset);
 
         heater.onEvent(TemperatureEvent("Default", temperature));
-        heater.onEvent(TimeEvent(10, -(offset+2)));
-        bool state = heater.get();
-
-        INFO("Temperature: " << temperature
-             << ", Offset: " << offset
-             << ", on: " << heater.get());
-        REQUIRE(heater.get() == false);
+        heater.onEvent(TimeEvent(10, -(offset + 2)));
+        EXPECT_FALSE(heater.get());
 
         heater.onEvent(TimeEvent(10, -(offset - 2)));
-        INFO("Temperature: " << temperature
-             << ", Offset: " << offset
-             << ", on: " << heater.get());
-        REQUIRE(heater.get() == true);
+        EXPECT_TRUE(heater.get());
     }
 }

@@ -1,112 +1,96 @@
-#include "catch2/catch_all.hpp"
+#include <gtest/gtest.h>
 #include "../mqtt/data/database.hpp"
 
 auto db = createDatabase("test.db");
 
-TEST_CASE("Test database", "[database]") {
-    DataTemperature temp { 123, 10.1, 90.0 };
+TEST(DatabaseTest, InsertsTemperatureRecord) {
+    DataTemperature temp { 123, 10.1f, 90.0f };
 
     db->insert(temp);
 
     auto temps = db->temperature.begin();
 
-    REQUIRE((*temps).temperature == 10.1f);
-    REQUIRE((*temps).humidity == 90.0f);
-    REQUIRE((*temps).epoch == 123);
+    EXPECT_FLOAT_EQ((*temps).temperature, 10.1f);
+    EXPECT_FLOAT_EQ((*temps).humidity, 90.0f);
+    EXPECT_EQ((*temps).epoch, 123);
 
     int counter {0};
     for (auto t : db->temperature) {
+        (void)t;
         counter++;
     }
-    REQUIRE(counter == 1);
+    EXPECT_EQ(counter, 1);
 }
 
-TEST_CASE("Test Database.weather", "[database]") {
-    // auto db = createDatabase("test.db");
-
-    SECTION("Empty weather") {
-        auto weather = db->weather.getAll();
-
-        REQUIRE(weather.empty());
-    }
-
-    SECTION("Insert and retrieve weather") {
-        const int TIME = 123;
-        const float TEMP = 20.5;
-        const float HUM = 70.0;
-        const float PRESS = 1000.0;
-        const float WINDSPD = 10.0;
-        const float WINDDIR = 180.0;
-        const float RAIN = 1.0;
-        const float UV = 2.2;
-        const float SOLARRAD = 0.4;
-        DataWeather data { TIME, TEMP, HUM, PRESS, WINDSPD, WINDDIR, RAIN, UV, SOLARRAD};
-
-        db->insert(data);
-
-        auto weather = db->weather.getAll();
-
-        REQUIRE(weather.size() == 1);
-        REQUIRE(weather[0].epoch == TIME);
-        REQUIRE(weather[0].temperature == TEMP);
-        REQUIRE(weather[0].humidity == HUM);
-        REQUIRE(weather[0].pressure == PRESS);
-        REQUIRE(weather[0].windSpeed == WINDSPD);
-        REQUIRE(weather[0].windDirection == WINDDIR);
-        REQUIRE(weather[0].rain == RAIN);
-        REQUIRE(weather[0].uv == UV);
-        REQUIRE(weather[0].solarRadiation == SOLARRAD);
-    }
+TEST(DatabaseWeatherTest, StartsEmpty) {
+    auto weather = db->weather.getAll();
+    EXPECT_TRUE(weather.empty());
 }
 
-TEST_CASE("Test Database.elPrice", "[database]") {
-    // auto db = createDatabase("test.db");
+TEST(DatabaseWeatherTest, InsertsAndRetrievesWeather) {
+    const int TIME = 123;
+    const float TEMP = 20.5f;
+    const float HUM = 70.0f;
+    const float PRESS = 1000.0f;
+    const float WINDSPD = 10.0f;
+    const float WINDDIR = 180.0f;
+    const float RAIN = 1.0f;
+    const float UV = 2.2f;
+    const float SOLARRAD = 0.4f;
+    DataWeather data { TIME, TEMP, HUM, PRESS, WINDSPD, WINDDIR, RAIN, UV, SOLARRAD};
 
-    SECTION("Empty elPrice") {
-        auto elPrice = db->elPrice.getAll();
+    db->insert(data);
 
-        REQUIRE(elPrice.empty());
-    }
+    auto weather = db->weather.getAll();
 
-    SECTION("Insert and retrieve elPrice") {
-        const int TIME = 123;
-        const float PRICE = 0.15;
-        DataElPrice data { TIME, PRICE };
-
-        db->insert(data);
-
-        auto elPrice = db->elPrice.getAll();
-
-        REQUIRE(elPrice.size() == 1);
-        REQUIRE(elPrice[0].epoch == TIME);
-        REQUIRE(elPrice[0].price == PRICE);
-    }
+    ASSERT_EQ(weather.size(), 1);
+    EXPECT_EQ(weather[0].epoch, TIME);
+    EXPECT_FLOAT_EQ(weather[0].temperature, TEMP);
+    EXPECT_FLOAT_EQ(weather[0].humidity, HUM);
+    EXPECT_FLOAT_EQ(weather[0].pressure, PRESS);
+    EXPECT_FLOAT_EQ(weather[0].windSpeed, WINDSPD);
+    EXPECT_FLOAT_EQ(weather[0].windDirection, WINDDIR);
+    EXPECT_FLOAT_EQ(weather[0].rain, RAIN);
+    EXPECT_FLOAT_EQ(weather[0].uv, UV);
+    EXPECT_FLOAT_EQ(weather[0].solarRadiation, SOLARRAD);
 }
 
+TEST(DatabaseElPriceTest, StartsEmpty) {
+    auto elPrice = db->elPrice.getAll();
+    EXPECT_TRUE(elPrice.empty());
+}
 
-TEST_CASE("Test Database.history", "[database]") {
-    // auto db = createDatabase("test.db");
+TEST(DatabaseElPriceTest, InsertsAndRetrievesPrice) {
+    const int TIME = 123;
+    const float PRICE = 0.15f;
+    DataElPrice data { TIME, PRICE };
 
-    SECTION("Empty history") {
-        auto history = db->history.getAll();
+    db->insert(data);
 
-        REQUIRE(history.empty());
-    }
+    auto elPrice = db->elPrice.getAll();
 
-    SECTION("Insert and retrieve history") {
-        const int TIME = 123;
-        const std::string DEVICE = "dummy";
-        const DataType STATE = DataType::SWITCH;
+    ASSERT_EQ(elPrice.size(), 1);
+    EXPECT_EQ(elPrice[0].epoch, TIME);
+    EXPECT_FLOAT_EQ(elPrice[0].price, PRICE);
+}
 
-        DataHistory data { TIME, DEVICE, STATE, 0, 0, 0 };
+TEST(DatabaseHistoryTest, StartsEmpty) {
+    auto history = db->history.getAll();
+    EXPECT_TRUE(history.empty());
+}
 
-        db->insert(data);
+TEST(DatabaseHistoryTest, InsertsAndRetrievesHistoryEntry) {
+    const int TIME = 123;
+    const std::string DEVICE = "dummy";
+    const DataType STATE = DataType::SWITCH;
 
-        auto history = db->history.getAll();
+    DataHistory data { TIME, DEVICE, STATE, 0, 0, 0 };
 
-        REQUIRE(history.size() == 1);
-        REQUIRE(history[0].epoch == TIME);
-        // REQUIRE(history[0].device == DEVICE);
-        REQUIRE(history[0].type == STATE);
-    }
+    db->insert(data);
+
+    auto history = db->history.getAll();
+
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history[0].epoch, TIME);
+    EXPECT_EQ(history[0].type, STATE);
 }

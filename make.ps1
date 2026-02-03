@@ -76,7 +76,7 @@ function Export-Vs {
     [string]$bld_dir
   )
   Write-Host "Export Visual Studio project"
-  cmake --fresh -S"." -B"$bld_dir" --toolchain "etc/$toolchain" -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE="Debug"    
+  cmake --fresh -S"." -B"$bld_dir" --toolchain "etc/$toolchain" -G "Visual Studio 18 2026" -DCMAKE_BUILD_TYPE="Debug"    
   if ($LASTEXITCODE -ne 0) {
     throw "cmake config exit code: $LASTEXITCODE"
   }

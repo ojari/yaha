@@ -1,218 +1,210 @@
-#include "catch2/catch_all.hpp"
+#include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
+
 #include "../mqtt/device/switch_device.hpp"
 #include "mocks.h"
-#include <nlohmann/json.hpp>
 
 namespace device {
 
 struct MockSwitch {
-    MockSwitch(EventBus& evbus) {
+    explicit MockSwitch(EventBus& evbus) {
         evbus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
             name = e.name;
             state = e.state;
             notified = true;
-            // Print to Catch2 logs
-            INFO("SwitchEvent received: name=" << name << ", state=" << state);
         });
     }
 
     std::string name;
     bool state = false;
-    int notified = false;
+    bool notified = false;
 };
 
-
-TEST_CASE("SwitchDevice - on_message with state key") {
+TEST(SwitchDeviceStateTest, HandlesOnStateMessages) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
 
-    SECTION("State ON") {
-        nlohmann::json payload = {{"state", "ON"}};
-        std::string deviceName = "test_switch";
+    nlohmann::json payload = {{"state", "ON"}};
+    device.onMessage("test_switch", payload);
 
-        device.onMessage(deviceName, payload);
-
-        REQUIRE(mock.notified);
-        REQUIRE(mock.state == true);
-    }
-
-    SECTION("State OFF") {
-        nlohmann::json payload = {{"state", "OFF"}};
-        std::string deviceName = "test_switch";
-
-        device.onMessage(deviceName, payload);
-
-        REQUIRE(mock.notified);
-        REQUIRE(mock.state == false);
-    }
+    EXPECT_TRUE(mock.notified);
+    EXPECT_TRUE(mock.state);
 }
 
-TEST_CASE("SwitchDevice - on_message with action key") {
+TEST(SwitchDeviceStateTest, HandlesOffStateMessages) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
 
-    SECTION("Action on") {
-        nlohmann::json payload = {{"action", "on"}};
-        std::string deviceName = "test_switch";
+    nlohmann::json payload = {{"state", "OFF"}};
+    device.onMessage("test_switch", payload);
 
-        device.onMessage(deviceName, payload);
-
-        REQUIRE(mock.notified);
-        REQUIRE(mock.state == true);
-    }
-
-    SECTION("Action off") {
-        nlohmann::json payload = {{"action", "off"}};
-        std::string deviceName = "test_switch";
-
-        device.onMessage(deviceName, payload);
-
-        REQUIRE(mock.notified);
-        REQUIRE(mock.state == false);
-    }
-
-    SECTION("Invalid action") {
-        nlohmann::json payload = {{"action", "invalid"}};
-        std::string deviceName = "test_switch";
-
-        mock.notified = false;
-        device.onMessage(deviceName, payload);
-
-        // Should not notify on invalid action
-        REQUIRE_FALSE(mock.notified);
-    }
-
-    SECTION("Null action") {
-        nlohmann::json payload = {{"action", nullptr}};
-        std::string deviceName = "test_switch";
-
-        mock.notified = false;
-        device.onMessage(deviceName, payload);
-
-        // Should not notify on null action
-        REQUIRE_FALSE(mock.notified);
-    }
+    EXPECT_TRUE(mock.notified);
+    EXPECT_FALSE(mock.state);
 }
 
-TEST_CASE("SwitchDevice - send method") {
+TEST(SwitchDeviceActionTest, HandlesOnActions) {
     EventBus evbus;
+    MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
-    MockOutput output;
 
-    SECTION("Send ON") {
-        device.send(output, true);
+    nlohmann::json payload = {{"action", "on"}};
+    device.onMessage("test_switch", payload);
 
-        REQUIRE(output.lastTopic == "zigbee2mqtt/test_switch/set");
-        REQUIRE(output.lastPayload == "{\"state\": \"ON\"}");
-    }
-
-    SECTION("Send OFF") {
-        device.send(output, false);
-
-        REQUIRE(output.lastTopic == "zigbee2mqtt/test_switch/set");
-        REQUIRE(output.lastPayload == "{\"state\": \"OFF\"}");
-    }
+    EXPECT_TRUE(mock.notified);
+    EXPECT_TRUE(mock.state);
 }
 
-// Bug detection test - this test exposes a bug in the current implementation
-TEST_CASE("SwitchDevice - bug in on_message") {
+TEST(SwitchDeviceActionTest, HandlesOffActions) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
 
     nlohmann::json payload = {{"action", "off"}};
-    std::string deviceName = "test_switch";
+    device.onMessage("test_switch", payload);
 
-    device.onMessage(deviceName, payload);
-
-    // Current implementation has a bug where it overwrites state with payload["action"] == "on"
-    // after already setting it based on the string value
-    REQUIRE(mock.state == false);  // This might fail with current implementation
+    EXPECT_TRUE(mock.notified);
+    EXPECT_FALSE(mock.state);
 }
 
-TEST_CASE("SwitchDevice - ignores messages for other device") {
+TEST(SwitchDeviceActionTest, IgnoresInvalidActions) {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+
+    nlohmann::json payload = {{"action", "invalid"}};
+    mock.notified = false;
+    device.onMessage("test_switch", payload);
+
+    EXPECT_FALSE(mock.notified);
+}
+
+TEST(SwitchDeviceActionTest, IgnoresNullActions) {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+
+    nlohmann::json payload = {{"action", nullptr}};
+    mock.notified = false;
+    device.onMessage("test_switch", payload);
+
+    EXPECT_FALSE(mock.notified);
+}
+
+TEST(SwitchDeviceSendTest, PublishesOnPayload) {
+    EventBus evbus;
+    SwitchDevice device("test_switch", evbus);
+    MockOutput output;
+
+    device.send(output, true);
+
+    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/test_switch/set");
+    EXPECT_EQ(output.lastPayload, "{\"state\": \"ON\"}");
+}
+
+TEST(SwitchDeviceSendTest, PublishesOffPayload) {
+    EventBus evbus;
+    SwitchDevice device("test_switch", evbus);
+    MockOutput output;
+
+    device.send(output, false);
+
+    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/test_switch/set");
+    EXPECT_EQ(output.lastPayload, "{\"state\": \"OFF\"}");
+}
+
+TEST(SwitchDeviceActionTest, ExposesKnownBug) {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+
+    nlohmann::json payload = {{"action", "off"}};
+    device.onMessage("test_switch", payload);
+
+    EXPECT_FALSE(mock.state);
+}
+
+TEST(SwitchDeviceRoutingTest, IgnoresOtherDevices) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
 
     nlohmann::json payload = {{"state", "ON"}};
-    std::string deviceName = "other_device";
-
     mock.notified = false;
-    device.onMessage(deviceName, payload);
+    device.onMessage("other_device", payload);
 
-    REQUIRE_FALSE(mock.notified);
+    EXPECT_FALSE(mock.notified);
 }
 
-TEST_CASE("SwitchDevice - non-string or null state should not notify") {
+TEST(SwitchDeviceStateTest, AcceptsBooleanState) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
-    std::string deviceName = "test_switch";
 
-    SECTION("Boolean state") {
-		nlohmann::json payload = { {"state", true} }; // accepted as valid
-        mock.notified = false;
-        device.onMessage(deviceName, payload);
-        REQUIRE(mock.notified);
-    }
+    nlohmann::json payload = {{"state", true}};
+    mock.notified = false;
+    device.onMessage("test_switch", payload);
 
-    SECTION("Null state") {
-        nlohmann::json payload = {{"state", nullptr}};
-        mock.notified = false;
-        device.onMessage(deviceName, payload);
-        REQUIRE_FALSE(mock.notified);
-    }
+    EXPECT_TRUE(mock.notified);
 }
 
-TEST_CASE("SwitchDevice - both 'state' and 'action' present: 'state' wins") {
+TEST(SwitchDeviceStateTest, IgnoresNullState) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
-    std::string deviceName = "test_switch";
 
-    // If implementation should prefer explicit "state" over "action"
+    nlohmann::json payload = {{"state", nullptr}};
+    mock.notified = false;
+    device.onMessage("test_switch", payload);
+
+    EXPECT_FALSE(mock.notified);
+}
+
+TEST(SwitchDevicePreferenceTest, PrefersStateOverAction) {
+    EventBus evbus;
+    MockSwitch mock(evbus);
+    SwitchDevice device("test_switch", evbus);
+
     nlohmann::json payload = {{"state", "OFF"}, {"action", "on"}};
-    device.onMessage(deviceName, payload);
-    REQUIRE(mock.notified);
-    REQUIRE(mock.state == false);
+    device.onMessage("test_switch", payload);
 
-    // reverse order: still prefer "state"
+    EXPECT_TRUE(mock.notified);
+    EXPECT_FALSE(mock.state);
+
     nlohmann::json payload2 = {{"action", "off"}, {"state", "ON"}};
     mock.notified = false;
-    device.onMessage(deviceName, payload2);
-    REQUIRE(mock.notified);
-    REQUIRE(mock.state == true);
+    device.onMessage("test_switch", payload2);
+
+    EXPECT_TRUE(mock.notified);
+    EXPECT_TRUE(mock.state);
 }
 
-TEST_CASE("SwitchDevice - multiple subscribers are notified") {
+TEST(SwitchDeviceSubscriptionTest, NotifiesMultipleSubscribers) {
     EventBus evbus;
     MockSwitch mock1(evbus);
     MockSwitch mock2(evbus);
     SwitchDevice device("test_switch", evbus);
-    std::string deviceName = "test_switch";
 
     nlohmann::json payload = {{"state", "ON"}};
-    device.onMessage(deviceName, payload);
+    device.onMessage("test_switch", payload);
 
-    REQUIRE(mock1.notified);
-    REQUIRE(mock2.notified);
-    REQUIRE(mock1.state == true);
-    REQUIRE(mock2.state == true);
+    EXPECT_TRUE(mock1.notified);
+    EXPECT_TRUE(mock2.notified);
+    EXPECT_TRUE(mock1.state);
+    EXPECT_TRUE(mock2.state);
 }
 
-TEST_CASE("SwitchDevice - empty payload does not notify") {
+TEST(SwitchDeviceStateTest, EmptyPayloadDoesNotNotify) {
     EventBus evbus;
     MockSwitch mock(evbus);
     SwitchDevice device("test_switch", evbus);
-    std::string deviceName = "test_switch";
 
     nlohmann::json payload = nlohmann::json::object();
     mock.notified = false;
-    device.onMessage(deviceName, payload);
-    REQUIRE_FALSE(mock.notified);
+    device.onMessage("test_switch", payload);
+
+    EXPECT_FALSE(mock.notified);
 }
 
 }  // namespace device

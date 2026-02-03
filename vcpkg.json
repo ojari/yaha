@@ -1,16 +1,19 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-
     "dependencies": [
-        "catch2",
+        "gtest",
         "spdlog",
         "nlohmann-json",
         "tinyxml2",
         "sqlite3",
-        { "name": "cpp-httplib", "features": ["openssl"] },
+        {
+            "name": "cpp-httplib",
+            "features": [
+                "openssl"
+            ]
+        },
         "paho-mqtt",
         "libuv",
         "curl"
     ]
-    
 }

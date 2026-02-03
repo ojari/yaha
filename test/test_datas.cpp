@@ -1,42 +1,42 @@
-#include "catch2/catch_all.hpp"
+#include <gtest/gtest.h>
 #include "../mqtt/data/tables.hpp"
 
-TEST_CASE("DataValue Test", "[DataValue]") {
+TEST(DataTablesTest, DataValue) {
     data::DataValue value1("name1", 10);
-    REQUIRE(value1.getName() == "name1");
-    REQUIRE(value1.getValue<int>() == 10);
+    EXPECT_EQ(value1.getName(), "name1");
+    EXPECT_EQ(value1.getValue<int>(), 10);
 
     data::DataValue value2("name2", 3.14f);
-    REQUIRE(value2.getName() == "name2");
-    REQUIRE(value2.getValue<float>() == 3.14f);
+    EXPECT_EQ(value2.getName(), "name2");
+    EXPECT_FLOAT_EQ(value2.getValue<float>(), 3.14f);
 
     data::DataValue value3("name3", "hello");
-    REQUIRE(value3.getName() == "name3");
-    REQUIRE(value3.getValue<std::string>() == "hello");
+    EXPECT_EQ(value3.getName(), "name3");
+    EXPECT_EQ(value3.getValue<std::string>(), "hello");
 }
 
-TEST_CASE("TableConfigDevice Test", "[TableConfigDevice]") {
+TEST(DataTablesTest, TableConfigDevice) {
     data::TableConfigDevice table;
 
     data::ConfigDevice config("device1", "type1");
     dataToHeader(table, config);
 
     const std::string name = table.getValue<std::string>("name");
-    REQUIRE(name == "device1");
+    EXPECT_EQ(name, "device1");
 
     std::string type = table.getValue<std::string>("type");
-    REQUIRE(type == "type1");
+    EXPECT_EQ(type, "type1");
 }
 
-TEST_CASE("TableConfigController Test", "[TableConfigController]") {
+TEST(DataTablesTest, TableConfigController) {
     data::TableConfigController table;
 
     data::ConfigController config("controller1", "type1", "actuator1", 10, 20);
     dataToHeader(table, config);
 
-    REQUIRE(table.getValue<std::string>("name") == "controller1");
-    REQUIRE(table.getValue<std::string>("type") == "type1");
-    REQUIRE(table.getValue<std::string>("actuator") == "actuator1");
-    REQUIRE(table.getValue<int>("time1") == 10);
-    REQUIRE(table.getValue<int>("time2") == 20);
+    EXPECT_EQ(table.getValue<std::string>("name"), "controller1");
+    EXPECT_EQ(table.getValue<std::string>("type"), "type1");
+    EXPECT_EQ(table.getValue<std::string>("actuator"), "actuator1");
+    EXPECT_EQ(table.getValue<int>("time1"), 10);
+    EXPECT_EQ(table.getValue<int>("time2"), 20);
 }

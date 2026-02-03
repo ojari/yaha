@@ -1,8 +1,8 @@
-#define CATCH_CONFIG_RUNNER  // Configure catch to use your main, and not its own.
-#include <iostream>
 #include <exception>
 #include <filesystem>
-#include "catch2/catch_all.hpp"
+#include <iostream>
+
+#include <gtest/gtest.h>
 
 void remove_database() {
     std::cout << "Removing database\n";
@@ -14,19 +14,19 @@ void remove_database() {
     }
 }
 
-int main(int argCount, char** ppArgs) {
+int main(int argc, char** argv) {
     // remove_database();
     try {
-        auto result = Catch::Session().run(argCount, ppArgs);
+        ::testing::InitGoogleTest(&argc, argv);
+        const int result = RUN_ALL_TESTS();
         if (result != 0) {
             std::cout << "Result: " << result << "\n";
         }
-        return (result < 0xFF ? result : 0xFF);
+        return result;
     }
     catch (const std::exception& ex) {
-        auto pMessage = ex.what();
-        if (pMessage) {
-            std::cout << "An unhandled exception was thrown:\n" << pMessage;
+        if (const char* message = ex.what()) {
+            std::cout << "An unhandled exception was thrown:\n" << message;
         }
         return -1;
     }
