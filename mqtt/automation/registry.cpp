@@ -9,8 +9,6 @@
 #include "lights.hpp"
 #include "car_heater.hpp"
 #include "storage_heater.hpp"
-#include "water_heater.hpp"
-#include "room_heater.hpp"
 #include "switch_light.hpp"
 
 namespace automation {

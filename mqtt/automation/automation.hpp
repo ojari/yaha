@@ -3,6 +3,7 @@
 #include <string>
 #include <variant>
 #include "../common.hpp"
+#include "facts.hpp"
 
 namespace automation {
 
