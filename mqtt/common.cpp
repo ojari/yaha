@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 #include "common.hpp"
 
 
@@ -10,6 +11,24 @@ int hm2time(int hour, int minute) {
     int ctime = hour * 100 + minute;
     return ctime;
 }
+
+int time2mins(int time) {
+    int hour = time / 100;
+    int minute = time % 100;
+    return hour * 60 + minute;
+}
+
+int hm_diff(int time1, int time2) {
+    int diff = time2mins(time1) - time2mins(time2);
+    if (diff < 0) {
+        diff = -diff;
+    }
+    if (diff > 720) {     // handle wrap-around
+        diff = 1440 - diff;
+    }
+    return diff;
+}
+
 
 int dm2date(int day, int month) {
     if (month < 1 || month > 12 || day < 1 || day > 31) {

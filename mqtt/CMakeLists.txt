@@ -42,16 +42,15 @@ add_executable(${PROJECT_NAME}
   debug_output.hpp
   event_bus.hpp
   events.h
-  history.cpp
-  history.hpp
-  int_time.hpp
   mqtt.cpp
   mqtt.hpp
   task.hpp
+
   automation/automation.cpp
   automation/automation.hpp
   automation/car_heater.cpp
   automation/car_heater.hpp
+  automation/facts.hpp
   automation/lights.cpp
   automation/lights.hpp
   automation/registry.cpp
@@ -60,17 +59,18 @@ add_executable(${PROJECT_NAME}
   automation/storage_heater.hpp
   automation/switch_light.cpp
   automation/switch_light.hpp
-  data/config.hpp
-  data/data.hpp
-  data/datasource.hpp
-  data/sourcesqlite.cpp
-  data/sourcesqlite.hpp
-  data/tables.cpp
-  data/tables.hpp
-  data/sourcesqlite.cpp
-  data/tables.cpp
-  demo/suntime.cpp
-  demo/suntime.hpp
+
+  # data/config.hpp
+  # data/data.hpp
+  # data/datasource.hpp
+  # data/sourcesqlite.cpp
+  # data/sourcesqlite.hpp
+  # data/tables.cpp
+  # data/tables.hpp
+  # data/tables.cpp
+  # demo/suntime.cpp
+  # demo/suntime.hpp
+
   device/debug_device.h
   device/device.hpp
   device/light_device.hpp
@@ -79,6 +79,8 @@ add_executable(${PROJECT_NAME}
   device/shelly_device.hpp
   device/switch_device.hpp
   device/temp_sensor_device.hpp
+  device/registry.cpp
+
   task/calc_price.hpp
   task/calc_sun.hpp
   task/calc_sun.cpp
@@ -88,7 +90,7 @@ add_executable(${PROJECT_NAME}
   task/temperature.hpp
   task/time.cpp
   task/time.hpp
-  device/registry.cpp
+
   ${GENERATED_HEADERS}
 )
 

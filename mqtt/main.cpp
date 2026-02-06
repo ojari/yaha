@@ -6,14 +6,10 @@
 #include <spdlog/spdlog.h>
 #include "mqtt.hpp"
 #include "common.hpp"
-#include "data/sourcesqlite.hpp"
-#include "data/tables.hpp"
 #include "debug_output.hpp"
 #include "event_bus.hpp"
-#include "history.hpp"
 #include "automation/registry.hpp"
 #include "application.hpp"
-#include "int_time.hpp"
 // #include <spdlog/sinks/basic_file_sink.h>
 #ifndef WIN32
 #include <spdlog/sinks/syslog_sink.h>
@@ -21,7 +17,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 
-void writePidToFile(const std::string& filePath) {
+/*void writePidToFile(const std::string& filePath) {
     std::ofstream pidFile(filePath);
     if (pidFile.is_open()) {
         pidFile << getpid();
@@ -29,7 +25,7 @@ void writePidToFile(const std::string& filePath) {
     } else {
         spdlog::error("Unable to open file: {}", filePath);
     }
-}
+}*/
 
 void initializeLogger() {
     // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
@@ -50,13 +46,8 @@ void initializeLogger() {
  * @brief The main function of the program.
  */
 int main(int argc, char* argv[]) {
-    bool createTables = false;
-    bool simulatedMode = false;
-    
     initializeLogger();
     
-    writePidToFile("/tmp/yaha.pid");
-
     // Command line parsing using modern C++
     // Usage: program [--create] [--simulate] [devicesFile] [automationFile]
     std::string devicesFile = "devices.json";
@@ -64,28 +55,12 @@ int main(int argc, char* argv[]) {
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
-        if (arg == "--create") {
-            createTables = true;
-        } else if (arg == "--simulate") {
-            simulatedMode = true;
-        } else if (devicesFile == "devices.json") {  // except that deviceFile content is changed
+        if (devicesFile == "devices.json") {  // except that deviceFile content is changed
             devicesFile = arg;
         } else if (automationFile == "automation.json") {
             automationFile = arg;
         }
     }
-
-    // database initialization
-    //
-    sqlite3* db = data::createDatabase("data_yaha.db");
-    data::SourceSqlite source(db);
-    data::TableHistory tableHistory;
-    if (createTables) {
-	    source.createTable(tableHistory);
-	    return 0;
-    }
-
-    source.createSql(tableHistory);
 
     // initialize system
     //
@@ -95,12 +70,10 @@ int main(int argc, char* argv[]) {
     auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
     automation::Registry automations(mqtt, evBus);
     DebugOutput debugOutput;
-    History history(source);
 
     automations.load(automationFile, evBus);
 
     debugOutput.registerEvents(evBus);
-    history.registerEvents(evBus);
 
     Application app;
     TimerSlow timer1(evBus, app);
