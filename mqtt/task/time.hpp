@@ -27,6 +27,11 @@ public:
 
         sendNotification(hour, minute);
 		// sendWeekdayNotification(new_weekday);
+
+        if (local_tm.tm_yday != lastDay) {
+            sendDateNotification(local_tm.tm_year + 1900, local_tm.tm_mon + 1, local_tm.tm_mday);
+            lastDay = local_tm.tm_yday;
+        }
     }
 
 protected:
@@ -41,6 +46,7 @@ protected:
     }
     int hour {0};
     int minute {1};
+    int lastDay{ -1 };
     EventBus& evbus;
 };
 

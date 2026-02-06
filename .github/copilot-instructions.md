@@ -1,5 +1,10 @@
 # GitHub Copilot Instructions for Advanced C++ Development
 
+## Architecture and Design Patterns
+- Use design patterns such as Observer (for event-driven updates, e.g., device state changes), Factory (for creating device objects), and Strategy (for interchangeable algorithms like weather providers).
+- Ensure loose coupling: Use interfaces (e.g., abstract base classes like ICommand in common) to allow easy extension (e.g., adding new devices without modifying core logic).
+- Example: When generating code for a new device, prioritize composition over inheritance and ensure thread-safety for concurrent operations (e.g., MQTT subscriptions).
+
 ## General Guidelines
 - Follow the C++17 standard or later.
 - Prioritize readability and maintainability of the code.
@@ -16,7 +21,7 @@
 ## Libraries and Frameworks
 - Prefer using the Standard Template Library (STL) for data structures and algorithms.
 - Avoid using Boost libraries.
-- For unit testing, use the Catch2 framework.
+- For unit testing, use the Google Test framework.
 
 ## Error Handling
 - Use exceptions for error handling.
@@ -29,9 +34,19 @@
 - Avoid premature optimization; focus on clear and correct code first.
 
 ## Documentation
-- Document all public functions and classes using Doxygen-style comments.
-- Provide examples of usage where applicable.
 - Ensure all comments are up-to-date with the code changes.
+
+## Testing and Validation
+- Write unit tests for all public functions using Google Test; place tests in test with filenames matching source (e.g. utils_test.cpp).
+- Use mocking for external dependencies (e.g., MQTT clients or weather APIs) to isolate tests.
+- Run tests via CMake/CTest (e.g., ctest command); aim for high coverage, especially for critical paths like device commands.
+- Example: For new code, generate test stubs automatically and suggest assertions for edge cases (e.g., network failures).
+
+## Security and Safety
+- Validate all inputs (e.g., from MQTT or JSON configs) to prevent injection attacks; use secure parsing libraries.
+- Handle sensitive data (e.g., API keys in etc) with environment variables or encrypted storage; avoid hardcoding.
+- Implement timeouts and retries for network operations (e.g., downloads in download.cpp); use RAII for resource management.
+- Example: When generating network code, include checks for SSL/TLS and log security events.
 
 ## Example Code
 ```cpp

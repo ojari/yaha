@@ -22,8 +22,8 @@ void DeviceMessageRouter::route(const std::string& deviceName, const std::string
             spdlog::info("Device: {} Payload: {}", deviceName, payload);
         }
 
-        json jsonPayload = json::parse(payload);
         try {
+            json jsonPayload = json::parse(payload);
             device->onMessage(deviceName, jsonPayload);
         } catch (const nlohmann::json::parse_error& e) {
             spdlog::error("Json parse error: {}", e.what());
@@ -101,12 +101,15 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
 void mqtt_connlost(void *context, char *cause)
 {
     spdlog::error("Connection lost cause: {}", cause);
+    auto* mqtt = static_cast<Mqtt*>(context);
+    mqtt->setConnected(false);
 }
 
 //------------------------------------------------------------------
 Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
 	devRouter(devrouter),
-	bridgeRouter(bridgerouter)
+	bridgeRouter(bridgerouter),
+    connected(false)
 {
     int rc = 0;
     const char* hostname = getenv("RPI_HOST");
@@ -138,7 +141,7 @@ Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
         return;
     }
 
-    const std::vector<std::string> topics = {
+    topics = {
         std::string(MQTT_TOPIC) + "/#"
     };
 
@@ -149,10 +152,43 @@ Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
             return;
         }
     }
+
+    connected = true;
 }
 
 void Mqtt::execute() {
     int rc = 0;
+
+    // Check connection status periodically
+    if (!MQTTClient_isConnected(client)) {
+        spdlog::warn("MQTT client is disconnected (detected in execute)");
+        if (!connected) {
+            spdlog::info("Attempting to reconnect to MQTT broker...");
+
+            MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+            conn_opts.keepAliveInterval = 60;
+            conn_opts.cleansession = 1;
+            rc = MQTTClient_connect(client, &conn_opts);  // Use default options
+            if (rc == MQTTCLIENT_SUCCESS) {
+                spdlog::info("Reconnected to MQTT broker");
+                // Resubscribe to topics
+                for (const auto& t : topics) {
+                    rc = MQTTClient_subscribe(client, t.c_str(), 0);
+                    if (rc != MQTTCLIENT_SUCCESS) {
+                        spdlog::error("Unable to resubscribe to topic '{}': {}", t, rc);
+                    } else {
+                        spdlog::info("Resubscribed to topic '{}'", t);
+                    }
+                }
+                connected = true;
+            } else {
+                spdlog::error("Failed to reconnect: {}", rc);
+            }
+        }
+    }
+    else {
+        connected = true;
+    }
 
 /*    rc = mosquitto_loop(mosq, 5, 1);
     if (rc) {
@@ -164,6 +200,7 @@ void Mqtt::execute() {
 
 void Mqtt::send(std::string_view topic, const std::string& payload) {
     int rc = 0;
+
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
     // MQTTClient_deliveryToken token;
 

@@ -45,9 +45,13 @@ public:
 		bridgeRouter.route(topic, payload);
     }
 
+    void setConnected(bool state) { connected = state; }
+
 private:
     MQTTClient client;
     IMessageRouter& devRouter;
 	IMessageRouter& bridgeRouter;
     int errorCounter = 0;
+    bool connected = false;
+    std::vector<std::string> topics;
 };
