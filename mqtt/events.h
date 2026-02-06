@@ -100,13 +100,6 @@ struct ElectricityPriceEvent : public EventBase {
     double price;             // €/kWh
 };
 
-struct ButtonEvent : public EventBase {
-    DEFINE_EVENT(Button)
-    ButtonEvent(const std::string& location, bool pressed) : location(location), pressed(pressed) {}
-    std::string location;     // "LivingRoom" / "Library"
-    bool pressed;
-};
-
 struct SwitchEvent : public EventBase {
     DEFINE_EVENT(Switch)
     SwitchEvent(const std::string& name, bool state) : name(name), state(state) {}

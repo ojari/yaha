@@ -50,11 +50,6 @@ public:
             evbus.publish(ElectricityPriceEvent(
                 payload["price"].get<double>()));
         }
-        else if (eventType == "Button" && payload.contains("location") && payload.contains("pressed")) {
-            evbus.publish(ButtonEvent(
-                payload["location"].get<std::string>(),
-                payload["pressed"].get<bool>()));
-        }
         else if (eventType == "Switch" && payload.contains("name") && payload.contains("state")) {
             evbus.publish(SwitchEvent(
                 payload["name"].get<std::string>(),

@@ -17,9 +17,9 @@ struct SwitchLight : public Automation {
     std::string toString() override;
 
     void registerEvents(EventBus& evbus) override {
-        evbus.subscribe<ButtonEvent>([&](const ButtonEvent& e) {
-            if (e.location == buttonLocation) {
-                onButton(e.pressed);
+        evbus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
+            if (e.name == buttonLocation) {
+                onButton(e.state);
             }
         });
 

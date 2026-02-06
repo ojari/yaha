@@ -5,26 +5,21 @@
 
 struct DebugOutput {
     void registerEvents(EventBus& bus) {
-        bus.subscribe<ButtonEvent>([&](const ButtonEvent& e) {
-            spdlog::info("{}: Button {} = {}", time2str(time), e.location, e.pressed);
-        });
-
         bus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
-            spdlog::info("{}: Switch {} = {}", time2str(time), e.name, e.state);
+            spdlog::info("{}: SwitchEvent {} = {}", time2str(time), e.name, e.state);
         });
 
         bus.subscribe<LampEvent>([&](const LampEvent& e) {
-            spdlog::info("{}: Lamp {} = {}", time2str(time), e.location, e.brightness);
+            spdlog::info("{}: LampEvent {} = {}", time2str(time), e.location, e.brightness);
         });
 
         bus.subscribe<TemperatureEvent>([&](const TemperatureEvent& e) {
-            spdlog::info("{}: Temp {} = {}", time2str(time), e.room, e.value);
+            spdlog::info("{}: TempEvent {} = {}", time2str(time), e.room, e.value);
         });
 
         bus.subscribe<TimeEvent>([&](const TimeEvent& e) {
             time = e.GetTime();
         });
-
     }
 
 private:

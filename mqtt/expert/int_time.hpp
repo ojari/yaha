@@ -16,7 +16,7 @@ public:
         return hm2time(hour, minute);
     }
 
-    void operator+(int minutes) {
+    IntTime& operator+=(int minutes) {
         minute += minutes;
         if (minute >= 60) {
             hour += minute / 60;
@@ -25,6 +25,7 @@ public:
                 hour %= 24;
             }
         }
+        return *this;
     }
 private:
     int hour;
