@@ -89,13 +89,13 @@ struct TimerFast : public TimerBase {
     {
         timer.data = this;
 
-        tasks.emplace_back(std::make_unique<task::TaskTemperature>(evbus));
 #ifdef DEBUG_TIME
+        tasks.emplace_back(std::make_unique<task::TaskTemperature>(evbus));
         tasks.emplace_back(std::make_unique<task::TaskDebugTime>(evbus));
+        tasks.emplace_back(std::make_unique<task::TaskCalcPrice>(evbus));
 #else
         tasks.emplace_back(std::make_unique<task::TaskTime>(evbus));
 #endif
-        tasks.emplace_back(std::make_unique<task::TaskCalcPrice>(evbus));
 
         for (const auto& task : tasks) {
             task->initialize();

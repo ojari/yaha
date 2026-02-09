@@ -5,15 +5,15 @@ function build {
     # cmake -DYOCTO=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --toolchain etc/toolchain-x64.cmake ..
     make
-  cd ..
+    cd ..
 }
 
 function expert {
-  cd build
-  # cmake -DYOCTO=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --toolchain etc/toolchain-x64.cmake ..
-  make expert
-  cd ..
+    cd build
+    # cmake -DYOCTO=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+    cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --toolchain etc/toolchain-x64.cmake ..
+    make expert
+    cd ..
 }
 
 function build-arm {
@@ -24,10 +24,10 @@ function build-arm {
 
 case $1 in
   "vcpkg")
-    /home/jari/vcpkg/vcpkg install --triplet x64-linux-release
+    $HOME/source/vcpkg/vcpkg install --triplet x64-linux-release
     ;;
   "vcpkg-arm")
-    /home/jari/vcpkg/vcpkg install --triplet arm64-linux-release
+    $HOME/source/vcpkg/vcpkg install --triplet arm64-linux-release
     ;;
   "clean")
     rm -R build
@@ -48,7 +48,7 @@ case $1 in
     ;;
   "export")
     scp _build_arm/mqtt/yaha pi@${TARGET_HOST}:
-    scp *.json pi@${TARGET_HOST}:
+    #scp *.json pi@${TARGET_HOST}:
     ;;
   "wc")
     cloc --exclude-dir=expert --exclude-lang="CMake,Bourne Shell" mqtt weather spot

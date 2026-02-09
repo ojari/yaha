@@ -17,6 +17,14 @@ struct DebugOutput {
             spdlog::info("{}: TempEvent {} = {}", time2str(time), e.room, e.value);
         });
 
+        bus.subscribe<DateEvent>([&](const DateEvent& e) {
+            spdlog::info("{}: DateEvent {}/{} {}  weekday = {}", time2str(time), e.day, e.month, e.year, e.weekday);
+        });
+
+	bus.subscribe<ElectricityPriceEvent>([&](const ElectricityPriceEvent& e) {
+            // spdlog::info("{}: PriceEvent {}", time2str(time), e.price);
+        });
+
         bus.subscribe<TimeEvent>([&](const TimeEvent& e) {
             time = e.GetTime();
         });

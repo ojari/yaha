@@ -106,9 +106,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/lib
 )
 
-
-find_package(fmt REQUIRED)
-
 target_link_libraries(${PROJECT_NAME}
     ${EXTRA_LIBRARIES}
     # fmt::fmt

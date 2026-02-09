@@ -44,10 +44,10 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${VCPKG_ROOT}/debug/lib
     ${VCPKG_ROOT}/lib/manual-link
 )
-find_package(GTest CONFIG REQUIRED)
+# find_package(GTest CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
-    GTest::gtest
+    gtest
     ${EXTRA_LIBRARIES}
 )
 

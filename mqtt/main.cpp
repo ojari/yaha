@@ -32,7 +32,7 @@ void initializeLogger() {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 #ifndef WIN32
     auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>("yaha", LOG_PID, LOG_USER, true);
-    spdlog::sinks_init_list sink_list = { syslog_sink };
+    spdlog::sinks_init_list sink_list = { console_sink, syslog_sink };
 #else
     spdlog::sinks_init_list sink_list = { console_sink };
 #endif
@@ -65,8 +65,8 @@ int main(int argc, char* argv[]) {
     // initialize system
     //
     EventBus evBus;
-	DeviceMessageRouter devRouter(devicesFile, evBus);
-	BridgeMessageRouter bridgeRouter;
+    DeviceMessageRouter devRouter(devicesFile, evBus);
+    BridgeMessageRouter bridgeRouter;
     auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
     automation::Registry automations(mqtt, evBus);
     DebugOutput debugOutput;
