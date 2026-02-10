@@ -57,6 +57,7 @@ void BridgeMessageRouter::route(const std::string& topic, const std::string& pay
 
 void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
 {
+    // spdlog::info("MQTT deliveded {}", dt);
     // spdlog::info("Message with token value {} delivery confirmed", dt);
     // deliveredtoken = dt;
 }
@@ -66,6 +67,8 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     std::string payload {static_cast<char*>(message->payload), static_cast<size_t>(message->payloadlen)};
     std::string topic {topicName};
     int slashCount = std::count(topic.begin(), topic.end(), '/');
+
+    // spdlog::info("MQTT receive {}", topicName);
 
     if (topic.find("/bridge") != std::string::npos) {
         auto* mqtt = static_cast<Mqtt*>(context);
@@ -80,7 +83,6 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
         MQTTClient_free(topicName);
         return 1;
     }
-    // spdlog::info("Message arrived");
     // spdlog::info("     topic: {}", topicName);
     // spdlog::info("   message: {}", payload.c_str());
 
@@ -100,9 +102,9 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
 
 void mqtt_connlost(void *context, char *cause)
 {
-    spdlog::error("Connection lost cause: {}", cause);
-    auto* mqtt = static_cast<Mqtt*>(context);
-    mqtt->setConnected(false);
+    spdlog::error("MQTT Connection lost: {}", cause);
+    //auto* mqtt = static_cast<Mqtt*>(context);
+    //mqtt->setConnected(false);
 }
 
 //------------------------------------------------------------------
@@ -135,6 +137,7 @@ Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
         return;
     }
 
+    spdlog::info("MQTT connecting...");
     rc = MQTTClient_connect(client, &conn_opts);
     if (rc != MQTTCLIENT_SUCCESS) {
         spdlog::error("Unable to connect: {}", rc);
@@ -146,9 +149,10 @@ Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
     };
 
     for (const auto& t : topics) {
+	spdlog::info("MQTT subscribe topic {}", t.c_str());
         rc = MQTTClient_subscribe(client, t.c_str(), 0);
         if (rc != MQTTCLIENT_SUCCESS) {
-            spdlog::error("Unable to subscribe to topic '{}': {}", t, rc);
+            spdlog::error("MQTT Unable to subscribe to topic '{}': {}", t, rc);
             return;
         }
     }
@@ -157,8 +161,7 @@ Mqtt::Mqtt(IMessageRouter& devrouter, IMessageRouter& bridgerouter) :
 }
 
 void Mqtt::execute() {
-    int rc = 0;
-
+#if 0
     // Check connection status periodically
     if (!MQTTClient_isConnected(client)) {
         spdlog::warn("MQTT client is disconnected (detected in execute)");
@@ -168,7 +171,7 @@ void Mqtt::execute() {
             MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
             conn_opts.keepAliveInterval = 60;
             conn_opts.cleansession = 1;
-            rc = MQTTClient_connect(client, &conn_opts);  // Use default options
+            int rc = MQTTClient_connect(client, &conn_opts);  // Use default options
             if (rc == MQTTCLIENT_SUCCESS) {
                 spdlog::info("Reconnected to MQTT broker");
                 // Resubscribe to topics
@@ -189,33 +192,31 @@ void Mqtt::execute() {
     else {
         connected = true;
     }
-
-/*    rc = mosquitto_loop(mosq, 5, 1);
-    if (rc) {
-        spdlog::error("Loop error: {}", mosquitto_strerror(rc));
-        mosquitto_reconnect(mosq);
-    }
-*/
+#endif
 }
 
 void Mqtt::send(std::string_view topic, const std::string& payload) {
-    int rc = 0;
-
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
-    // MQTTClient_deliveryToken token;
+    MQTTClient_deliveryToken token;
 
     pubmsg.payload = const_cast<char*>(payload.c_str());
     pubmsg.payloadlen = payload.size();
     pubmsg.qos = 1;
     pubmsg.retained = 0;
 
-    rc = MQTTClient_publishMessage(client, topic.data(), &pubmsg, NULL);
+    //spdlog::info("MQTT publish {}", topic.data());
+    int rc = MQTTClient_publishMessage(client, topic.data(), &pubmsg, &token);
     if (rc != MQTTCLIENT_SUCCESS) {
         errorCounter++;
         if (errorCounter <= 3) {
-            spdlog::error("Unable to publish: {}", rc);
+            spdlog::error("MQTT Unable to publish: {}", rc);
         }
     } else {
         errorCounter = 0;
+
+	//rc = MQTTClient_waitForCompletion(client, token, 4000);
+	//if (rc != MQTTCLIENT_SUCCESS) {
+	//    spdlog::error("MQTT wait token {}", rc);
+	//}
     }
 }
