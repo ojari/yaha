@@ -377,7 +377,7 @@ static const std::array<SunTimes, 366> sunTimesTable = {{
     { 926, 1522 }  // 365
 }};
 
-void TaskSimpleCalcSun::calculateDark(int amonth, int aday) {
+void SimpleCalcSun::calculateDark(int amonth, int aday) {
     int dayOfYear = aday;
     for (int m = 0; m < amonth - 1 && m < 12; ++m) {
         dayOfYear += daysInMonth[m];

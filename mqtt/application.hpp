@@ -76,7 +76,7 @@ struct TimerSlow : public TimerBase {
         tasks.emplace_back(std::make_unique<task::MemoryUsageReader>());
         tasks.emplace_back(std::make_unique<task::ProcessMemoryReader>(evbus));
 
-        tasks.emplace_back(std::make_unique<task::TaskCalcSun>(evbus));
+        // tasks.emplace_back(std::make_unique<task::TaskCalcSun>(evbus));
     }
 };
 

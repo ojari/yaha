@@ -7,9 +7,9 @@
 
 namespace task {
 
-class TaskSimpleCalcSun {
+class SimpleCalcSun {
 public:
-    TaskSimpleCalcSun(EventBus& aevbus) :
+    SimpleCalcSun(EventBus& aevbus) :
         evbus(aevbus)
     {
         evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {

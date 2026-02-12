@@ -69,6 +69,7 @@ int main(int argc, char* argv[]) {
     BridgeMessageRouter bridgeRouter;
     auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
     automation::Registry automations(mqtt, evBus);
+    task::SimpleCalcSun simpleCalcSun(evBus);
     DebugOutput debugOutput;
 
     automations.load(automationFile, evBus);

@@ -27,6 +27,7 @@ void DeviceMessageRouter::route(const std::string& deviceName, const std::string
             device->onMessage(deviceName, jsonPayload);
         } catch (const nlohmann::json::parse_error& e) {
             spdlog::error("Json parse error: {}", e.what());
+            spdlog::error("Device: {} Payload: {}", deviceName, payload);
         } catch (const nlohmann::json::type_error& e) {
             spdlog::error("Json type error: {}", e.what());
             spdlog::error("Device: {} Payload: {}", deviceName, payload);
@@ -62,6 +63,15 @@ void mqtt_delivered(void *context, MQTTClient_deliveryToken dt)
     // deliveredtoken = dt;
 }
 
+std::string extractDeviceName(const std::string& topic)
+{
+    size_t firstSlash = topic.find('/');
+    if (firstSlash != std::string::npos) {
+        return topic.substr(firstSlash + 1);
+    }
+    return std::string();
+}
+
 int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
     std::string payload {static_cast<char*>(message->payload), static_cast<size_t>(message->payloadlen)};
@@ -71,8 +81,10 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     // spdlog::info("MQTT receive {}", topicName);
 
     if (topic.find("/bridge") != std::string::npos) {
-        auto* mqtt = static_cast<Mqtt*>(context);
-        mqtt->bridge_msg(topic, payload);
+        if (context != nullptr) {
+            auto* mqtt = static_cast<Mqtt*>(context);
+            mqtt->bridge_msg(topic, payload);
+        }
         MQTTClient_freeMessage(&message);
         MQTTClient_free(topicName);
         return 1;
@@ -86,12 +98,12 @@ int mqtt_msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_messa
     // spdlog::info("     topic: {}", topicName);
     // spdlog::info("   message: {}", payload.c_str());
 
-    size_t firstSlash = topic.find('/');
-    if (firstSlash != std::string::npos) {
-        auto* mqtt = static_cast<Mqtt*>(context);
-
-        std::string device_name = topic.substr(firstSlash + 1);
-        mqtt->route(device_name, payload);
+    std::string device_name = extractDeviceName(topic);
+    if (device_name.length() > 0) {
+        if (context != nullptr) {
+            auto* mqtt = static_cast<Mqtt*>(context);
+            mqtt->route(device_name, payload);
+        }
     } else {
         spdlog::error("Invalid topic format: {}", topic);
     }

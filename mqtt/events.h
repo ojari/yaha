@@ -39,8 +39,8 @@ struct TemperatureEvent : public EventBase {
 
 struct DarkEvent : public EventBase {
     DEFINE_EVENT(Dark)
-    DarkEvent(bool isDark) : isDark(isDark) {}
-    bool isDark;              // true = dark outside
+    DarkEvent(bool isDark) : dark(isDark) {}
+    bool dark;              // true = dark outside
 };
 
 struct DateEvent : public EventBase {
