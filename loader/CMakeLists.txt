@@ -7,6 +7,7 @@ project(loader VERSION 0.1)
 # target_include_directories(${PROJECT_NAME} PRIVATE ../common)
 add_executable(${PROJECT_NAME}
     ICommand.hpp
+    asus_download.hpp
     spot_download.hpp
     spot_parse.hpp
     weather_download.hpp
