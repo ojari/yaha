@@ -49,3 +49,5 @@ _build_win
 .cccc
 vs
 .vs
+TestGui/
+CTestTestfile.cmake

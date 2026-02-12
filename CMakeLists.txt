@@ -22,9 +22,7 @@ endif()
 include(CTest)
 
 add_subdirectory(mqtt)
-#add_subdirectory(asus)
-#add_subdirectory(weather)
-#add_subdirectory(spot)
+add_subdirectory(loader)
 
 enable_testing()
 add_subdirectory(test)
