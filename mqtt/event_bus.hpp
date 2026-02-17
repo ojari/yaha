@@ -59,12 +59,17 @@ public:
     }
 
     void publish(const EventBase& event) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        auto it = m_listeners.find(event.GetId());
-        if (it != m_listeners.end()) {
-            for (auto& listener : it->second) {
-                listener(event);
+        std::vector<std::function<void(const EventBase&)>> listeners;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            auto it = m_listeners.find(event.GetId());
+            if (it != m_listeners.end()) {
+                listeners = it->second;
             }
+        }
+
+        for (auto& listener : listeners) {
+            listener(event);
         }
     }
 

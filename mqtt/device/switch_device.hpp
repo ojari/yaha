@@ -44,6 +44,11 @@ public:
                 const std::string s = j.get<std::string>();
                 if (s == "on") state = true;
                 else if (s == "off") state = false;
+                else if (s == "brightness_move_up") state = true;
+                else if (s == "brightness_move_down") state = false;
+                else if (s == "brightness_stop") {
+                    return; // ignore, we only care about on/off state
+                }
                 else {
                     spdlog::warn("Switch {}: unknown action '{}'", deviceName, s);
                     return;
