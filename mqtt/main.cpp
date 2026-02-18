@@ -27,6 +27,22 @@
     }
 }*/
 
+struct DebugMqtt : public IOutput {
+
+    DebugMqtt(EventBus& evbus) {
+        evbus.subscribe<TimeEvent>([this](const TimeEvent& event) { onEvent(event); });
+    }
+    void send(std::string_view topic, const std::string& message) override {
+        spdlog::info("{} OUTPUT: {} {}", time2str(time), topic.data(), message.c_str());
+    }
+private:
+    int time {-1};
+
+    void onEvent(const TimeEvent& event) {
+        time = event.GetTime();
+    }
+};
+
 void initializeLogger() {
     // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/switch_device.log", true);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -65,9 +81,13 @@ int main(int argc, char* argv[]) {
     // initialize system
     //
     EventBus evBus;
+#ifdef DEBUG_TIME
+    auto mqtt = std::make_shared<DebugMqtt>(evBus);
+#else
     DeviceMessageRouter devRouter(devicesFile, evBus);
     BridgeMessageRouter bridgeRouter;
     auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
+#endif
     automation::Registry automations(mqtt, evBus);
     task::SimpleCalcSun simpleCalcSun(evBus);
     DebugOutput debugOutput;

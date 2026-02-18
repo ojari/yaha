@@ -4,6 +4,7 @@
 #include <variant>
 #include "../common.hpp"
 #include "facts.hpp"
+#include "nlohmann/json.hpp"
 
 namespace automation {
 
@@ -25,6 +26,9 @@ struct Automation {
     {}
 
     virtual void setArg(const std::string& name, const std::string& value) {
+    }
+
+    virtual void setCondition(const std::string& type, const nlohmann::json& config) {
     }
 
     virtual void registerEvents(EventBus& evbus) = 0;

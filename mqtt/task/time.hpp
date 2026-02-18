@@ -67,10 +67,6 @@ public:
     void execute() override {
         incrementTime(5);
         int hours = hm2time(hour, minute);
-        int darkness {0};
-
-
-        evbus.publish(DarkEvent(darkness));
 
         sendNotification(hour, minute);
     }

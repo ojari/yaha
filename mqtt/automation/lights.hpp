@@ -1,83 +1,65 @@
 #pragma once
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
+#include <nlohmann/json.hpp>
 #include "automation.hpp"
+#include "facts.hpp"
 
 namespace automation {
 
-struct LightValue {
-    static const int NONE = -1;
+class Lights : public Automation {
+public:
+    struct Condition {
+        enum class Group {
+            Time,
+            Dark,
+            ElectricityPrice
+        };
 
-    enum LightMode {
-        FIXED,
-        SUNRISE,
-        SUNSET
+        explicit Condition() = default;
+        virtual ~Condition() = default;
+    
+        [[nodiscard]] virtual bool matches(const Facts& facts) const = 0;
+        [[nodiscard]] virtual Group group() const = 0;
     };
 
-    LightValue(int _time) {
-        set(_time);
-    }
+    struct TimeCondition : Condition {
+        TimeCondition(int onTime, int offTime);
+        [[nodiscard]] bool matches(const Facts& facts) const override;
+        [[nodiscard]] Group group() const override { return Group::Time; }
 
-    void set(int value) {
-        if (value == 9990) {
-            mode = LightMode::SUNRISE;
-        }
-        else if (value == 9991) {
-            mode = LightMode::SUNSET;
-        }
-        else {
-            mode = LightMode::FIXED;
-        }
-        time = value;
-    }
+    private:
+        int onTime;
+        int offTime;
+    };
 
-    friend bool operator>=(int lhs, const LightValue& rhs) {
-        return lhs >= rhs.time;
-    }
+    struct DarkCondition : Condition {
+        DarkCondition(bool whenDark);
+        [[nodiscard]] bool matches(const Facts& facts) const override;
+        [[nodiscard]] Group group() const override { return Group::Dark; }
 
-    friend bool operator<(int lhs, const LightValue& rhs) {
-        return lhs < rhs.time;
-    }
+    private:
+        bool whenDark;
+    };
 
-private:
-    int time;
-    LightMode mode = LightMode::FIXED;
-};
+    struct ElectricityPriceCondition : Condition {
+        ElectricityPriceCondition(double threshold, bool above);
+        [[nodiscard]] bool matches(const Facts& facts) const override;
+        [[nodiscard]] Group group() const override { return Group::ElectricityPrice; }
 
-struct Lights : public Automation {
+    private:
+        double threshold;
+        bool above;
+    };
 
-    Lights(std::shared_ptr<IOutput> output, const std::string& name) :
-        Automation(output, name),
-        onTime(LightValue::NONE),
-        offTime(LightValue::NONE)
-    {
-        initial_value(false);
-    }
+    Lights(std::shared_ptr<IOutput> output, const std::string& name);
 
-    Lights(std::shared_ptr<IOutput> output, const std::string& name, int onTime, int offTime) :
-        Automation(output, name),
-        onTime(onTime),
-        offTime(offTime)
-    {
-        initial_value(false);
-    }
-
+    void setCondition(const std::string &type, const nlohmann::json& data);
     void setArg(const std::string& name, const std::string& value) override;
 
-    void registerEvents(EventBus& evbus) override {
-        evbus.subscribe<TimeEvent>([&](const TimeEvent& e) {
-            this->onEvent(e);
-        });
-
-        evbus.subscribe<DarkEvent>([&](const DarkEvent& e) {
-            //this->onEvent(e);
-        });
-
-        //evbus->subscribe(EventId::SUNRISE, this);
-        //evbus->subscribe(EventId::SUNSET, this);
-    }
-
-    std::string toString() override;
+    void registerEvents(EventBus& evbus) override;
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
@@ -86,11 +68,16 @@ struct Lights : public Automation {
         return std::make_shared<Lights>(output, name);
     }
 
-    void onEvent(const TimeEvent& event);
-
 private:
-    LightValue onTime;
-    LightValue offTime;
+    void onEvent(const TimeEvent& event);
+    void onEvent(const DateEvent& event);
+    void onEvent(const DarkEvent& event);
+    void onEvent(const ElectricityPriceEvent& event);
+
+    void updateState();
+
+    Facts facts;
+    std::vector<std::unique_ptr<Condition>> conditions;
     int brightness = NAN_VALUE;
 };
 

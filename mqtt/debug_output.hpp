@@ -30,6 +30,7 @@ struct DebugOutput {
         });
 
         bus.subscribe<TimeEvent>([&](const TimeEvent& e) {
+            // spdlog::info("{}: Ev Time   {}:{}", time2str(time), e.hour, e.minute);
             time = e.GetTime();
         });
     }

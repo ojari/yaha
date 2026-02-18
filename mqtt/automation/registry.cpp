@@ -52,6 +52,17 @@ void Registry::load(const std::string& filename, EventBus& evbus) {
                 if (it.key() != "name" &&
                     it.key() != "type")
                 {
+                    if (it.key() == "conditions") {
+                        for(auto condIt = it.value().begin(); condIt != it.value().end(); ++condIt) {
+                            if (condIt->contains("type")) {
+                                const std::string condType = (*condIt)["type"].get<std::string>();
+
+                                ctrl->setCondition(condType, *condIt);
+                            } else {
+                                spdlog::warn("Condition is missing 'type'");
+                            }
+                        }
+                    }
                     if (it.value().is_string()) {
                         ctrl->setArg(it.key(), it.value().get<std::string>());
                     } else if (it.value().is_number()) {

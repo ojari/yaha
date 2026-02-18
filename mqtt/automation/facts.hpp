@@ -16,7 +16,8 @@ struct Facts {
         DirtyOutsideTemp = 1u << 2,
         DirtyStorageTemp = 1u << 3,
         DirtyDownstairTemp = 1u << 4,
-        DirtyElectricityPrice = 1u << 5
+        DirtyElectricityPrice = 1u << 5,
+        DirtyDark = 1u << 6
     };
 
     /**
@@ -29,10 +30,21 @@ struct Facts {
      */
     [[nodiscard]] bool isDirty(std::uint32_t mask) const noexcept { return (dirtyFlags & mask) != 0u; }
 
+    [[nodiscard]] int getTime() const noexcept { return time; }
+
     void setTime(int value) noexcept {
         if (time != value) {
             time = value;
             dirtyFlags |= DirtyTime;
+        }
+    }
+
+    [[nodiscard]] bool isDark() const noexcept { return dark; }
+
+    void setDark(bool value) noexcept {
+        if (dark != value) {
+            dark = value;
+            dirtyFlags |= DirtyDark;
         }
     }
 
@@ -108,6 +120,7 @@ private:
     float storageTemp = 0.0;
     float downstairTemp = 0.0;
     float electricityPrice = 0.0;
+    bool dark = false;
 };
 
 }  // namespace automation
