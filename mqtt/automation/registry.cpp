@@ -15,7 +15,7 @@ namespace automation {
 
 namespace {
 
-using CreateFunc = std::shared_ptr<Automation>(*)(const std::string&, std::shared_ptr<IOutput>);
+using CreateFunc = std::shared_ptr<Automation>(*)(const std::string&, std::shared_ptr<IAutomationOutput>);
 
 struct AutomationDescriptor {
     const char* typeName;

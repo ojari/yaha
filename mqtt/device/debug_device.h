@@ -5,11 +5,10 @@
 
 namespace device {
 
-class DebugDevice : public Device, public IDeviceBoolOut {
+class DebugDevice : public Device {
 public:
     explicit DebugDevice(const std::string& name, EventBus& evbus) :
-        Device(name, evbus),
-        evbus(evbus)
+        Device(name, evbus)
     {}
 
     void onMessage(const std::string& _deviceName, nlohmann::json& payload) override {
@@ -72,17 +71,6 @@ public:
         }
     }
 
-    void send(IOutput& output, bool value) override {
-        std::string topic = "debug/" + deviceName + "/set";
-        std::string payload;
-        // payload.append(R"({"state": ")");
-        // payload.append(value ? "ON" : "OFF");
-        // payload.append("\"}");
-        output.send(topic, payload);
-    }
-
-private:
-    EventBus& evbus;
 };
 
 }  // namespace device

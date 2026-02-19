@@ -2,19 +2,7 @@
 #include <MQTTClient.h>
 #include "common.hpp"
 #include "task.hpp"
-#include "device/registry.hpp"
 #include "data/sourcesqlite.hpp"
-
-class DeviceMessageRouter : public IMessageRouter {
-public:
-    explicit DeviceMessageRouter(const std::string& filename, EventBus& evbus);
-
-    void route(const std::string& topic, const std::string& payload) override;
-
-private:
-    device::Registry deviceRegistry;
-};
-
 
 class BridgeMessageRouter : public IMessageRouter {
 public:

@@ -1,5 +1,6 @@
 #include <memory>
 #include <array>
+#include <nlohmann/json.hpp>
 
 #include <gtest/gtest.h>
 
@@ -31,11 +32,77 @@ struct TestOutput : public IOutput {
 
 TEST(LightsAutomationTest, TurnsOffOutsideWindow) {
     std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
-    automation::Lights lights(actuator, "test_dev", hm2time(10, 0), hm2time(20, 0));
+    automation::Lights lights(actuator, "test_dev");
+    nlohmann::json config = nlohmann::json::object({
+        {"conditions", nlohmann::json::array({
+            nlohmann::json::object({{"type", "time"}, {"on", 1000}, {"off", 2000}})
+        })}
+    });
+    lights.configure(config);
 
     lights.onEvent(TimeEvent(21, 0));
 
     EXPECT_FALSE(lights.get());
+}
+
+TEST(LightsAutomationTest, HandlesMultipleTimeRanges) {
+    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    automation::Lights lights(actuator, "test_dev");
+    nlohmann::json config = nlohmann::json::object({
+        {"conditions", nlohmann::json::array({
+            nlohmann::json::object({{"type", "time"}, {"on", 500}, {"off", 800}}),
+            nlohmann::json::object({{"type", "time"}, {"on", 1700}, {"off", 2000}})
+        })}
+    });
+    lights.configure(config);
+
+    lights.onEvent(TimeEvent(6, 30));
+    EXPECT_TRUE(lights.get());
+
+    lights.onEvent(TimeEvent(12, 0));
+    EXPECT_FALSE(lights.get());
+
+    lights.onEvent(TimeEvent(18, 0));
+    EXPECT_TRUE(lights.get());
+}
+
+TEST(LightsAutomationTest, DarknessConditionOverridesSchedules) {
+    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    automation::Lights lights(actuator, "test_dev");
+    nlohmann::json config = nlohmann::json::object({
+        {"conditions", nlohmann::json::array({
+            {{"type", "dark"}, {"when", "dark"}, {"requiredState", true}},
+            {{"type", "dark"}, {"when", "light"}, {"requiredState", false}}
+        })}
+    });
+    lights.configure(config);
+
+    lights.onEvent(DarkEvent(true));
+    EXPECT_TRUE(lights.get());
+
+    lights.onEvent(DarkEvent(false));
+    EXPECT_FALSE(lights.get());
+}
+
+TEST(LightsAutomationTest, ElectricityPriceCanDisableLight) {
+    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    automation::Lights lights(actuator, "test_dev");
+    nlohmann::json config = nlohmann::json::object({
+        {"conditions", nlohmann::json::array({
+            {{"type", "time"}, {"on", 0}, {"off", 2359}},
+            {{"type", "electricity"}, {"threshold", 0.3}, {"direction", "above"}, {"requiredState", false}}
+        })}
+    });
+    lights.configure(config);
+
+    lights.onEvent(TimeEvent(12, 0));
+    EXPECT_TRUE(lights.get());
+
+    lights.onEvent(ElectricityPriceEvent(0.35));
+    EXPECT_FALSE(lights.get());
+
+    lights.onEvent(ElectricityPriceEvent(0.25));
+    EXPECT_TRUE(lights.get());
 }
 
 TEST(SwitchModeZeroTest, TogglesOnButtonPress) {

@@ -4,7 +4,7 @@
 
 namespace automation {
 
-Lights::Lights(std::shared_ptr<IOutput> output, const std::string& name) :
+Lights::Lights(std::shared_ptr<IAutomationOutput> output, const std::string& name) :
     Automation(std::move(output), name)
 {
     initial_value(false);

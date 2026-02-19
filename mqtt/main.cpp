@@ -9,6 +9,8 @@
 #include "debug_output.hpp"
 #include "event_bus.hpp"
 #include "automation/registry.hpp"
+#include "automation/mqtt_output.hpp"
+#include "device/registry.hpp"
 #include "application.hpp"
 // #include <spdlog/sinks/basic_file_sink.h>
 #ifndef WIN32
@@ -84,11 +86,14 @@ int main(int argc, char* argv[]) {
 #ifdef DEBUG_TIME
     auto mqtt = std::make_shared<DebugMqtt>(evBus);
 #else
-    DeviceMessageRouter devRouter(devicesFile, evBus);
+    device::Registry deviceRegistry(evBus);
+    deviceRegistry.load(devicesFile);
+
     BridgeMessageRouter bridgeRouter;
-    auto mqtt = std::make_shared<Mqtt>(devRouter, bridgeRouter);
+    auto mqtt = std::make_shared<Mqtt>(deviceRegistry, bridgeRouter);
 #endif
-    automation::Registry automations(mqtt, evBus);
+    auto automationOutput = std::make_shared<automation::MqttAutomationOutput>(mqtt);
+    automation::Registry automations(automationOutput, evBus);
     task::SimpleCalcSun simpleCalcSun(evBus);
     DebugOutput debugOutput;
 

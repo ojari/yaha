@@ -19,8 +19,13 @@ enum AutomationType {
     ROOM_HEATER
 };
 
+struct IAutomationOutput {
+    virtual ~IAutomationOutput() = default;
+    virtual void sendCommand(const std::string& deviceName, const std::string& payload) = 0;
+};
+
 struct Automation {
-    Automation(std::shared_ptr<IOutput> output, const std::string& name) :
+    Automation(std::shared_ptr<IAutomationOutput> output, const std::string& name) :
         output(output),
         name(name)
     {}
@@ -70,7 +75,7 @@ protected:
     void send(bool value);
 
 private:
-    std::shared_ptr<IOutput> output;
+    std::shared_ptr<IAutomationOutput> output;
     std::variant<int, bool> state;
     bool verbose = false;
     std::string name;

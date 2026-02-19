@@ -22,7 +22,7 @@ int parseRelay(const std::string& name) {
     return std::stoi(name.substr(pos + 1));
 }
 
-class ShellyDevice : public Device, public IDeviceBoolOut {
+class ShellyDevice : public Device {
 public:
     explicit ShellyDevice(const std::string& name, EventBus& evbus) :
         Device(parseDeviceName(name), evbus),
@@ -54,14 +54,14 @@ public:
         */
     }
 
-    void send(IOutput& output, bool value) override {
+    /*void send(IOutput& output, bool value) override {
         std::string topic = deviceName + "/rpc";
         std::string payload;
         payload.append(R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":)");
         payload.append(value ? "true" : "false");
         payload.append("}}");
         output.send(topic, payload);
-    }
+    }*/
 
 private:
     bool state = false;

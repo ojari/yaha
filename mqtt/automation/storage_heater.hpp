@@ -7,7 +7,7 @@ namespace automation {
 
 class StorageHeater : public Automation {
 public:
-    explicit StorageHeater(std::shared_ptr<IOutput> output, const std::string& name) :
+    explicit StorageHeater(std::shared_ptr<IAutomationOutput> output, const std::string& name) :
         Automation(output, name)
     {
         initial_value(false);
@@ -21,7 +21,7 @@ public:
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IOutput> output)
+        std::shared_ptr<IAutomationOutput> output)
     {
         return std::make_shared<StorageHeater>(output, name);
     }

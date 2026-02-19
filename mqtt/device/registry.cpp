@@ -63,6 +63,28 @@ void Registry::load(const std::string& filename) {
     }
 }
 
+void Registry::route(const std::string& topic, const std::string& payload) {
+    auto device = getDevice(topic);
+    if (device) {
+        if (0) {
+            spdlog::info("Device: {} Payload: {}", topic, payload);
+        }
+        try {
+            nlohmann::json jsonPayload = nlohmann::json::parse(payload);
+            device->onMessage(topic, jsonPayload);
+        } catch (const nlohmann::json::parse_error& e) {
+            spdlog::error("Json parse error: {}", e.what());
+            spdlog::error("Device: {} Payload: {}", topic, payload);
+        } catch (const nlohmann::json::type_error& e) {
+            spdlog::error("Json type error: {}", e.what());
+            spdlog::error("Device: {} Payload: {}", topic, payload);
+        }
+    } else {
+        spdlog::error("Device not found for topic: {} Payload: {}", topic, payload);
+    }
+}
+
+
 /*bool Registry::subscribe(EventId eventId, IObserver& observer) {
     for (const auto& [name, device] : devices_) {
         if (device->hasEvent(eventId)) {

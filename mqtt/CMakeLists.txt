@@ -53,6 +53,7 @@ add_executable(${PROJECT_NAME}
   automation/facts.hpp
   automation/lights.cpp
   automation/lights.hpp
+  automation/mqtt_output.hpp
   automation/registry.cpp
   automation/registry.hpp
   automation/storage_heater.cpp

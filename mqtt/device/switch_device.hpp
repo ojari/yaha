@@ -1,11 +1,10 @@
 #pragma once
 #include <spdlog/spdlog.h>
 #include "device.hpp"
-#include "../config.hpp"
 
 namespace device {
 
-class SwitchDevice : public Device, public IDeviceBoolOut {
+class SwitchDevice : public Device {
 public:
     explicit SwitchDevice(const std::string& name, EventBus& evbus) :
         Device(name, evbus)
@@ -72,15 +71,6 @@ public:
             last_state = state;
             first_time = false;
         }
-    }
-
-    void send(IOutput& output, bool value) override {
-        std::string topic = std::string(MQTT_TOPIC) + "/" + deviceName + "/set";
-        std::string payload;
-        payload.append(R"({"state": ")");
-        payload.append(value ? "ON" : "OFF");
-        payload.append("\"}");
-        output.send(topic, payload);
     }
 
 private:

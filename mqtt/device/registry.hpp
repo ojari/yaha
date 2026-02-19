@@ -6,13 +6,17 @@
 
 namespace device {
 
-class Registry {
+class Registry : public IMessageRouter {
 public:
     explicit Registry(EventBus& evBus)
         : eventBus(evBus)
     {}
    
     void load(const std::string& filename);
+    void route(const std::string& topic, const std::string& payload) override;
+
+private:
+    EventBus& eventBus;
 
     std::shared_ptr<Device> getDevice(const std::string& name) {
         if (auto it = devices_.find(name); it != devices_.end()) {
@@ -20,11 +24,6 @@ public:
         }
         return nullptr;
     }
-
-    // bool subscribe(EventId eventId, IObserver& observer) override;
-
-private:
-    EventBus& eventBus;
 
     std::shared_ptr<Device> createDevice(
         const std::string& name,

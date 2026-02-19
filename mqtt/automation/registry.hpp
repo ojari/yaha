@@ -11,7 +11,7 @@ namespace automation {
 
 class Registry {
 public:
-    explicit Registry(std::shared_ptr<IOutput> output, EventBus& evbus) :
+    explicit Registry(std::shared_ptr<IAutomationOutput> output, EventBus& evbus) :
 		output{ output },
         eventBus{ evbus }
     {}
@@ -31,7 +31,7 @@ public:
 private:
     std::vector<std::shared_ptr<Automation>> controllers;
 	EventBus& eventBus;
-    std::shared_ptr<IOutput> output;
+    std::shared_ptr<IAutomationOutput> output;
 
     AutomationType toAutomationType(const std::string& typeStr);
 

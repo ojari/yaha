@@ -8,34 +8,6 @@
 #include "common.hpp"
 using json = nlohmann::json;
 
-DeviceMessageRouter::DeviceMessageRouter(const std::string& filename, EventBus& evbus) :
-    deviceRegistry(evbus)
-{
-	deviceRegistry.load(filename);
-}
-
-
-void DeviceMessageRouter::route(const std::string& deviceName, const std::string& payload) {
-    std::shared_ptr<device::Device> device = deviceRegistry.getDevice(deviceName);
-    if (device) {
-        if (0) {
-            spdlog::info("Device: {} Payload: {}", deviceName, payload);
-        }
-
-        try {
-            json jsonPayload = json::parse(payload);
-            device->onMessage(deviceName, jsonPayload);
-        } catch (const nlohmann::json::parse_error& e) {
-            spdlog::error("Json parse error: {}", e.what());
-            spdlog::error("Device: {} Payload: {}", deviceName, payload);
-        } catch (const nlohmann::json::type_error& e) {
-            spdlog::error("Json type error: {}", e.what());
-            spdlog::error("Device: {} Payload: {}", deviceName, payload);
-        }
-    } else {
-        spdlog::error("Missing topic: {} Payload: {}", deviceName, payload);
-    }
-}
 
 void BridgeMessageRouter::route(const std::string& topic, const std::string& payload) {
 #if 0

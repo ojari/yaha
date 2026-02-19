@@ -1,11 +1,10 @@
 #pragma once
 #include <spdlog/spdlog.h>
-#include "../config.hpp"
 #include "device.hpp"
 
 namespace device {
 
-class LightDevice : public Device, public IDeviceLightOut {
+class LightDevice : public Device {
 public:
     explicit LightDevice(const std::string& name, EventBus& evbus) :
         Device(name, evbus)
@@ -26,17 +25,6 @@ public:
         } else {
             evbus.publish(LampEvent(deviceName, brightness));
         }
-    }
-
-    void send(IOutput& output, bool value, int newBrightness) override {
-        std::string topic = std::string(MQTT_TOPIC) + "/" + deviceName + "/set";
-        std::string payload;
-        payload.append(R"({"state": ")");
-        payload.append(value ? "ON" : "OFF");
-        payload.append(R"(", "brightness": )");
-        payload.append(std::to_string(newBrightness));
-        payload.append("}");
-        output.send(topic, payload);
     }
 
 private:

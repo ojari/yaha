@@ -27,12 +27,4 @@ protected:
 	EventBus& evbus;
 };
 
-struct IDeviceBoolOut {
-    virtual void send(IOutput& output, bool value) = 0;
-};
-
-struct IDeviceLightOut {
-    virtual void send(IOutput& output, bool state, int brightness) = 0;
-};
-
 }  // namespace device

@@ -54,7 +54,7 @@ public:
         bool above;
     };
 
-    Lights(std::shared_ptr<IOutput> output, const std::string& name);
+    Lights(std::shared_ptr<IAutomationOutput> output, const std::string& name);
 
     void setCondition(const std::string &type, const nlohmann::json& data);
     void setArg(const std::string& name, const std::string& value) override;
@@ -63,16 +63,16 @@ public:
 
     static std::shared_ptr<Automation> create(
         const std::string& name,
-        std::shared_ptr<IOutput> output)
+        std::shared_ptr<IAutomationOutput> output)
     {
         return std::make_shared<Lights>(output, name);
     }
-
-private:
     void onEvent(const TimeEvent& event);
     void onEvent(const DateEvent& event);
     void onEvent(const DarkEvent& event);
     void onEvent(const ElectricityPriceEvent& event);
+
+private:
 
     void updateState();
 
