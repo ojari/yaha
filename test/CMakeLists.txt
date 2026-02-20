@@ -1,6 +1,7 @@
 
 include(../setup.cmake)
 
+enable_testing()
 cmake_minimum_required(VERSION 3.10)
 
 project(utest)
@@ -21,6 +22,7 @@ add_executable(${PROJECT_NAME}
   test_shelly.cpp
   test_light_device.cpp
   test_switch_device.cpp
+    test_mqtt_output.cpp
   test_task_calc_sun_reference.cpp
 
   ../mqtt/common.cpp
@@ -32,6 +34,7 @@ add_executable(${PROJECT_NAME}
   ../mqtt/automation/switch_light.cpp
   ../mqtt/automation/car_heater.cpp
   ../mqtt/automation/automation.cpp
+  ../mqtt/device/registry.cpp
   ../mqtt/data/tables.cpp
 )
 

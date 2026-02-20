@@ -54,14 +54,14 @@ void SwitchLight::onLamp(int brightness)
     initial_value(brightness);
 }
 
-std::string SwitchLight::toString() {
-    std::string str_value = (getInt() != 0) ? "ON" : "OFF";
-    std::string result = "{\"state\": \"" + str_value + "\"";
-    if (get() && brightness != NAN_VALUE) {
-        result += ", \"brightness\": " + std::to_string(brightness);
+IAutomationOutput::CommandValues SwitchLight::commandValues() const {
+    IAutomationOutput::CommandValues values;
+    const int current = getInt();
+    values.on = current != 0;
+    if (values.on) {
+        values.brightness = current;
     }
-    result += "}";
-    return result;
+    return values;
 }
 
 

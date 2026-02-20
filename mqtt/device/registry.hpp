@@ -15,6 +15,13 @@ public:
     void load(const std::string& filename);
     void route(const std::string& topic, const std::string& payload) override;
 
+    std::shared_ptr<Device> getByName(const std::string& name) const {
+        if (auto it = devices_.find(name); it != devices_.end()) {
+            return it->second;
+        }
+        return nullptr;
+    }
+
 private:
     EventBus& eventBus;
 
@@ -29,6 +36,7 @@ private:
         const std::string& name,
         const std::string& type,
         EventBus& eventBus) const;
+
     std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 };
 

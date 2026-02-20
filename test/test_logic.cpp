@@ -8,14 +8,17 @@
 #include "../mqtt/automation/switch_light.hpp"
 #include "../mqtt/automation/car_heater.hpp"
 #include "../mqtt/common.hpp"
+#include "../mqtt/automation/automation.hpp"
 
-struct TestOutput : public IOutput {
-    void send(std::string_view device, const std::string& value) override {
-        //lastDevice = device;
-        //lastValue = value;
+struct TestOutput : public automation::IAutomationOutput {
+    void sendCommand(const std::string& deviceName, const automation::IAutomationOutput::CommandValues& values) override {
+        lastDevice = deviceName;
+        last_state = values.on;
     }
 
-    //std::string lastDevice;
+    std::string lastDevice;
+    bool last_state{ false };
+    int last_brightness{ 0 };
     //std::string lastValue;
 };
 
@@ -31,30 +34,23 @@ struct TestOutput : public IOutput {
 */
 
 TEST(LightsAutomationTest, TurnsOffOutsideWindow) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::Lights lights(actuator, "test_dev");
-    nlohmann::json config = nlohmann::json::object({
-        {"conditions", nlohmann::json::array({
-            nlohmann::json::object({{"type", "time"}, {"on", 1000}, {"off", 2000}})
-        })}
-    });
-    lights.configure(config);
+    lights.setCondition("time", nlohmann::json::object({ {"type", "time"}, {"on", 1000}, {"off", 2000} }));
 
     lights.onEvent(TimeEvent(21, 0));
-
     EXPECT_FALSE(lights.get());
+
+    lights.onEvent(TimeEvent(19, 59));
+    EXPECT_TRUE(lights.get());
 }
 
 TEST(LightsAutomationTest, HandlesMultipleTimeRanges) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::Lights lights(actuator, "test_dev");
-    nlohmann::json config = nlohmann::json::object({
-        {"conditions", nlohmann::json::array({
-            nlohmann::json::object({{"type", "time"}, {"on", 500}, {"off", 800}}),
-            nlohmann::json::object({{"type", "time"}, {"on", 1700}, {"off", 2000}})
-        })}
-    });
-    lights.configure(config);
+
+    lights.setCondition("time", nlohmann::json::object({ {"type", "time"}, {"on", 500}, {"off", 800} }));
+    lights.setCondition("time", nlohmann::json::object({ {"type", "time"}, {"on", 1700}, {"off", 2000} }));
 
     lights.onEvent(TimeEvent(6, 30));
     EXPECT_TRUE(lights.get());
@@ -67,15 +63,10 @@ TEST(LightsAutomationTest, HandlesMultipleTimeRanges) {
 }
 
 TEST(LightsAutomationTest, DarknessConditionOverridesSchedules) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::Lights lights(actuator, "test_dev");
-    nlohmann::json config = nlohmann::json::object({
-        {"conditions", nlohmann::json::array({
-            {{"type", "dark"}, {"when", "dark"}, {"requiredState", true}},
-            {{"type", "dark"}, {"when", "light"}, {"requiredState", false}}
-        })}
-    });
-    lights.configure(config);
+
+    lights.setCondition("dark", nlohmann::json::object({ {"when", "dark"} }));
 
     lights.onEvent(DarkEvent(true));
     EXPECT_TRUE(lights.get());
@@ -85,15 +76,11 @@ TEST(LightsAutomationTest, DarknessConditionOverridesSchedules) {
 }
 
 TEST(LightsAutomationTest, ElectricityPriceCanDisableLight) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::Lights lights(actuator, "test_dev");
-    nlohmann::json config = nlohmann::json::object({
-        {"conditions", nlohmann::json::array({
-            {{"type", "time"}, {"on", 0}, {"off", 2359}},
-            {{"type", "electricity"}, {"threshold", 0.3}, {"direction", "above"}, {"requiredState", false}}
-        })}
-    });
-    lights.configure(config);
+
+    lights.setCondition("time", nlohmann::json::object({ {"on", 0},  {"off", 2300} }));
+    lights.setCondition("electricity", nlohmann::json::object({ {"type", "electricity"}, {"threshold", 0.3}, {"direction", "above"}, {"requiredState", false} }));
 
     lights.onEvent(TimeEvent(12, 0));
     EXPECT_TRUE(lights.get());
@@ -106,7 +93,7 @@ TEST(LightsAutomationTest, ElectricityPriceCanDisableLight) {
 }
 
 TEST(SwitchModeZeroTest, TogglesOnButtonPress) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "0");
     sw.setArg("brightness", "64");
@@ -119,7 +106,7 @@ TEST(SwitchModeZeroTest, TogglesOnButtonPress) {
 }
 
 TEST(SwitchModeOneTest, TogglesWithBrightness) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "1");
     sw.setArg("brightness", "64");
@@ -133,7 +120,7 @@ TEST(SwitchModeOneTest, TogglesWithBrightness) {
 }
 
 TEST(SwitchModeTwoTest, TurnsOnWithCustomBrightness) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "2");
     sw.setArg("brightness", "40");
@@ -145,7 +132,7 @@ TEST(SwitchModeTwoTest, TurnsOnWithCustomBrightness) {
 }
 
 TEST(SwitchModeTwoTest, TurnsOffOnButtonRelease) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("mode", "2");
 
@@ -155,7 +142,7 @@ TEST(SwitchModeTwoTest, TurnsOffOnButtonRelease) {
 }
 
 TEST(SwitchMemoryTest, RemembersLastLampValue) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     automation::SwitchLight sw(actuator, "test_dev");
     sw.setArg("event", "Button Living Room");
     sw.setArg("eventLamp", "Lamp Living Room");
@@ -175,7 +162,7 @@ TEST(SwitchMemoryTest, RemembersLastLampValue) {
 }
 
 TEST(CarHeaterTest, ActivatesBasedOnTemperatureOffsets) {
-    std::shared_ptr<IOutput> actuator = std::make_shared<TestOutput>();
+    auto actuator = std::make_shared<TestOutput>();
     const int leaveTime = hm2time(10, 0);
     automation::CarHeater heater(actuator, "tmp_dev", leaveTime);
 

@@ -23,13 +23,13 @@ struct MockListener {
 TEST(LightDeviceTest, ConstructionSendsOnCommand) {
     EventBus evbus;
     LightDevice device("bedroom_light", evbus);
-    MockOutput output;
 
-    device.send(output, true, 100);
+    const std::string topic = device.buildCommandTopic();
+    const std::string payload = device.buildCommandPayload(true, 100);
 
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/bedroom_light/set");
-    EXPECT_NE(output.lastPayload.find("\"state\": \"ON\""), std::string::npos);
-    EXPECT_NE(output.lastPayload.find("\"brightness\": 100"), std::string::npos);
+    EXPECT_EQ(topic, "zigbee2mqtt/bedroom_light/set");
+    EXPECT_NE(payload.find("\"state\": \"ON\""), std::string::npos);
+    EXPECT_NE(payload.find("\"brightness\": 100"), std::string::npos);
 }
 
 TEST(LightDeviceOnMessageTest, ProcessesOnStateWithBrightness) {
@@ -86,28 +86,19 @@ TEST(LightDeviceOnMessageTest, ProcessesFalseState) {
 TEST(LightDeviceSendTest, SendsOnCommandVariants) {
     EventBus evbus;
     LightDevice device("kitchen_light", evbus);
-    MockOutput output;
 
-    device.send(output, true, 100);
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/kitchen_light/set");
-    EXPECT_EQ(output.lastPayload, R"({"state": "ON", "brightness": 100})");
-
-    device.send(output, true, 255);
-    EXPECT_EQ(output.lastPayload, R"({"state": "ON", "brightness": 255})");
-
-    device.send(output, true, 10);
-    EXPECT_EQ(output.lastPayload, R"({"state": "ON", "brightness": 10})");
+    EXPECT_EQ(device.buildCommandTopic(), "zigbee2mqtt/kitchen_light/set");
+    EXPECT_EQ(device.buildCommandPayload(true, 100), R"({"state": "ON", "brightness": 100})");
+    EXPECT_EQ(device.buildCommandPayload(true, 255), R"({"state": "ON", "brightness": 255})");
+    EXPECT_EQ(device.buildCommandPayload(true, 10), R"({"state": "ON", "brightness": 10})");
 }
 
 TEST(LightDeviceSendTest, SendsOffCommand) {
     EventBus evbus;
     LightDevice device("kitchen_light", evbus);
-    MockOutput output;
 
-    device.send(output, false, 0);
-
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/kitchen_light/set");
-    EXPECT_EQ(output.lastPayload, R"({"state": "OFF", "brightness": 0})");
+    EXPECT_EQ(device.buildCommandTopic(), "zigbee2mqtt/kitchen_light/set");
+    EXPECT_EQ(device.buildCommandPayload(false, 0), R"({"state": "OFF", "brightness": 0})");
 }
 
 TEST(LightDeviceEdgeCaseTest, ThrowsWhenMissingBrightness) {
@@ -135,14 +126,10 @@ TEST(LightDeviceEdgeCaseTest, ThrowsWhenMissingState) {
 TEST(LightDeviceEdgeCaseTest, SendsWithOutOfRangeBrightness) {
     EventBus evbus;
     LightDevice device("living_light", evbus);
-    MockOutput output;
 
-    device.send(output, true, -10);
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/living_light/set");
-    EXPECT_EQ(output.lastPayload, R"({"state": "ON", "brightness": -10})");
-
-    device.send(output, true, 1000);
-    EXPECT_EQ(output.lastPayload, R"({"state": "ON", "brightness": 1000})");
+    EXPECT_EQ(device.buildCommandTopic(), "zigbee2mqtt/living_light/set");
+    EXPECT_EQ(device.buildCommandPayload(true, -10), R"({"state": "ON", "brightness": -10})");
+    EXPECT_EQ(device.buildCommandPayload(true, 1000), R"({"state": "ON", "brightness": 1000})");
 }
 
 TEST(LightDeviceExtendedTest, ProcessesOnStateWithZeroBrightness) {

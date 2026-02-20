@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <optional>
 #include <string>
 #include <variant>
 #include "../common.hpp"
@@ -21,7 +22,12 @@ enum AutomationType {
 
 struct IAutomationOutput {
     virtual ~IAutomationOutput() = default;
-    virtual void sendCommand(const std::string& deviceName, const std::string& payload) = 0;
+    struct CommandValues {
+        bool on = false;
+        std::optional<int> brightness = std::nullopt;
+    };
+
+    virtual void sendCommand(const std::string& deviceName, const CommandValues& values) = 0;
 };
 
 struct Automation {
@@ -38,10 +44,8 @@ struct Automation {
 
     virtual void registerEvents(EventBus& evbus) = 0;
 
-    virtual std::string toString() {
-        std::string str_value = get() ? "ON" : "OFF";
-        std::string result = "{\"state\": \"" + str_value + "\"}";
-        return result;
+    virtual IAutomationOutput::CommandValues commandValues() const {
+        return { get(), std::nullopt };
     }
 
     bool get() const {

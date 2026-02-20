@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <spdlog/spdlog.h>
 #include "device.hpp"
 
@@ -6,7 +7,7 @@ namespace device {
 
 /** The name is formatted like <devicename>:<relay number>
  */
-std::string parseDeviceName(const std::string& name) {
+inline std::string parseDeviceName(const std::string& name) {
     size_t pos = name.find(':');
     if (pos == std::string::npos) {
         return name;
@@ -14,7 +15,7 @@ std::string parseDeviceName(const std::string& name) {
     return name.substr(0, pos);
 }
 
-int parseRelay(const std::string& name) {
+inline int parseRelay(const std::string& name) {
     size_t pos = name.find(':');
     if (pos == std::string::npos) {
         return 0;
@@ -52,6 +53,23 @@ public:
 
         notifyValue((int)state);
         */
+    }
+
+    std::string buildCommandTopic() const override {
+        return deviceName + "/rpc";
+    }
+
+    std::string buildCommandPayload(
+        bool on,
+        std::optional<int> brightness = std::nullopt) const override
+    {
+        std::string payload;
+        payload.append(R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":)");
+        payload.append(std::to_string(relay));
+        payload.append(R"(, "on":)");
+        payload.append(on ? "true" : "false");
+        payload.append("}}");
+        return payload;
     }
 
     /*void send(IOutput& output, bool value) override {

@@ -95,23 +95,17 @@ TEST(SwitchDeviceActionTest, IgnoresNullActions) {
 TEST(SwitchDeviceSendTest, PublishesOnPayload) {
     EventBus evbus;
     SwitchDevice device("test_switch", evbus);
-    MockOutput output;
 
-    device.send(output, true);
-
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/test_switch/set");
-    EXPECT_EQ(output.lastPayload, "{\"state\": \"ON\"}");
+    EXPECT_EQ(device.buildCommandTopic(), "zigbee2mqtt/test_switch/set");
+    EXPECT_EQ(device.buildCommandPayload(true), "{\"state\": \"ON\"}");
 }
 
 TEST(SwitchDeviceSendTest, PublishesOffPayload) {
     EventBus evbus;
     SwitchDevice device("test_switch", evbus);
-    MockOutput output;
 
-    device.send(output, false);
-
-    EXPECT_EQ(output.lastTopic, "zigbee2mqtt/test_switch/set");
-    EXPECT_EQ(output.lastPayload, "{\"state\": \"OFF\"}");
+    EXPECT_EQ(device.buildCommandTopic(), "zigbee2mqtt/test_switch/set");
+    EXPECT_EQ(device.buildCommandPayload(false), "{\"state\": \"OFF\"}");
 }
 
 TEST(SwitchDeviceActionTest, ExposesKnownBug) {

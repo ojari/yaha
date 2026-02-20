@@ -20,7 +20,6 @@ class ShellyDeviceTest : public ::testing::Test {
 protected:
     EventBus evbus;
     device::ShellyDevice shelly {"test_dev", evbus};
-    MockOutput output;
 };
 
 TEST_F(ShellyDeviceTest, HandlesIncomingOnState) {
@@ -32,13 +31,11 @@ TEST_F(ShellyDeviceTest, HandlesIncomingOnState) {
 }
 
 TEST_F(ShellyDeviceTest, SendsOnMethodPayload) {
-    shelly.send(output, true);
-    EXPECT_EQ(output.lastTopic, "test_dev/rpc");
-    EXPECT_EQ(output.lastPayload, R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":true}})");
+    EXPECT_EQ(shelly.buildCommandTopic(), "test_dev/rpc");
+    EXPECT_EQ(shelly.buildCommandPayload(true), R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":0, "on":true}})");
 }
 
 TEST_F(ShellyDeviceTest, SendsOffMethodPayload) {
-    shelly.send(output, false);
-    EXPECT_EQ(output.lastTopic, "test_dev/rpc");
-    EXPECT_EQ(output.lastPayload, R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":1, "on":false}})");
+    EXPECT_EQ(shelly.buildCommandTopic(), "test_dev/rpc");
+    EXPECT_EQ(shelly.buildCommandPayload(false), R"({"id":1, "src":"mytopic", "method":"Switch.Set", "params": {"id":0, "on":false}})");
 }

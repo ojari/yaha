@@ -83,16 +83,18 @@ int main(int argc, char* argv[]) {
     // initialize system
     //
     EventBus evBus;
+    const device::Registry* automationDeviceRegistry = nullptr;
 #ifdef DEBUG_TIME
     auto mqtt = std::make_shared<DebugMqtt>(evBus);
 #else
     device::Registry deviceRegistry(evBus);
     deviceRegistry.load(devicesFile);
+    automationDeviceRegistry = &deviceRegistry;
 
     BridgeMessageRouter bridgeRouter;
     auto mqtt = std::make_shared<Mqtt>(deviceRegistry, bridgeRouter);
 #endif
-    auto automationOutput = std::make_shared<automation::MqttAutomationOutput>(mqtt);
+    auto automationOutput = std::make_shared<automation::MqttAutomationOutput>(mqtt, automationDeviceRegistry);
     automation::Registry automations(automationOutput, evBus);
     task::SimpleCalcSun simpleCalcSun(evBus);
     DebugOutput debugOutput;

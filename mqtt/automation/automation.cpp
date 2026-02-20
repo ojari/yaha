@@ -14,7 +14,7 @@ void Automation::initial_value(bool value) {
 void Automation::send(int value) {
     if (value != std::get<int>(state)) {
         state = value;
-        output->sendCommand(name, toString());
+        output->sendCommand(name, commandValues());
         if (verbose) {
             spdlog::info("{} changed to {}", name, value);
         }
@@ -24,7 +24,7 @@ void Automation::send(int value) {
 void Automation::send(bool value) {
     if (value != std::get<bool>(state)) {
         state = value;
-        output->sendCommand(name, toString());
+        output->sendCommand(name, commandValues());
         if (verbose) {
             spdlog::info("{} changed to {}", name, value);
         }

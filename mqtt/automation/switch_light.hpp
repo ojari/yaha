@@ -14,7 +14,7 @@ struct SwitchLight : public Automation {
 
     void setArg(const std::string& name, const std::string& value) override;
 
-    std::string toString() override;
+    IAutomationOutput::CommandValues commandValues() const override;
 
     void registerEvents(EventBus& evbus) override {
         evbus.subscribe<SwitchEvent>([&](const SwitchEvent& e) {
