@@ -1,0 +1,194 @@
+@startuml
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+' Interfaces
+interface ITask {
+  +initialize(): void
+  +execute() <<abstract>>
+}
+
+interface IObservableTask {
+  +isValidEvent(EventId eventId) <<abstract>>
+}
+ITask <|-- IObservableTask
+
+
+interface IOutput {
+  +send(topic: string_view, message: string): void
+}
+
+interface IObserver {
+  +onChange(value: IEventData): void
+}
+
+interface IEventManager {
+  +subscribe(EventId, IObserver): bool
+}
+
+interface IEventData {
+  +id(): EventId
+  +getInt(default_val: int): int
+  +getFloat(): float
+  +isInt(): bool
+  +name(): string
+  +setv(item: IEventData): void
+  +set(value: int): bool
+  +set(value: float): void
+}
+
+' Core Classes
+class Mqtt {
+  -client: MQTTClient
+  +Mqtt(filename)
+  +execute()
+  +send(topic, message)
+  +getEventManager(): IEventManager*
+}
+
+class TaskManager {
+  -temperature: task::TaskTemperature
+  -time: task::TaskTime
+  -price: task::TaskCalcPrice
+  +initialize(): void
+  +execute(): void
+  +subscribe(EventId, IObserver): bool
+}
+
+class EventData {
+  -type: EventId
+  -value: variant<int, float>
+  -isInteger: bool
+  +id(): EventId
+  +getInt(default_val: int): int
+  +getFloat(): float
+  +isInt(): bool
+  +name(): string
+  +setv(IEventData)
+  +set(value): bool
+}
+
+class Observable {
+  -observers: vector<IObserver>
+  +notify(IEventData)
+  +subscribe(IObserver)
+  +unsubscribe(IObserver)
+}
+
+class MessageRouter {
+  +route(deviceName, payload)
+  +bridge_msg(topic, payload)
+}
+MessageRouter *- Registry
+
+class Application {
+  -loop: uv_loop_t
+  +Application()
+  +~Application()
+  +run()
+  +getLoop(): uv_loop_t*
+}
+
+class TimerBase {
+  #timer: uv_timer_t
+  +onTimer(): void <<abstract>>
+}
+
+class TimerSlow {
+  -vector<ITask> tasks
+}
+
+class LoadAverageReader {
+}
+ITask <|-- LoadAverageReader
+TimerSlow *- LoadAverageReader
+
+class MemoryUsageReader {
+}
+ITask <|-- MemoryUsageReader
+TimerSlow *- MemoryUsageReader: uses >
+
+class ProcessMemoryReader {
+}
+ITask <|-- ProcessMemoryReader
+TimerSlow *- ProcessMemoryReader: uses >
+
+class TimerFast {
+  -taskManager: TaskManager
+}
+
+class History {
+  -history: SourceSqlite
+  -table: TableHistory
+  +History(history: SourceSqlite)
+  +onChange(value: IEventData)
+  +registerEvents(IEventManager)
+}
+
+class DebugOutput {
+  -time: int
+  +onChange(value: IEventData)
+  +registerEvents(IEventManager)
+}
+
+class TaskCalcPrice {
+  -price: EventData
+}
+IObservableTask <|-- TaskCalcPrice
+Observable <|-- TaskCalcPrice
+
+class TaskTemperature {
+  -temperature: EventData
+}
+IObservableTask <|-- TaskTemperature
+Observable <|-- TaskTemperature
+
+class TaskTime {
+  -time: EventData
+}
+IObservableTask <|-- TaskTime
+Observable <|-- TaskTime
+
+class Device {
+  -eventData: EventData
+  +on_message(): void <<abstract>>
+
+}
+Observable <|-- Device
+
+class LightDevice {
+
+}
+Device <|-- LightDevice
+class SwitchDevice {
+
+}
+Device <|-- SwitchDevice
+
+class Registry {
+  -devices: map<string, Device>
+}
+IEventManager <|-- Registry
+Registry *- Device
+
+' Relationships
+ITask <|-- Mqtt
+IOutput <|-- Mqtt
+IEventManager <|-- TaskManager
+
+IObserver <|-- History
+IObserver <|-- DebugOutput
+
+TimerBase <|-- TimerSlow
+TimerBase <|-- TimerFast
+
+Mqtt --> MessageRouter
+Mqtt --> Registry
+
+TimerFast --> TaskManager
+
+IEventData <|.. EventData
+
+' Associations
+Application -- TimerBase: creates >
+
+@enduml
